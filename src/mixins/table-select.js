@@ -16,6 +16,10 @@ export default {
       type: String,
       default: 'doccode'
     },
+    onePageShowPagination: {
+      type: Boolean,
+      default: true
+    },
     pageSizes: {
       type: Array,
       default: () => ([20, 50, 100])
@@ -45,7 +49,7 @@ export default {
   },
   computed: {
     show() {
-      return !!this.page_total && this.page_total > this.pageSizes[0]
+      return this.onePageShowPagination || (!!this.page_total && this.page_total > this.pageSizes[0])
     },
     multiple() {
       return Array.isArray(this.value)
@@ -169,25 +173,6 @@ export default {
         })
       }
     },
-    // 请求表格数据
-    // async request_data() {
-    //   this.loading = true
-
-    //   const res = await this.request(this.page_no, this.page_size, this.data)
-    //   this.loading = false
-    //   if (res && res.data) {
-    //     this.data = res.data
-    //     this.page_total = res.total
-
-    //     this.$nextTick(() => {
-    //       this.fill_data(this.value, true)
-    //       if (this.$refs.table) {
-    //         this.$refs.table.bodyWrapper.scrollTop = 0
-    //         this.calc()
-    //       }
-    //     })
-    //   }
-    // },
     /** 刷新表格数据（对外）
      * params.keep 是否停留在分页状态
      */

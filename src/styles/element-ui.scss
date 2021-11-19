@@ -105,7 +105,8 @@
 }
 
 // 表头背景样色
-.el-table th {
+.el-table th,
+.el-table th.el-table__cell{
   background-color: #8A8F90;
 }
 

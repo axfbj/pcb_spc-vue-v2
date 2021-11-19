@@ -1,6 +1,6 @@
 import axios from 'axios'
 import helper from './helper'
-const qs = require('querystring')
+// const qs = require('querystring')
 
 // console.log( process.env.NODE_ENV)
 // 判断环境提供baseURL，注意要与后台地址一致
@@ -8,14 +8,14 @@ const root = process.env.NODE_ENV === 'development'
   // 开发环境api接口
   ? `http://192.168.1.245:8888/`
   // 生产环境api接口
-  : `http://127.0.0.1:3001/api`
+  : `http://127.0.0.1:8888`
 // 引用axios，设置头文件
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 axios.defaults.headers.post['Content-Type'] = 'application/json' // raw 格式
 
 function apiAxios(method, url, params, token) {
-  console.log(params)
-  console.log(qs.stringify(params))
+  // console.log(params)
+  // console.log(qs.stringify(params))
   return axios({
     method: method,
     // 拼接参数

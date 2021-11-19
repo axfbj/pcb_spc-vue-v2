@@ -23,58 +23,9 @@
             @mousedown="line_down($event)"
           />
         </div>
-        <!-- @mouseup="line_up($event)" -->
         <div style="height: 100%; overflow: auto;">
           <slot name="footer" />
         </div>
-      </div>
-    </div>
-
-    <div v-if="$slots.table" ref="layout_table" class="layout-table" :style="{height: !!fixedHeight ? (typeof fixedHeight ==='string' ? fixedHeight : 'auto') : (typeof content_height === 'string' ? content_height : content_height + 'px') }">
-      <el-table
-        ref="table"
-        v-loading="loading"
-        :data="data"
-        :max-height="!!fixedHeight && typeof(fixedHeight) === 'number' ? fixedHeight : 'none'"
-        :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : undefined) : table_height"
-        size="mini"
-        border
-        stripe
-        fit
-        :highlight-current-row="highlight_current_row"
-        :current-row-key="unique"
-        :row-key="unique"
-        :summary-method="summaryMethod"
-        :show-summary="showSummary"
-        @row-click="row_click"
-        @select="select"
-        @select-all="select_all"
-        @selection-change="selection_change"
-        @sort-change="sort_change"
-      >
-        <el-table-column
-          v-if="multiple"
-          type="selection"
-          width="55"
-          align="center"
-          fixed="left"
-        />
-        <slot name="table" />
-
-      </el-table>
-
-      <div v-if="show" class="table-pagination" :style="{bottom: table_pagination_bottom}">
-        <el-pagination
-          ref="pagination"
-          :current-page="page_no"
-          :page-sizes="pageSizes"
-          :page-size="pageSizes[0]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="page_total"
-          :pager-count="5"
-          @size-change="size_change"
-          @current-change="pagination_current_change"
-        />
       </div>
     </div>
     <slot />
@@ -195,7 +146,6 @@ export default {
         dv.style.cursor = 'default'
         this.move_num += parseFloat(dv.style.top)
         const fh = this.move_num > 0 ? '-' : '+'
-        // console.log(`calc(${this.footerHeight} ${fh} ${Math.abs(this.move_num)}px)`)
         this.footer_height = `calc(${this.footerHeight} ${fh} ${Math.abs(this.move_num)}px)`
         dv.style.top = 0
         this.$store.dispatch('trigger/changeRandom')
@@ -253,19 +203,19 @@ export default {
           content_height2 = content_height - this.$refs.footer.clientHeight
         }
       }
-      if (this.show) {
-        table_height = content_height - this.$refs.pagination.$el.clientHeight
-      } else {
-        table_height = content_height
-      }
+      // if (this.show) {
+      //   table_height = content_height - this.$refs.pagination.$el.clientHeight
+      // } else {
+      //   table_height = content_height
+      // }
       if (this.$refs.main_footer) {
-        table_height -= this.$refs.main_footer.clientHeight
-        this.table_pagination_bottom = this.$refs.main_footer.clientHeight + 'px'
+        // table_height -= this.$refs.main_footer.clientHeight
+        // this.table_pagination_bottom = this.$refs.main_footer.clientHeight + 'px'
       }
       this.$nextTick(() => {
         this.content_height = content_height
         this.content_height2 = content_height2
-        this.table_height = table_height
+        // this.table_height = table_height
       })
     }
   }

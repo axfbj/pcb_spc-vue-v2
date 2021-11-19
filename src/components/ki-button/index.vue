@@ -32,6 +32,7 @@ export default {
       if (this.autoLoading) {
         this.loadingStatus = true
       }
+      console.log('this.$listeners', this.$listeners)
       this.$emit('click', () => {
         this.loadingStatus = false
       })

@@ -48,21 +48,25 @@ Vue.config.productionTip = false
 import ContainerLayout from '@/components/container-layout'
 import ContainerTitle from '@/components/container-title'
 import DynamicTable from '@/components/dynamic-table'
+import DialogLayout from '@/components/dialog-layout'
+import ElReference from '@/components/el-reference'
 import KiButton from '@/components/ki-button'
 
 Vue.use((Vue) => {
   Vue.component('container-layout', ContainerLayout)
   Vue.component('container-title', ContainerTitle)
   Vue.component('dynamic-table', DynamicTable)
+  Vue.component('dialog-layout', DialogLayout)
+  Vue.component('el-reference', ElReference)
   Vue.component('ki-button', KiButton)
 })
-import http from '@/utils/http'
-http.post('/spc/hierarchicalType/list', {
-  page: '1',
-  limit: '10',
-  sidx: 'id',
-  order: 'desc'
-})
+// import http from '@/utils/http'
+// http.post('/spc/hierarchicalType/list', {
+//   page: '1',
+//   limit: '10',
+//   sidx: 'id',
+//   order: 'desc'
+// })
 // post('/spc/hierarchicalType/list', {})
 
 new Vue({

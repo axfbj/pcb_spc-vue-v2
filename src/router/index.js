@@ -79,7 +79,7 @@ export const constantRoutes = [
         path: 'dashboard',
         component: () => import('@/views/dashboard/index'),
         name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', affix: true }
+        meta: { title: '首页', icon: 'dashboard', affix: true }
       }
     ]
   }
@@ -136,7 +136,7 @@ export const asyncRoutes = [
     alwaysShow: true, // will always show the root menu
     name: 'Permission',
     meta: {
-      title: 'permission',
+      title: '权限管理',
       icon: 'lock',
       roles: ['admin', 'editor'] // you can set roles in root nav
     },
@@ -146,7 +146,7 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/page'),
         name: 'PagePermission',
         meta: {
-          title: 'pagePermission',
+          title: '页面权限',
           roles: ['admin'] // or you can only set roles in sub nav
         }
       },
@@ -155,7 +155,7 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/directive'),
         name: 'DirectivePermission',
         meta: {
-          title: 'directivePermission'
+          title: '指令权限'
           // if do not set roles, means: this page does not require permission
         }
       },
@@ -164,7 +164,7 @@ export const asyncRoutes = [
         component: () => import('@/views/permission/role'),
         name: 'RolePermission',
         meta: {
-          title: 'rolePermission',
+          title: '角色权限',
           roles: ['admin']
         }
       }
@@ -176,11 +176,10 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/permission/page',
     alwaysShow: true, // will always show the root menu
-    name: 'Permission',
+    name: 'StatisticalProcessControl ',
     meta: {
       title: '统计过程控制',
       icon: 'lock'
-      // roles: ['admin', 'editor'] // you can set roles in root nav
     },
     children: [
       {
@@ -189,16 +188,22 @@ export const asyncRoutes = [
         name: 'HierarchicalTypeDefinition',
         meta: {
           title: '层次信息定义'
-          // roles: ['admin'] // or you can only set roles in sub nav
         }
       },
       {
-        path: 'directive',
-        component: () => import('@/views/permission/directive'),
-        name: 'DirectivePermission',
+        path: 'test-item-definition',
+        component: () => import('@/views/test-item-definition/index'),
+        name: 'TestItemDefinition',
         meta: {
-          title: 'directivePermission'
-          // if do not set roles, means: this page does not require permission
+          title: '检测项目定义'
+        }
+      },
+      {
+        path: 'bad-item-definition',
+        component: () => import('@/views/bad-item-definition/index'),
+        name: 'BadItemDefinition',
+        meta: {
+          title: '不良项目定义'
         }
       }
       // {

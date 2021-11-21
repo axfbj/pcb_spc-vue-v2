@@ -119,7 +119,7 @@ export default {
             title = typeof this.extra.custom_title === 'function' ? (this.extra.custom_title(item) || '') : (item[this.extra.custom_title] || '')
             break
         }
-        return title || ''
+        return String(title) || ''
       }
     }
   },

@@ -71,10 +71,10 @@ export default {
       type: Array,
       default: () => ([])
     },
-    options: {
-      type: Object,
-      default: () => ({})
-    },
+    // options: {
+    //   type: Object,
+    //   default: () => ({})
+    // },
     rowClickNoSelect: {
       type: Boolean,
       default: false

@@ -171,20 +171,22 @@ export default {
     },
     // 重新计算表格的最大高度
     calc() {
-      let content_height, content_height2, table_height
+      // let content_height, content_height2, table_height
+      let content_height, content_height2
 
       if (this.fixedHeight) {
         content_height = this.fixedHeight
-        if (this.show && typeof this.fixedHeight === 'string') {
-          table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
-        }
+        // if (this.show && typeof this.fixedHeight === 'string') {
+        //   table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
+        // }
         this.$nextTick(() => {
           this.content_height = content_height
-          this.table_height = table_height
+          // this.table_height = table_height
         })
         return
       }
-      if (!this.$refs.table && !this.$refs.content_box) return
+      // if (!this.$refs.table && !this.$refs.content_box) return
+      if (!this.$refs.content_box) return
       if (this.$refs.content_box) {
         content_height = window.innerHeight - this.$refs.content_box.getBoundingClientRect().top
       } else {

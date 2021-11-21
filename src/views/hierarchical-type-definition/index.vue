@@ -4,8 +4,9 @@
       <template v-slot:btns>
         <div style="text-align: right;">
           <ki-button type="primary" :auto-loading="true" @click="cc(...arguments,'1111')">修改</ki-button>
-          <ki-button type="warning">备选值</ki-button>
-          <el-reference v-model="item2" type="select-dialog-template" />
+          <el-reference v-model="item2" type="select-dialog-template" style="margin:0 10px">
+            <ki-button type="warning">备选值</ki-button>
+          </el-reference>
         </div>
       </template>
       <template v-slot:custum_content>
@@ -27,7 +28,7 @@
 <script>
 
 export default {
-  name: 'Test',
+  name: 'HierarchicalTypeDefinition',
   data() {
     return {
       item2: {},

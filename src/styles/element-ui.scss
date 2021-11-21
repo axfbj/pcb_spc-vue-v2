@@ -100,8 +100,9 @@
 }
 
 // 表格间距调小 默认为6
-.el-table--mini td {
-  padding: 4px;
+.el-table--mini td,
+.el-table--mini .el-table__cell {
+  padding: 4px 0px;
 }
 
 // 表头背景样色

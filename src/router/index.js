@@ -183,6 +183,14 @@ export const asyncRoutes = [
     },
     children: [
       {
+        path: 'control-group-list',
+        component: () => import('@/views/control-group-list/index'),
+        name: 'ControlGroupList',
+        meta: {
+          title: '控制组列表'
+        }
+      },
+      {
         path: 'hierarchical-type-definition',
         component: () => import('@/views/hierarchical-type-definition/index'),
         name: 'HierarchicalTypeDefinition',

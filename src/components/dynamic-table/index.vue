@@ -211,37 +211,50 @@ export default {
 
     // 重新计算表格的最大高度
     calc() {
+      let content_height, table_height
       if (this.fixedHeight) {
-        this.content_height = this.fixedHeight
+        content_height = this.fixedHeight
+        console.log(this.show && typeof this.fixedHeight === 'string')
         if (this.show && typeof this.fixedHeight === 'string') {
-          this.table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
+          table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
         }
+        this.$nextTick(() => {
+          this.content_height = content_height
+          this.table_height = table_height
+        })
         return
       }
       if (!this.$refs.table) return
 
-      this.content_height = window.innerHeight - this.$refs.table.$el.getBoundingClientRect().top
+      content_height = window.innerHeight - this.$refs.table.$el.getBoundingClientRect().top
 
       if (this.show) {
-        this.table_height = this.content_height - this.$refs.pagination.$el.clientHeight
+        table_height = this.content_height - this.$refs.pagination.$el.clientHeight
       } else {
-        this.table_height = this.content_height
+        table_height = this.content_height
       }
-
-      // if (!this.$refs.table) return
-      // if (!this.show) {
-      //   this.max_height = window.innerHeight - this.$refs.table.$el.getBoundingClientRect().top
-      //   this.$refs.table.$el.style.maxHeight = this.max_height + 'px'
-      //   return
-      // } else {
-      //   this.max_height = (window.innerHeight - this.$refs.pagination.$el.clientHeight - 10) - this.$refs.table.$el.getBoundingClientRect().top
-      // }
+      this.$nextTick(() => {
+        this.content_height = content_height
+        this.table_height = table_height
+      })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.layout-table {
+  position: relative;
+  top: 0;
+  left: 0;
+  .table-pagination {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    text-align: right;
+    width: 100%;
+  }
+}
 ::v-deep
 .el-table__row {
   .super-mini {

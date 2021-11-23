@@ -44,6 +44,7 @@ import DynamicTable from '@/components/dynamic-table'
 import DialogLayout from '@/components/dialog-layout'
 import ElReference from '@/components/el-reference'
 import KiButton from '@/components/ki-button'
+import KiTree from '@/components/ki-tree'
 
 Vue.use((Vue) => {
   Vue.component('container-layout', ContainerLayout)
@@ -52,15 +53,16 @@ Vue.use((Vue) => {
   Vue.component('dialog-layout', DialogLayout)
   Vue.component('el-reference', ElReference)
   Vue.component('ki-button', KiButton)
+  Vue.component('ki-tree', KiTree)
 })
 
-// import http from '@/utils/http'
-// http.post('/spc/hierarchicalType/list', {
-//   page: '1',
-//   limit: '10',
-//   sidx: 'id',
-//   order: 'desc'
-// })
+import http from '@/api/http'
+http.post('/spc/hierarchicalType/list', {
+  page: '1',
+  limit: '10',
+  sidx: 'id',
+  order: 'desc'
+})
 // post('/spc/hierarchicalType/list', {})
 
 // register global utility filters

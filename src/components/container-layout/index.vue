@@ -225,16 +225,7 @@ export default {
 </script>
 
 <style lang="scss">
-.layout-table {
-  position: relative;
-  top: 0;
-  left: 0;
-  .table-pagination {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
-}
+
 .content_box {
   position: relative;
   top: 0;
@@ -275,7 +266,7 @@ export default {
     position: relative;
     .koimy-main-header {
         .el-form-item {
-            margin: 10px;
+            margin: 10px 5px 2px 5px
         }
     }
     .koimy-main-footer {

@@ -14,7 +14,7 @@ export default {
     },
     unique: {
       type: String,
-      default: 'doccode'
+      default: 'id'
     },
     onePageShowPagination: {
       type: Boolean,

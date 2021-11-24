@@ -38,12 +38,18 @@ Vue.use(Element, {
   // locale: enLang // 如果使用中文，无需设置，请删除
 })
 
+import api from './api/api.js'
+// 定义全局变量
+Vue.prototype.$api = api
+
 import ContainerLayout from '@/components/container-layout'
 import ContainerTitle from '@/components/container-title'
 import DynamicTable from '@/components/dynamic-table'
 import DialogLayout from '@/components/dialog-layout'
 import ElReference from '@/components/el-reference'
+import KiMessageBox from '@/components/ki-message-box'
 import KiButton from '@/components/ki-button'
+import KiDialog from '@/components/ki-dialog'
 import KiTree from '@/components/ki-tree'
 
 Vue.use((Vue) => {
@@ -52,17 +58,19 @@ Vue.use((Vue) => {
   Vue.component('dynamic-table', DynamicTable)
   Vue.component('dialog-layout', DialogLayout)
   Vue.component('el-reference', ElReference)
+  Vue.component('ki-message-box', KiMessageBox)
   Vue.component('ki-button', KiButton)
+  Vue.component('ki-dialog', KiDialog)
   Vue.component('ki-tree', KiTree)
 })
 
-import http from '@/api/http'
-http.post('/spc/hierarchicalType/list', {
-  page: '1',
-  limit: '10',
-  sidx: 'id',
-  order: 'desc'
-})
+// const res = Vue.prototype.$api.hierarchicalType_list({
+//   page: '1',
+//   limit: '10',
+//   sidx: 'id',
+//   order: 'desc'
+// })
+// console.log('res', res)
 // post('/spc/hierarchicalType/list', {})
 
 // register global utility filters

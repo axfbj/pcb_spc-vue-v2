@@ -3,39 +3,68 @@
     <container-layout ref="contenter">
       <template v-slot:btns>
         <div style="text-align: right;">
-          <ki-button type="primary" :auto-loading="true" @click="cc(...arguments,'1111')">修改</ki-button>
-          <el-reference v-model="item2" type="select-dialog-template" style="margin:0 10px">
+          <ki-button
+            type="paimary"
+            @click="add"
+          >添加</ki-button>
+          <ki-button
+            type="primary"
+            @click="edit('1111')"
+          >修改</ki-button>
+          <el-reference
+            v-model="item2"
+            type="select-dialog-template"
+            style="margin:0 10px"
+          >
             <ki-button type="warning">备选值</ki-button>
           </el-reference>
+
+          <ki-message-box
+            @next="del"
+            @click="del_btn"
+          >
+            <ki-button type="danger">删除</ki-button>
+          </ki-message-box>
         </div>
       </template>
       <template v-slot:custum_content>
         <dynamic-table
-          v-model="select"
+          ref="dy_table"
+          v-model="select_row"
           :header-list="header_list"
           :request="request_data"
           :page-sizes="[20,60,100]"
           fixed-height="100%"
+          :one-page-show-pagination="false"
           @current-change="current_change"
           @select="select_callback"
         />
       </template>
     </container-layout>
+
+    <edit-hierarchical-name-dialog
+      :visible="edit_name_dialog"
+      @handleClose="handleClose"
+      @confirm="confirm"
+    />
   </el-row>
 
 </template>
 
 <script>
-
+import EditHierarchicalNameDialog from './components/edit-hierarchicalName'
 export default {
   name: 'HierarchicalTypeDefinition',
+  components: {
+    EditHierarchicalNameDialog
+  },
   data() {
     return {
+      edit_name_dialog: false,
       item2: {},
       header_list: [
-        { prop: 'doccode', label: '层次类型ID', width: '180' },
-        { prop: 'name', label: '层次', width: '180' },
-        { prop: 'address', label: '类型名称' }
+        { prop: 'id', label: '层次类型ID', width: '180' },
+        { prop: 'hierarchicalName', label: '类型名称' }
       ],
       form: {
         name: '',
@@ -47,58 +76,87 @@ export default {
         resource: '',
         desc: ''
       },
-      checkList: ['选中且禁用', '复选框 A'],
-      select2: [],
-      select: [{
-        doccode: 1
-      }]
+      select_row: {
+        // id: 1
+      },
+      tableData: []
     }
   },
+  created() {
 
+  },
   methods: {
-    cc(loddingEnd, f) {
-      setTimeout(() => {
-        loddingEnd()
-      }, 1000)
+    confirm() {
+      alert(1)
     },
-
+    handleClose() {
+      this.edit_name_dialog = false
+    },
+    add() {
+      this.saveList()
+    },
+    del_btn(open) {
+      if (['{}', '[]'].includes(JSON.stringify(this.select_row))) {
+        this.$message.warning('请选择一条数据')
+        return
+      }
+      open()
+    },
+    async del(flag) {
+      const ids = typeof this.select_row === 'object' ? [this.select_row.id] : this.select_row.map(item => item.id)
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+      const res = await this.$api.hierarchicalType_delete(ids)
+      if (res === 200) {
+        this.$message.success('删除成功！')
+      }
+      this.$refs.dy_table.refresh()
+    },
+    async getList() {
+      const { data } = await this.$api.hierarchicalType_list({
+        page: '1',
+        limit: '10',
+        sidx: 'id',
+        order: 'desc'
+      })
+      this.tableData = data.list
+      console.log(data)
+    },
+    async saveList() {
+      const { data } = await this.$api.hierarchicalType_save({
+        id: '9', // 非要传一个0
+        hierarchicalName: '3333'
+      })
+      console.log(data)
+      this.$refs.dy_table.refresh()
+    },
+    edit() {
+      this.edit_name_dialog = true
+      // setTimeout(() => {
+      //   loddingEnd()
+      // }, 1000)
+    },
     click_link(data) {
       console.log(data)
     },
 
-    async copy(name, title) {
-      if (!this.can_copy) return
-
-      await this.can_copy.writeText(`<icon name="${name}" title="${title}" />`)
-      this.$message.success('按钮已到剪贴板')
-    },
     current_change(val) {
       console.log('current_change')
       console.log(val)
     },
-    request_data({ page_no, page_size, data }) {
-      console.log('------------------', page_no, page_size)
-      const total = 9
-      const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: Array(list_num).fill({
-              date: '2016-05-02',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1518 弄'
-            }).map((i, index) => {
-              const doccode = (page_no - 1) * page_size + index
-              console.log(doccode)
-              return {
-                ...i,
-                doccode
-              }
-            }),
-            total
-          })
-        }, 1000)
+    async request_data({ page_no, page_size, tableData }) {
+      const { data } = await this.$api.hierarchicalType_list({
+        page: String(page_no),
+        limit: String(page_size),
+        sidx: 'id'
+        // order: 'desc'
       })
+      return {
+        data: data.list,
+        total: data.totalCount
+      }
     },
     select_callback(data) {
       console.log('select_callback：  ', JSON.stringify(data))

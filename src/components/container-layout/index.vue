@@ -1,21 +1,44 @@
 <template>
   <div class="koimy-main-container">
     <div class="koimy-main-header">
-      <container-title v-if="$slots.btns">
+      <container-title
+        v-if="$slots.btns"
+        style="padding: 0 10px;"
+      >
         <slot name="btns" />
       </container-title>
 
-      <el-form inline size="mini" label-position="left">
+      <el-form
+        inline
+        size="mini"
+        label-position="left"
+      >
         <slot name="form" />
       </el-form>
     </div>
     <!-- <div>{{ show_loading }}</div> -->
-    <div v-if="$slots.custum_content" ref="content_box" class="content_box" :style="{height: typeof(content_height) === 'string'? content_height : content_height + 'px',overflow:'auto'}">
-      <div ref="content_body" :style="{height: typeof(content_height2) === 'string'? content_height2 : content_height2 + 'px',overflow:'auto'}">
+    <div
+      v-if="$slots.custum_content"
+      ref="content_box"
+      class="content_box"
+      :style="{height: typeof(content_height) === 'string'? content_height : content_height + 'px',overflow:'auto'}"
+    >
+      <div
+        ref="content_body"
+        :style="{height: typeof(content_height2) === 'string'? content_height2 : content_height2 + 'px',overflow:'auto'}"
+      >
         <slot name="custum_content" />
       </div>
-      <div v-if="$slots.footer && footer" ref="footer" class="footer" :style="{height: typeof(footer_height) === 'string'? footer_height : footer_height + 'px',paddingTop: '4px'}">
-        <div v-if="adjustableHeight" class="line-div-box">
+      <div
+        v-if="$slots.footer && footer"
+        ref="footer"
+        class="footer"
+        :style="{height: typeof(footer_height) === 'string'? footer_height : footer_height + 'px',paddingTop: '4px'}"
+      >
+        <div
+          v-if="adjustableHeight"
+          class="line-div-box"
+        >
           <div
             ref="lineDiv"
             class="lineDiv"
@@ -29,7 +52,11 @@
       </div>
     </div>
     <slot />
-    <div v-if="$slots.main_footer" ref="main_footer" class="koimy-main-footer">
+    <div
+      v-if="$slots.main_footer"
+      ref="main_footer"
+      class="koimy-main-footer"
+    >
       <slot name="main_footer" />
     </div>
   </div>
@@ -225,7 +252,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 .content_box {
   position: relative;
   top: 0;
@@ -236,50 +262,48 @@ export default {
     bottom: 0;
     left: 0;
     .line-div-box {
-        position:absolute;
-        top: 0;
-        left: 0;
-        height:4px;
-        width: 100%;
-        z-index: 100;
-        background-color:#DCDCDC;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 4px;
+      width: 100%;
+      z-index: 100;
+      background-color: #dcdcdc;
       .lineDiv {
-        position:absolute;
+        position: absolute;
         // top: 0;
         left: 0;
         width: 100%;
         z-index: 100;
-        background-color:#DCDCDC;
+        background-color: #dcdcdc;
         height: 100%;
-        transition: background-color .3s;
-        &:hover{
+        transition: background-color 0.3s;
+        &:hover {
           background-color: #bdbcbc;
-          cursor:n-resize !important;
+          cursor: n-resize !important;
         }
       }
     }
-
   }
 }
 
 .koimy-main-container {
-    position: relative;
-    .koimy-main-header {
-        .el-form-item {
-            margin: 10px 5px 2px 5px
-        }
+  position: relative;
+  .koimy-main-header {
+    .el-form-item {
+      margin: 10px 5px 2px 5px;
     }
-    .koimy-main-footer {
-        width: 100%;
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        z-index: 4;
-        padding-top: 5px;
-        background-color: #fff; // rgb(245,245,245);
-        box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
-    }
+  }
+  .koimy-main-footer {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 4;
+    padding-top: 5px;
+    background-color: #fff; // rgb(245,245,245);
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+  }
 }
-
 </style>
 

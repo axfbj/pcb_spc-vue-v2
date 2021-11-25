@@ -1,19 +1,46 @@
 <template>
-  <el-dialog :title="title" :visible.sync="visible" top="50px" :append-to-body="true" class="koimy-dialog-container" :before-close="before_close">
+  <el-dialog
+    :title="title"
+    :visible.sync="visible"
+    top="50px"
+    :append-to-body="true"
+    class="koimy-dialog-container"
+    :before-close="before_close"
+  >
     <div class="koimy-dialog-header">
       <!-- <div v-if="$slots.btns" style="background: #d9e8ff"> -->
-      <div v-if="$slots.btns" style="background: #dfdfdf">
+      <div
+        v-if="$slots.btns"
+        style="background: #dfdfdf"
+      >
         <slot name="btns" />
       </div>
-      <el-form v-if="$slots.form" ref="form" :model="form" :inline="true" label-position="left">
+      <el-form
+        v-if="$slots.form"
+        ref="form"
+        :model="form"
+        :inline="true"
+        label-position="left"
+      >
         <slot name="form" />
       </el-form>
     </div>
     <el-row v-if="multiple && topTab">
-      <el-scrollbar ref="scrollbar" style="height:100%">
+      <el-scrollbar
+        ref="scrollbar"
+        style="height:100%"
+      >
         <span style="white-space:nowrap; display:inline-bloack;">
           <div style="height:24px">
-            <el-tag v-for="(tag,index) in save_data" :key="tag[unique]" closable size="small" type="info" disable-transitions @close="close(index)">
+            <el-tag
+              v-for="(tag,index) in save_data"
+              :key="tag[unique]"
+              closable
+              size="small"
+              type="info"
+              disable-transitions
+              @close="close(index)"
+            >
               {{ tagContent ? tagContent(tag) : tag[unique] }}
             </el-tag>
           </div>
@@ -23,15 +50,15 @@
     <div>
       <slot />
     </div>
+    <!-- border
+      stripe
+      fit -->
     <el-table
       ref="table"
       v-loading="loading"
       :style="{width: '100%'}"
       :data="data"
       :max-height="dialog_max_height"
-      border
-      stripe
-      fit
       :highlight-current-row="highlight_current_row"
       :current-row-key="unique"
       :row-key="unique"
@@ -51,7 +78,10 @@
       <slot name="table" />
     </el-table>
 
-    <div v-if="$slots.table && show" class="koimy-dialog-footer">
+    <div
+      v-if="$slots.table && show"
+      class="koimy-dialog-footer"
+    >
       <el-pagination
         ref="pagination"
         :current-page="page_no"
@@ -87,18 +117,18 @@ export default {
     },
     form: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     tagContent: {
       type: Function,
-      default: () => {}
+      default: () => { }
     },
     topTab: {
       type: Boolean,
       default: false
     }
   },
-  data: function() {
+  data() {
     // 初始值
     return {
       dialog_max_height: window.innerHeight / 2,
@@ -251,22 +281,22 @@ export default {
 
 <style lang="scss">
 .koimy-dialog-container {
-    .el-dialog__body {
-        padding: 0
+  .el-dialog__body {
+    padding: 0;
+  }
+  .koimy-dialog-header {
+    .el-form-item {
+      margin: 10px;
     }
-    .koimy-dialog-header {
-        .el-form-item {
-            margin: 10px;
-        }
-    }
-    .koimy-dialog-footer {
-        width: 100%;
-        position: absolute;
-        z-index: 4;
-        padding-top: 5px;
-        background-color: #fff; // rgb(245,245,245);
-        box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
-        text-align: right;
-    }
+  }
+  .koimy-dialog-footer {
+    width: 100%;
+    position: absolute;
+    z-index: 4;
+    padding-top: 5px;
+    background-color: #fff; // rgb(245,245,245);
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    text-align: right;
+  }
 }
 </style>

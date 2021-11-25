@@ -14,27 +14,43 @@
     <!-- 按钮组 -->
     <template v-slot:btns>
       <div style="text-align: right; padding: 4px 10px;">
-        <ki-button type="primary" @click="sure">确定</ki-button>
-        <ki-button type="danger" @click="close">取消</ki-button>
+        <ki-button
+          type="primary"
+          @click="sure"
+        >确定</ki-button>
+        <ki-button
+          type="danger"
+          @click="close"
+        >取消</ki-button>
       </div>
       <!-- <ki-button>取消</ki-button>. -->
     </template>
 
     <template v-slot:form>
-      <el-form-item label="物品编号：" prop="goods_no">
+      <el-form-item
+        label="物品编号："
+        prop="goods_no"
+      >
         <el-input
           v-model="add_form.goods_no"
           style="width: 150px"
         />
       </el-form-item>
-      <el-form-item label="物品名称：" prop="goods_name">
+      <el-form-item
+        label="物品名称："
+        prop="goods_name"
+      >
         <el-input
           v-model="add_form.goods_name"
           style="width: 150px"
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" @click="query()">查询</el-button>
+        <el-button
+          type="primary"
+          icon="el-icon-search"
+          @click="query()"
+        >查询</el-button>
       </el-form-item>
     </template>
     <!-- 表格 -->
@@ -69,10 +85,10 @@ export default {
      */
     extra: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
-  data: function() {
+  data() {
     // 初始值
     return {
       add_form: {

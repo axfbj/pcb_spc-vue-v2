@@ -1,7 +1,7 @@
 <template>
   <ki-dialog
     :visible="visible"
-    title="修改层次类型名称"
+    title="修改备选值"
     width="25%"
     @handleClose="handleClose"
     @confirm="confirm"
@@ -15,12 +15,12 @@
         label-width="auto"
       >
         <el-form-item
-          prop="hierarchicalName"
-          label="类型名称:"
+          prop="keywordName"
+          label="备选值名称:"
         >
           <el-input
             ref="ipt"
-            v-model="form.hierarchicalName"
+            v-model="form.keywordName"
           />
         </el-form-item>
 
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-  name: 'EditHierarchicalName',
+  name: 'EditKeywordName',
   props: {
     visible: {
       type: Boolean,
@@ -44,21 +44,41 @@ export default {
   },
   data() {
     return {
+      flag: '',
       form: {
-        hierarchicalName: ''
+        keywordName: ''
       }
     }
   },
   methods: {
-
     handleClose() {
       this.$refs.form.resetFields()
+      this.flag = ''
       this.$emit('handleClose')
     },
     async confirm() {
-      const res = await this.$api.hierarchicalType_update({
+      if (this.flag === 'add') {
+        this.add()
+      } else {
+        this.update()
+      }
+    },
+    async add() {
+      const res = await this.$api.keywordValue_save({
+        hierarchicalTypeId: this.$attrs.parentId,
+        keywordName: this.form.keywordName,
+        id: 0
+      })
+      if (res.code === '200') {
+        this.$emit('confirm')
+      }
+      this.$emit('handleClose')
+    },
+    async update() {
+      const res = await this.$api.keywordValue_update({
+        hierarchicalTypeId: this.$attrs.parentId,
         id: this.selectRow.id,
-        hierarchicalName: this.form.hierarchicalName
+        keywordName: this.form.keywordName
       })
       if (res.code === '200') {
         this.$emit('confirm')
@@ -66,10 +86,12 @@ export default {
       this.$emit('handleClose')
     },
     async opened({ loading }) {
+      this.flag = this.$attrs.flag
+      if (this.flag === 'add') return
       loading(true)
-      const res = await this.$api.hierarchicalType_info({ id: this.selectRow.id })
+      const res = await this.$api.keywordValue_info({ id: this.selectRow.id })
       if (res.code === '200') {
-        this.form.hierarchicalName = res.data.hierarchicalName
+        this.form.keywordName = res.data.keywordName
       }
       this.$refs['ipt'].focus()
       loading(false)

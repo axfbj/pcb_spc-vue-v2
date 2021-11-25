@@ -1,6 +1,12 @@
 <template>
-  <div class="layout-table" :style="{height: !!fixedHeight ? (typeof fixedHeight ==='string' ? fixedHeight : 'auto') : (typeof content_height === 'string' ? content_height : content_height + 'px') }">
+  <div
+    class="layout-table"
+    :style="{height: !!fixedHeight ? (typeof fixedHeight ==='string' ? fixedHeight : 'auto') : (typeof content_height === 'string' ? content_height : content_height + 'px') }"
+  >
     <!-- :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : '') : table_height" -->
+    <!-- border
+      stripe
+      fit -->
     <el-table
       ref="table"
       v-loading="loading"
@@ -8,9 +14,6 @@
       :max-height="!!fixedHeight && typeof(fixedHeight) === 'number' ? fixedHeight : 'none'"
       :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : undefined) : table_height"
       size="mini"
-      border
-      stripe
-      fit
       :highlight-current-row="highlight_current_row"
       :current-row-key="unique"
       :row-key="unique"
@@ -23,21 +26,55 @@
       @selection-change="selection_change"
       @sort-change="sort_change"
     >
-      <el-table-column v-if="multiple" type="selection" width="55" align="center" fixed="left" />
+      <el-table-column
+        v-if="multiple"
+        type="selection"
+        width="55"
+        align="center"
+        fixed="left"
+      />
 
       <template v-for="(list,index) in headerList">
-        <table-column-item v-if="is_hide_column(list.prop)" :key="(`${list.prop}_${index}`)" :list="list" :sort-type="sortType">
-          <template slot="header-template" slot-scope="scope">
-            <slot name="header-template" :scope="scope.scope" :list="scope.list" :label="scope.label" />
+        <table-column-item
+          v-if="is_hide_column(list.prop)"
+          :key="(`${list.prop}_${index}`)"
+          :list="list"
+          :sort-type="sortType"
+        >
+          <template
+            slot="header-template"
+            slot-scope="scope"
+          >
+            <slot
+              name="header-template"
+              :scope="scope.scope"
+              :list="scope.list"
+              :label="scope.label"
+            />
           </template>
 
-          <template slot="cell-template" slot-scope="scope">
-            <slot name="cell-template" :scope="scope.scope" :list="scope.list" :cell-value="scope.cellValue" :row="scope.row" :column="scope.column" :index="scope.index" :table-data="data" />
+          <template
+            slot="cell-template"
+            slot-scope="scope"
+          >
+            <slot
+              name="cell-template"
+              :scope="scope.scope"
+              :list="scope.list"
+              :cell-value="scope.cellValue"
+              :row="scope.row"
+              :column="scope.column"
+              :index="scope.index"
+              :table-data="data"
+            />
           </template>
         </table-column-item>
       </template>
     </el-table>
-    <div v-if="show" class="table-pagination">
+    <div
+      v-if="show"
+      class="table-pagination"
+    >
       <el-pagination
         ref="pagination"
         :current-page="page_no"
@@ -214,7 +251,7 @@ export default {
       let content_height, table_height
       if (this.fixedHeight) {
         content_height = this.fixedHeight
-        console.log(this.show && typeof this.fixedHeight === 'string')
+        // console.log(this.show && typeof this.fixedHeight === 'string')
         if (this.show && typeof this.fixedHeight === 'string') {
           table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
         }
@@ -255,8 +292,7 @@ export default {
     width: 100%;
   }
 }
-::v-deep
-.el-table__row {
+::v-deep .el-table__row {
   .super-mini {
     padding: 0;
     .cell {
@@ -264,5 +300,4 @@ export default {
     }
   }
 }
-
 </style>

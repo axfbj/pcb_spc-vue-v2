@@ -53,6 +53,10 @@ export default {
     },
     multiple() {
       return Array.isArray(this.value)
+    },
+    isSelect() {
+      if (this.multiple) return this.value.length !== 0
+      else return Object.prototype.hasOwnProperty.call(this.value, this.unique)
     }
   },
   mounted() {
@@ -149,9 +153,9 @@ export default {
     async request_data() {
       this.loading = true
       const res = await this.request({
-        page_no: this.page_no,
-        page_size: this.page_size,
-        data: this.data,
+        page_no: String(this.page_no),
+        page_size: String(this.page_size),
+        table_data: this.data,
         field: this.field,
         sort: this.sort,
         total: this.page_total

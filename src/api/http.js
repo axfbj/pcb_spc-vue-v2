@@ -11,34 +11,48 @@ const root = process.env.NODE_ENV === 'development'
   // 生产环境api接口
   : `http://127.0.0.1:9527`
 // 引用axios，设置头文件
-// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-request.defaults.headers.post['Content-Type'] = 'application/json' // raw 格式
 
-function apiAxios(method, url, params, token) {
+// request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+// request.defaults.headers.post['Content-Type'] = 'application/json' // raw 格式
+
+const serialize = data => {
+  const list = []
+  Object.keys(data).forEach(ele => {
+    list.push(`${ele}=${data[ele]}`)
+  })
+  return list.join('&')
+}
+
+function apiAxios(method, url, params, contentType) {
+  if (contentType === 'form') {
+    request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+  } else {
+    request.defaults.headers.post['Content-Type'] = 'application/json'
+  }
   // console.log(params)
   // console.log(qs.stringify(params))
   return request({
     method: method,
     // 拼接参数
     url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,
-    data: method === 'POST' || method === 'PUT' ? JSON.stringify(params) : null,
+    data: method === 'POST' || method === 'PUT' ? (contentType === 'form' ? serialize(params) : JSON.stringify(params)) : null,
     baseURL: root,
-    headers: { Authorization: `Bearer ${token}` },
+    // headers: { Authorization: `Bearer ${token}` },
     withCredentials: false
   })
 }
 
 export default {
-  get: function(url, params, token) {
-    return apiAxios('GET', url, params, token)
+  get: function({ url, params }) {
+    return apiAxios('GET', url, params)
   },
-  post: function(url, params, token) {
-    return apiAxios('POST', url, params, token)
+  post: function(url, params, contentType) {
+    return apiAxios('POST', url, params, contentType)
   },
-  put: function(url, params, token) {
-    return apiAxios('PUT', url, params, token)
+  put: function(url, params) {
+    return apiAxios('PUT', url, params)
   },
-  delete: function(url, params, token) {
-    return apiAxios('DELETE', url, params, token)
+  delete: function(url, params) {
+    return apiAxios('DELETE', url, params)
   }
 }

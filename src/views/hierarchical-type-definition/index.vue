@@ -9,21 +9,32 @@
           >添加</ki-button>
           <ki-button
             type="primary"
-            @click="edit('1111')"
+            @click="edit"
           >修改</ki-button>
-          <el-reference
+          <!-- <el-reference
             v-model="item2"
             type="select-dialog-template"
             style="margin:0 10px"
           >
-            <ki-button type="warning">备选值</ki-button>
-          </el-reference>
+            <ki-button
+              type="warning"
+              @click="keyword"
+            >备选值</ki-button>
+          </el-reference> -->
+
+          <ki-button
+            type="warning"
+            @click="keyword_btn"
+          >备选值</ki-button>
 
           <ki-message-box
-            @next="del"
             @click="del_btn"
+            @next="del"
           >
-            <ki-button type="danger">删除</ki-button>
+            <ki-button
+              type="danger"
+              style="margin-left: 10px;"
+            >删除</ki-button>
           </ki-message-box>
         </div>
       </template>
@@ -44,8 +55,14 @@
 
     <edit-hierarchical-name-dialog
       :visible="edit_name_dialog"
+      :select-row="select_row"
       @handleClose="handleClose"
-      @confirm="confirm"
+      @confirm="refresh"
+    />
+    <keyword-dialog
+      :visible="keyword_dialog"
+      :select-row="select_row"
+      @handleClose="keywordClose"
     />
   </el-row>
 
@@ -53,53 +70,58 @@
 
 <script>
 import EditHierarchicalNameDialog from './components/edit-hierarchicalName'
+import { KeywordDialog } from '@/components/ki-reference'
 export default {
   name: 'HierarchicalTypeDefinition',
   components: {
-    EditHierarchicalNameDialog
+    EditHierarchicalNameDialog,
+    KeywordDialog
   },
   data() {
     return {
       edit_name_dialog: false,
+      keyword_dialog: false,
       item2: {},
       header_list: [
-        { prop: 'id', label: '层次类型ID', width: '180' },
-        { prop: 'hierarchicalName', label: '类型名称' }
+        { prop: 'id', label: '层次类型ID', width: '150' },
+        { prop: 'hierarchicalName', label: '类型名称', width: '260' }
       ],
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
-      },
-      select_row: {
-        // id: 1
-      },
+      select_row: {},
       tableData: []
     }
   },
   created() {
-
   },
   methods: {
-    confirm() {
-      alert(1)
+    refresh() {
+      this.$refs.dy_table.refresh()
+    },
+    one_row_select() {
+      if (!this.$refs.dy_table.isSelect) {
+        this.$message.warning('请选择一条数据')
+        return false
+      }
+      return true
     },
     handleClose() {
       this.edit_name_dialog = false
     },
+    keywordClose() {
+      this.keyword_dialog = false
+    },
     add() {
       this.saveList()
     },
+    edit() {
+      if (!this.one_row_select()) return
+      this.edit_name_dialog = true
+    },
+    keyword_btn() {
+      if (!this.one_row_select()) return
+      this.keyword_dialog = true
+    },
     del_btn(open) {
-      if (['{}', '[]'].includes(JSON.stringify(this.select_row))) {
-        this.$message.warning('请选择一条数据')
-        return
-      }
+      if (!this.one_row_select()) return
       open()
     },
     async del(flag) {
@@ -117,7 +139,7 @@ export default {
     async getList() {
       const { data } = await this.$api.hierarchicalType_list({
         page: '1',
-        limit: '10',
+        limit: '20',
         sidx: 'id',
         order: 'desc'
       })
@@ -126,32 +148,22 @@ export default {
     },
     async saveList() {
       const { data } = await this.$api.hierarchicalType_save({
-        id: '9', // 非要传一个0
-        hierarchicalName: '3333'
+        id: '1',
+        hierarchicalName: '产品型号'
       })
       console.log(data)
       this.$refs.dy_table.refresh()
     },
-    edit() {
-      this.edit_name_dialog = true
-      // setTimeout(() => {
-      //   loddingEnd()
-      // }, 1000)
-    },
-    click_link(data) {
-      console.log(data)
-    },
-
     current_change(val) {
       console.log('current_change')
       console.log(val)
     },
-    async request_data({ page_no, page_size, tableData }) {
+    async request_data({ page_no, page_size, table_data }) {
       const { data } = await this.$api.hierarchicalType_list({
-        page: String(page_no),
-        limit: String(page_size),
-        sidx: 'id'
-        // order: 'desc'
+        page: page_no,
+        limit: page_size,
+        sidx: 'id',
+        order: 'ASC'
       })
       return {
         data: data.list,

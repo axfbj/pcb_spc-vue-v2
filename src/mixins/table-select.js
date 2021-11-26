@@ -123,6 +123,13 @@ export default {
       }
       this.$emit('row-click', ...args)
     },
+    one_row_select() {
+      if (!this.isSelect) {
+        this.$message.warning('请选择一条数据')
+        return false
+      }
+      return true
+    },
     set_currentRow(row) {
       if (!row || row === -1) {
         this.$refs.table.setCurrentRow(row)
@@ -152,7 +159,7 @@ export default {
     // 请求表格数据
     async request_data() {
       this.loading = true
-      const res = await this.request({
+      let res = await this.request({
         page_no: String(this.page_no),
         page_size: String(this.page_size),
         table_data: this.data,
@@ -161,21 +168,27 @@ export default {
         total: this.page_total
       })
       this.loading = false
-      if (res && res.data) {
-        this.data = res.data
-        this.page_total = res.total
-
-        this.$nextTick(() => {
-          this.fill_data(this.value, true)
-          if (this.$refs.table) {
-            if (this.multiple || !this.value || ['{}', '[]'].includes(this.value)) {
-              this.$refs.table.bodyWrapper.scrollTop = 0
-            }
-            this.$refs['table'] && this.$refs['table'].doLayout() // 能重置表格的布局 必要
-            this.calc()
-          }
-        })
+      if (!res || !res.data) {
+        res = {
+          data: [],
+          total: 0
+        }
       }
+      // if (res && res.data) {
+      this.data = res.data
+      this.page_total = Number(res.total)
+
+      this.$nextTick(() => {
+        this.fill_data(this.value, true)
+        if (this.$refs.table) {
+          if (this.multiple || !this.value || ['{}', '[]'].includes(this.value)) {
+            this.$refs.table.bodyWrapper.scrollTop = 0
+          }
+          this.$refs['table'] && this.$refs['table'].doLayout() // 能重置表格的布局 必要
+          this.calc()
+        }
+      })
+      // }
     },
     /** 刷新表格数据（对外）
      * params.keep 是否停留在分页状态

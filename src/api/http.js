@@ -5,12 +5,13 @@ import helper from './helper'
 
 // console.log( process.env.NODE_ENV)
 // 判断环境提供baseURL，注意要与后台地址一致
-const root = process.env.NODE_ENV === 'development'
-  // 开发环境api接口
-  ? `http://192.168.1.245:9527/`
-  // 生产环境api接口
-  : `http://127.0.0.1:9527`
-// 引用axios，设置头文件
+// const root = process.env.NODE_ENV === 'development'
+//   // 开发环境api接口
+//   // ? `http://192.168.1.245:9527/`
+//   ? ``
+//   // 生产环境api接口
+//   : `http://127.0.0.1:9527`
+// // 引用axios，设置头文件
 
 // request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 // request.defaults.headers.post['Content-Type'] = 'application/json' // raw 格式
@@ -36,7 +37,6 @@ function apiAxios(method, url, params, contentType) {
     // 拼接参数
     url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,
     data: method === 'POST' || method === 'PUT' ? (contentType === 'form' ? serialize(params) : JSON.stringify(params)) : null,
-    baseURL: root,
     // headers: { Authorization: `Bearer ${token}` },
     withCredentials: false
   })

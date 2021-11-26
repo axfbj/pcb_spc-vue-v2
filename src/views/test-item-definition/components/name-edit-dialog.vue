@@ -1,7 +1,7 @@
 <template>
   <ki-dialog
     :visible="visible"
-    :title="`${s_text}备选值`"
+    :title="title"
     width="25%"
     @handleClose="handleClose"
     @confirm="confirm"
@@ -16,12 +16,12 @@
         label-width="auto"
       >
         <el-form-item
-          prop="keywordName"
+          prop="inspectionName"
           label="备选值名称:"
         >
           <el-input
             ref="ipt"
-            v-model="form.keywordName"
+            v-model="form.inspectionName"
           />
         </el-form-item>
 
@@ -31,10 +31,8 @@
 </template>
 
 <script>
-import DialogCommon from '../../mixins/dialog-common'
 export default {
-  name: 'EditKeywordName',
-  mixins: [DialogCommon],
+  name: 'NameEditDialog',
   props: {
     visible: {
       type: Boolean,
@@ -49,8 +47,17 @@ export default {
     return {
       flag: '',
       form: {
-        keywordName: ''
+        inspectionName: ''
       }
+    }
+  },
+  computed: {
+    title() {
+      const statesText = {
+        'add': '添加',
+        'edit': '修改'
+      }
+      return `${statesText[this.flag] || ''}备选值`
     }
   },
   methods: {
@@ -67,38 +74,38 @@ export default {
       }
     },
     async add() {
-      const res = await this.$api.keywordValue_save({
-        hierarchicalTypeId: this.$attrs.parentId,
-        keywordName: this.form.keywordName,
-        id: 0
+      const res = await this.$api.inspectionItems_save({
+        inspectionName: this.form.inspectionName
       })
       if (res.code === '200') {
         this.$emit('confirm')
       }
-      this.$emit('handleClose')
+      this.handleClose()
     },
     async update() {
-      const res = await this.$api.keywordValue_update({
-        hierarchicalTypeId: this.$attrs.parentId,
+      const res = await this.$api.inspectionItems_update({
         id: this.selectRow.id,
-        keywordName: this.form.keywordName
+        inspectionName: this.form.inspectionName
       })
       if (res.code === '200') {
         this.$emit('confirm')
       }
-      this.$emit('handleClose')
+      this.handleClose()
     },
     async open({ loading }) {
-      if (this.flag === 'add') return
-      loading(true)
-      const res = await this.$api.keywordValue_info({ id: this.selectRow.id })
-      if (res.code === '200') {
-        this.form.keywordName = res.data.keywordName
+      this.flag = this.$attrs.flag
+      if (this.flag !== 'add') {
+        loading(true)
+        const { code, data } = await this.$api.inspectionItems_info({ id: this.selectRow.id })
+        if (code === '200' && data) {
+          this.form.inspectionName = data.inspectionName
+        }
+        loading(false)
       }
       this.$refs['ipt'].focus()
-      loading(false)
     },
     async opened({ loading }) {
+
     }
   }
 }

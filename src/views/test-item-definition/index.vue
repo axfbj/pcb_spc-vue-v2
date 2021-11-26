@@ -3,15 +3,43 @@
     <container-layout ref="contenter">
       <template v-slot:btns>
         <div style="text-align: right;">
-          <ki-button type="primary" :auto-loading="true" @click="cc(...arguments,'1111')">修改</ki-button>
-          <el-reference v-model="item2" type="select-dialog-template" style="margin:0 10px">
+          <!-- <ki-button
+            type="primary"
+            :auto-loading="true"
+            @click="cc(...arguments,'1111')"
+          >修改</ki-button>
+          <el-reference
+            v-model="item2"
+            type="select-dialog-template"
+            style="margin:0 10px"
+          >
             <ki-button type="warning">备选值</ki-button>
-          </el-reference>
+          </el-reference> -->
+
+          <ki-button
+            type="primary"
+            @click="add"
+          >添加</ki-button>
+          <ki-button
+            type="warning"
+            @click="edit"
+          >修改</ki-button>
+          <ki-message-box
+            @click="del_btn"
+            @next="del"
+          >
+            <ki-button
+              type="danger"
+              style="margin-left: 10px;"
+              @click="del_btn"
+            >删除</ki-button>
+          </ki-message-box>
         </div>
       </template>
       <template v-slot:custum_content>
         <dynamic-table
-          v-model="select"
+          ref="dy_table"
+          v-model="select_row"
           :header-list="header_list"
           :request="request_data"
           :page-sizes="[20,60,100]"
@@ -21,21 +49,32 @@
         />
       </template>
     </container-layout>
+    <name-edit-dialog
+      :visible="name_edit_dialog"
+      :select-row="select_row"
+      :flag="dialog_flag"
+      @handleClose="dialog_close"
+      @confirm="refresh"
+    />
   </el-row>
 
 </template>
 
 <script>
-
+import NameEditDialog from './components/name-edit-dialog'
 export default {
   name: 'TestItemDefinition',
+  components: {
+    NameEditDialog
+  },
   data() {
     return {
+      dialog_flag: 'add',
+      name_edit_dialog: false,
       item2: {},
       header_list: [
-        { prop: 'doccode', label: '层次类型ID', width: '180' },
-        { prop: 'name', label: '层次', width: '180' },
-        { prop: 'address', label: '类型名称' }
+        { prop: 'id', label: '检测项目ID', width: '180' },
+        { prop: 'inspectionName', label: '检测项目名称', width: '280' }
       ],
       form: {
         name: '',
@@ -47,58 +86,68 @@ export default {
         resource: '',
         desc: ''
       },
-      checkList: ['选中且禁用', '复选框 A'],
-      select2: [],
-      select: [{
-        doccode: 1
-      }]
+      select_row: {}
     }
   },
 
   methods: {
+    add() {
+      this.dialog_flag = 'add'
+      this.name_edit_dialog = true
+    },
+    edit() {
+      if (!this.$refs.dy_table.one_row_select()) return
+      this.dialog_flag = 'edit'
+      this.name_edit_dialog = true
+    },
+    del_btn(open) {
+      if (!this.$refs.dy_table.one_row_select()) return
+      open()
+    },
+    async del(flag) {
+      const ids = typeof this.select_row === 'object' ? [this.select_row.id] : this.select_row.map(item => item.id)
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+      const { code, data } = await this.$api.inspectionItems_delete(ids)
+      if (code === '200' && data) {
+        this.$message.success('删除成功！')
+      }
+      this.refresh()
+    },
     cc(loddingEnd, f) {
       setTimeout(() => {
         loddingEnd()
       }, 1000)
     },
+    refresh() {
+      this.$refs.dy_table.refresh()
+    },
 
     click_link(data) {
       console.log(data)
     },
-
-    async copy(name, title) {
-      if (!this.can_copy) return
-
-      await this.can_copy.writeText(`<icon name="${name}" title="${title}" />`)
-      this.$message.success('按钮已到剪贴板')
+    dialog_close() {
+      this.name_edit_dialog = false
     },
     current_change(val) {
       console.log('current_change')
       console.log(val)
     },
-    request_data({ page_no, page_size, data }) {
-      console.log('------------------', page_no, page_size)
-      const total = 9
-      const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: Array(list_num).fill({
-              date: '2016-05-02',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1518 弄'
-            }).map((i, index) => {
-              const doccode = (page_no - 1) * page_size + index
-              console.log(doccode)
-              return {
-                ...i,
-                doccode
-              }
-            }),
-            total
-          })
-        }, 1000)
+    async request_data({ page_no, page_size, table_data }) {
+      const { code, data } = await this.$api.inspectionItems_list({
+        page: page_no,
+        limit: page_size,
+        order: 'asc'
       })
+
+      if (code === '200' && data) {
+        return {
+          data: data.list,
+          total: data.totalPage
+        }
+      }
     },
     select_callback(data) {
       console.log('select_callback：  ', JSON.stringify(data))

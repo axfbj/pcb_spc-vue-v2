@@ -70,7 +70,9 @@ export default {
       this.loading = state
     },
     open() {
-      this.$emit('open', { loading: this.setLoadingState })
+      this.$nextTick(() => {
+        this.$emit('open', { loading: this.setLoadingState })
+      })
     },
     opened() {
       this.$emit('opened', { loading: this.setLoadingState })

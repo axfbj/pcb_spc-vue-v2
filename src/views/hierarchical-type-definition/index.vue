@@ -96,13 +96,7 @@ export default {
     refresh() {
       this.$refs.dy_table.refresh()
     },
-    one_row_select() {
-      if (!this.$refs.dy_table.isSelect) {
-        this.$message.warning('请选择一条数据')
-        return false
-      }
-      return true
-    },
+
     handleClose() {
       this.edit_name_dialog = false
     },
@@ -113,15 +107,15 @@ export default {
       this.saveList()
     },
     edit() {
-      if (!this.one_row_select()) return
+      if (!this.$refs.dy_table.one_row_select()) return
       this.edit_name_dialog = true
     },
     keyword_btn() {
-      if (!this.one_row_select()) return
+      if (!this.$refs.dy_table.one_row_select()) return
       this.keyword_dialog = true
     },
     del_btn(open) {
-      if (!this.one_row_select()) return
+      if (!this.$refs.dy_table.one_row_select()) return
       open()
     },
     async del(flag) {
@@ -130,8 +124,8 @@ export default {
         this.$message('操作取消')
         return
       }
-      const res = await this.$api.hierarchicalType_delete(ids)
-      if (res === 200) {
+      const { code, data } = await this.$api.hierarchicalType_delete(ids)
+      if (code === '200' && data) {
         this.$message.success('删除成功！')
       }
       this.$refs.dy_table.refresh()
@@ -163,7 +157,7 @@ export default {
         page: page_no,
         limit: page_size,
         sidx: 'id',
-        order: 'ASC'
+        order: 'asc'
       })
       return {
         data: data.list,

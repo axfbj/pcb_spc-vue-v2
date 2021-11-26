@@ -5,6 +5,7 @@
     width="25%"
     @handleClose="handleClose"
     @confirm="confirm"
+    @open="open"
     @opened="opened"
     @keypress.native.enter="confirm"
   >
@@ -65,7 +66,7 @@ export default {
       }
       this.$emit('handleClose')
     },
-    async opened({ loading }) {
+    async open({ loading }) {
       loading(true)
       const res = await this.$api.hierarchicalType_info({ id: this.selectRow.id })
       if (res.code === '200') {
@@ -73,6 +74,9 @@ export default {
       }
       this.$refs['ipt'].focus()
       loading(false)
+    },
+    async opened({ loading }) {
+
     }
   }
 }

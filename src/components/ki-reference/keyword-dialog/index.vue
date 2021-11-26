@@ -122,15 +122,17 @@ export default {
       console.log(val)
     },
     async request_data({ page_no, page_size, table_data }) {
-      const { data } = await this.$api.keywordValue_list({
+      const { code, data } = await this.$api.keywordValue_list({
         page: page_no,
         limit: page_size,
         sidx: String(this.selectRow.id),
         order: 'asc'
       })
-      return {
-        data: data.list,
-        total: data.totalCount
+      if (code === '200' && data) {
+        return {
+          data: data.list,
+          total: data.totalCount
+        }
       }
     },
     select_callback(data) {

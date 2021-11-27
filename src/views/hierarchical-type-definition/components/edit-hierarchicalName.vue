@@ -7,7 +7,6 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
-    @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 20px;">
       <el-form
@@ -51,12 +50,12 @@ export default {
     }
   },
   methods: {
-
     handleClose() {
       this.$refs.form.resetFields()
       this.$emit('handleClose')
     },
-    async confirm() {
+    async confirm({ loading }) {
+      loading(true)
       const res = await this.$api.hierarchicalType_update({
         id: this.selectRow.id,
         hierarchicalName: this.form.hierarchicalName
@@ -64,16 +63,14 @@ export default {
       if (res.code === '200') {
         this.$emit('confirm')
       }
-      this.$emit('handleClose')
+      this.handleClose()
     },
-    async open({ loading }) {
-      loading(true)
-      const res = await this.$api.hierarchicalType_info({ id: this.selectRow.id })
-      if (res.code === '200') {
-        this.form.hierarchicalName = res.data.hierarchicalName
+    async open({ load }) {
+      const { code, data } = await load(() => this.$api.hierarchicalType_info({ id: this.selectRow.id }))
+      if (code === '200' && data) {
+        this.form.hierarchicalName = data.hierarchicalName
       }
       this.$refs['ipt'].focus()
-      loading(false)
     },
     async opened({ loading }) {
 

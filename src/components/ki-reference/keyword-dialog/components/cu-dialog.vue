@@ -1,13 +1,14 @@
 <template>
   <ki-dialog
     :visible="visible"
-    :title="`${s_text}备选值`"
+    title="备选值"
     width="25%"
+    v-bind="$attrs"
+    :flag="$attrs.flag"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
     @opened="opened"
-    @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 20px;">
       <el-form
@@ -31,10 +32,8 @@
 </template>
 
 <script>
-import DialogCommon from '../../mixins/dialog-common'
 export default {
   name: 'EditKeywordName',
-  mixins: [DialogCommon],
   props: {
     visible: {
       type: Boolean,
@@ -43,11 +42,14 @@ export default {
     selectRow: {
       type: [Object, Array],
       default: () => ({})
+    },
+    parentId: {
+      type: [String, Number],
+      default: ''
     }
   },
   data() {
     return {
-      flag: '',
       form: {
         keywordName: ''
       }
@@ -56,10 +58,10 @@ export default {
   methods: {
     handleClose() {
       this.$refs.form.resetFields()
-      this.flag = ''
       this.$emit('handleClose')
     },
-    async confirm() {
+    async confirm({ loading }) {
+      loading(true)
       if (this.flag === 'add') {
         this.add()
       } else {
@@ -67,36 +69,35 @@ export default {
       }
     },
     async add() {
-      const res = await this.$api.keywordValue_save({
-        hierarchicalTypeId: this.$attrs.parentId,
-        keywordName: this.form.keywordName,
-        id: 0
+      const { code, data } = await this.$api.keywordValue_save({
+        hierarchicalTypeId: this.parentId,
+        keywordName: this.form.keywordName
       })
-      if (res.code === '200') {
+      if (code === '200' && data) {
         this.$emit('confirm')
       }
-      this.$emit('handleClose')
+      this.handleClose()
     },
     async update() {
       const res = await this.$api.keywordValue_update({
-        hierarchicalTypeId: this.$attrs.parentId,
+        hierarchicalTypeId: this.parentId,
         id: this.selectRow.id,
         keywordName: this.form.keywordName
       })
       if (res.code === '200') {
         this.$emit('confirm')
       }
-      this.$emit('handleClose')
+      this.handleClose()
     },
-    async open({ loading }) {
-      if (this.flag === 'add') return
-      loading(true)
-      const res = await this.$api.keywordValue_info({ id: this.selectRow.id })
-      if (res.code === '200') {
-        this.form.keywordName = res.data.keywordName
+    async open({ load }) {
+      this.flag = this.$attrs.flag
+      if (this.flag !== 'add') {
+        const { code, data } = await load(() => this.$api.keywordValue_info({ id: this.selectRow.id }))
+        if (code === '200' && data) {
+          this.form.keywordName = data.keywordName
+        }
       }
       this.$refs['ipt'].focus()
-      loading(false)
     },
     async opened({ loading }) {
     }

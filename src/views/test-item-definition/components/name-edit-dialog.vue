@@ -1,13 +1,13 @@
 <template>
   <ki-dialog
     :visible="visible"
-    :title="title"
+    title="检测项目"
+    :flag="$attrs.flag"
     width="25%"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
     @opened="opened"
-    @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 20px;">
       <el-form
@@ -51,22 +51,14 @@ export default {
       }
     }
   },
-  computed: {
-    title() {
-      const statesText = {
-        'add': '添加',
-        'edit': '修改'
-      }
-      return `${statesText[this.flag] || ''}备选值`
-    }
-  },
   methods: {
     handleClose() {
       this.$refs.form.resetFields()
       this.flag = ''
       this.$emit('handleClose')
     },
-    async confirm() {
+    async confirm({ loading }) {
+      loading(true)
       if (this.flag === 'add') {
         this.add()
       } else {

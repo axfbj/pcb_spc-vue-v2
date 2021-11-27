@@ -28,8 +28,8 @@
           >备选值</ki-button>
 
           <ki-message-box
+            :next="del"
             @click="del_btn"
-            @next="del"
           >
             <ki-button
               type="danger"
@@ -138,12 +138,11 @@ export default {
         order: 'desc'
       })
       this.tableData = data.list
-      console.log(data)
     },
     async saveList() {
       const { data } = await this.$api.hierarchicalType_save({
-        id: '1',
-        hierarchicalName: '产品型号'
+        id: '9',
+        hierarchicalName: '工商单号'
       })
       console.log(data)
       this.$refs.dy_table.refresh()

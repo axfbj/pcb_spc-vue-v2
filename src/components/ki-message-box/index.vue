@@ -16,6 +16,10 @@ export default {
         content: '此操作将永久删除该数据, 是否继续?',
         title: `提示`
       })
+    },
+    next: {
+      type: Function,
+      default: () => {}
     }
   },
   methods: {
@@ -31,10 +35,10 @@ export default {
         type: 'warning'
       }).then(() => {
         flag = 'Y'
-        this.$emit('next', flag)
+        this.next(flag)
       }).catch(() => {
         flag = 'N'
-        this.$emit('next', flag)
+        this.next(flag)
       })
     }
   }

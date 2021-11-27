@@ -25,8 +25,8 @@
             @click="edit"
           >修改</ki-button>
           <ki-message-box
+            :next="del"
             @click="del_btn"
-            @next="del"
           >
             <ki-button
               type="danger"

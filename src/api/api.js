@@ -1,6 +1,7 @@
-import hierarchicalType from './hierarchicalType'
-import keywordValue from './keywordValue'
-import inspectionItems from './inspectionItems'
+import hierarchicalType from './hierarchical-type'
+import keywordValue from './keyword-value'
+import inspectionItems from './inspection-items'
+import badDefinition from './bad-definition'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -10,5 +11,6 @@ export default {
   // },
   ...hierarchicalType,
   ...keywordValue,
-  ...inspectionItems
+  ...inspectionItems,
+  ...badDefinition
 }

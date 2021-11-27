@@ -21,8 +21,8 @@
           @click="edit"
         >修改</ki-button>
         <ki-message-box
+          :next="del"
           @click="del_btn"
-          @next="del"
         >
           <ki-button
             type="danger"
@@ -37,7 +37,7 @@
       :auto-init="false"
       :header-list="header_list"
       :request="request_data"
-      :page-sizes="[30,60,120]"
+      :page-sizes="[20,60,100]"
       fixed-height="40vh"
       @current-change="current_change"
       @select="select_callback"
@@ -46,7 +46,7 @@
       :visible="cu_dialog"
       :select-row="select_row"
       :flag="cu_flag"
-      :parent-id="selectRow"
+      :parent-id="selectRow.id"
       @handleClose="cu_close"
       @confirm="refresh"
     />
@@ -108,8 +108,8 @@ export default {
         this.$message('操作取消')
         return
       }
-      const res = await this.$api.keywordValue_delete(ids)
-      if (res === 200) {
+      const { code, data } = await this.$api.keywordValue_delete(ids)
+      if (code === '200' && data) {
         this.$message.success('删除成功！')
       }
       this.$refs.dy_table.refresh()
@@ -125,7 +125,7 @@ export default {
       const { code, data } = await this.$api.keywordValue_list({
         page: page_no,
         limit: page_size,
-        sidx: String(this.selectRow.id),
+        hierarchicalTypeId: Number(this.selectRow.id),
         order: 'asc'
       })
       if (code === '200' && data) {
@@ -141,7 +141,6 @@ export default {
     click_link(data) {
       console.log(data)
     },
-
     handleClose() {
       this.$emit('handleClose')
     },
@@ -152,11 +151,7 @@ export default {
       this.refresh()
     },
     open({ loading }) {
-      loading(true)
-      this.$nextTick(() => {
-        this.refresh({ keep: true })
-        loading(false)
-      })
+      this.refresh({ keep: true })
     },
     async opened({ loading }) {
     }

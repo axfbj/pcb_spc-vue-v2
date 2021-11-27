@@ -1,12 +1,14 @@
 <template>
   <el-dialog
     :visible.sync="visible"
-    :title="title"
+    :title="f_title"
     :width="width"
     :before-close="handleClose"
     append-to-body
     @open="open"
     @opened="opened"
+    @closed="closed"
+    @keypress.native.enter="confirm"
   >
     <div v-loading="loading">
       <container-title
@@ -56,7 +58,17 @@ export default {
   },
   data() {
     return {
+      flag: '',
       loading: false
+    }
+  },
+  computed: {
+    f_title() {
+      const statesText = {
+        'add': '添加',
+        'edit': '修改'
+      }
+      return `${statesText[this.flag] || ''}${this.title}`
     }
   },
   methods: {
@@ -64,18 +76,30 @@ export default {
       this.$emit('handleClose')
     },
     confirm() {
-      this.$emit('confirm')
+      if (this.loading) return
+      this.$emit('confirm', { loading: this.setLoadingState, load: this.load })
     },
     setLoadingState(state) {
       this.loading = state
     },
+    async load(func) {
+      this.loading = true
+      const res = await func()
+      this.loading = false
+      return res
+    },
     open() {
+      this.flag = this.$attrs.flag
       this.$nextTick(() => {
-        this.$emit('open', { loading: this.setLoadingState })
+        this.$emit('open', { loading: this.setLoadingState, load: this.load })
       })
     },
     opened() {
-      this.$emit('opened', { loading: this.setLoadingState })
+      this.$emit('opened', { loading: this.setLoadingState, load: this.load })
+    },
+    closed() {
+      this.flag = ''
+      this.loading = false
     }
   }
 }

@@ -213,6 +213,14 @@ export const asyncRoutes = [
         meta: {
           title: '不良项目定义'
         }
+      },
+      {
+        path: 'exception-handling',
+        component: () => import('@/views/exception-handling/index'),
+        name: 'ExceptionHandling',
+        meta: {
+          title: '失控点处理'
+        }
       }
       // {
       //   path: 'role',

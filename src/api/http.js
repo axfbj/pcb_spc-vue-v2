@@ -32,7 +32,7 @@ function apiAxios(method, url, params, contentType) {
   }
   // console.log(params)
   // console.log(qs.stringify(params))
-  return request({
+  request({
     method: method,
     // 拼接参数
     url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,

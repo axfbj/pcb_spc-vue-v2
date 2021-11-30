@@ -24,7 +24,7 @@ const serialize = data => {
   return list.join('&')
 }
 
-function apiAxios(method, url, params, contentType) {
+async function apiAxios(method, url, params, contentType) {
   if (contentType === 'form') {
     request.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
   } else {
@@ -32,14 +32,21 @@ function apiAxios(method, url, params, contentType) {
   }
   // console.log(params)
   // console.log(qs.stringify(params))
-  request({
-    method: method,
-    // 拼接参数
-    url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,
-    data: method === 'POST' || method === 'PUT' ? (contentType === 'form' ? serialize(params) : JSON.stringify(params)) : null,
-    // headers: { Authorization: `Bearer ${token}` },
-    withCredentials: false
-  })
+  try {
+    return await request({
+      method: method,
+      // 拼接参数
+      url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,
+      data: method === 'POST' || method === 'PUT' ? (contentType === 'form' ? serialize(params) : JSON.stringify(params)) : null,
+      // headers: { Authorization: `Bearer ${token}` },
+      withCredentials: false
+    })
+  } catch (error) {
+    return {
+      code: 3000,
+      data: false
+    }
+  }
 }
 
 export default {

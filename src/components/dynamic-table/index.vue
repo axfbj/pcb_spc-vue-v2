@@ -252,8 +252,12 @@ export default {
       if (this.fixedHeight) {
         content_height = this.fixedHeight
         // console.log(this.show && typeof this.fixedHeight === 'string')
-        if (this.show && typeof this.fixedHeight === 'string') {
-          table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
+        if (typeof this.fixedHeight === 'string') {
+          if (this.show) {
+            table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
+          } else {
+            table_height = '100%'
+          }
         }
         this.$nextTick(() => {
           this.content_height = content_height
@@ -285,9 +289,9 @@ export default {
   top: 0;
   left: 0;
   .table-pagination {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    // position: absolute;
+    // bottom: 0;
+    // left: 0;
     text-align: right;
     width: 100%;
   }

@@ -3,6 +3,7 @@ import keywordValue from './keyword-value'
 import inspectionItems from './inspection-items'
 import badDefinition from './bad-definition'
 import controlGroup from './control-group'
+import controlChart from './control-chart'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -14,5 +15,6 @@ export default {
   ...keywordValue,
   ...inspectionItems,
   ...badDefinition,
-  ...controlGroup
+  ...controlGroup,
+  ...controlChart
 }

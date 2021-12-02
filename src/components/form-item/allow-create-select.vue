@@ -3,15 +3,17 @@
     v-model="final_value"
     filterable
     allow-create
+    clearable
     default-first-option
     placeholder=""
     @change="change_val(...arguments)"
+    @focus="focus"
   >
     <el-option
-      v-for="item in options"
-      :key="item.value"
-      :label="item.label"
-      :value="item.value"
+      v-for="(item,index) in options"
+      :key="index"
+      :label="item[props.label]"
+      :value="item[props.value]"
     />
   </el-select>
 </template>
@@ -27,6 +29,13 @@ export default {
     value: {
       type: String,
       default: ''
+    },
+    props: {
+      type: Object,
+      default: () => ({
+        value: 'value',
+        label: 'label'
+      })
     },
     options: {
       type: Array,
@@ -60,6 +69,9 @@ export default {
     change_val(val) {
       this.internal_value = val
       this.$emit('change', val)
+    },
+    focus(...args) {
+      this.$emit('focus', ...args)
     }
   }
 }

@@ -43,7 +43,7 @@
           <el-select v-model="level" placeholder="请选择" style="width: 100%;">
             <el-option
               v-for="item in options"
-              :key="item. level"
+              :key="item.level"
               :label="item.label"
               :value="item. level"
             />

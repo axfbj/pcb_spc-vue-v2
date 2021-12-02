@@ -4,6 +4,7 @@
     :title="f_title"
     :width="width"
     :before-close="handleClose"
+    :top="top"
     append-to-body
     @open="open"
     @opened="opened"
@@ -54,6 +55,10 @@ export default {
     width: {
       type: String,
       default: '30%'
+    },
+    top: {
+      type: String,
+      default: '15vh'
     }
   },
   data() {

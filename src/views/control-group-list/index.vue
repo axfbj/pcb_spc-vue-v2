@@ -1,14 +1,37 @@
 <template>
   <el-row>
-    <el-col :span="4">
+    <el-col :span="4" style="border-right: 1px solid #ccc;">
       <container-layout ref="left_tree">
         <template v-slot:btns>
-          <div style="text-align: left;">
-            控制组列表
-          </div>
+          <el-row>
+            <el-col :span="8" style="text-align: left; font-size: 14px;">
+              控制组列表
+            </el-col>
+            <el-col :span="16" style="text-align: right;">
+              <el-button-group>
+                <ki-button type="primary" icon="el-icon-plus" @click="tree_add" />
+                <ki-button type="warning" icon="el-icon-edit" @click="tree_edit" />
+                <ki-message-box
+                  :next="tree_del_next"
+                  style="float: left;"
+                  @click="tree_del"
+                >
+                  <ki-button type="danger" icon="el-icon-delete" />
+                </ki-message-box>
+
+              </el-button-group>
+            </el-col>
+          </el-row>
+
         </template>
         <template v-slot:custum_content>
-          <ki-tree />
+          <!-- <ki-tree /> -->
+          <control-group-tree
+            ref="tree"
+            :current-key="current_tree_node_key"
+            @node-click="node_click"
+            @render-after="render_after"
+          />
         </template>
       </container-layout>
     </el-col>
@@ -18,14 +41,11 @@
           <div style="text-align: right;">
             <ki-button
               type="primary"
-              :auto-loading="true"
-              @click="cc(...arguments,'1111')"
+              @click="cc"
             >控制图设置</ki-button>
             <ki-button type="warning">单项目输入</ki-button>
             <ki-button
               type="danger"
-              :auto-loading="true"
-              @click="cc(...arguments,'1111')"
             >删除</ki-button>
           </div>
         </template>
@@ -135,7 +155,9 @@
         </template>
         <template v-slot:custum_content>
           <dynamic-table
+            ref="dy_table"
             v-model="select"
+            :auto-init="false"
             :header-list="header_list"
             :request="request_data"
             :page-sizes="[20,60,100]"
@@ -164,25 +186,47 @@
         </template>
       </container-layout>
     </el-col>
+    <control-chart-settings
+      :visible="chartSetting_dialog"
+      @handleClose="chartSetting_dialog=false"
+    />
+    <add-group-tree-dialog
+      :visible="add_group_tree_dialog"
+      :flag="tree_flag"
+      :node-data="current_tree_node_data"
+      @handleClose="tree_dialog_close"
+      @confirm="tree_confirm"
+    />
   </el-row>
 
 </template>
 
 <script>
-import Rectangle from './components/rectangle'
-import RoundShape from './components/round-shape'
 import { AllowCreateSelect } from '@/components/form-item'
+import Rectangle from './components/status-graph/rectangle'
+import RoundShape from './components/status-graph/round-shape'
+import ControlChartSettings from './components/control-chart-settings'
+import ControlGroupTree from './components/control-group-tree'
+import AddGroupTreeDialog from './components/add-group-tree-dialog'
 // import StatusFlag from './components/status-flag'
 export default {
   name: 'ControlGroupList',
   components: {
     Rectangle,
     RoundShape,
-    AllowCreateSelect
+    AllowCreateSelect,
+    ControlChartSettings,
+    ControlGroupTree,
+    AddGroupTreeDialog
     // StatusFlag
   },
   data() {
     return {
+      tree_flag: '',
+      // current_tree_node_key: '',
+      current_tree_node_data: {},
+      add_group_tree_dialog: false,
+      chartSetting_dialog: false,
       form_data: {
         state: '',
         s_number: '',
@@ -222,53 +266,91 @@ export default {
       }]
     }
   },
-
+  computed: {
+    current_tree_node_key() {
+      return this.current_tree_node_data.id
+    }
+  },
   methods: {
-    cc(loddingEnd, f) {
-      setTimeout(() => {
-        loddingEnd()
-      }, 1000)
+    render_after(currentData) {
+      this.current_tree_node_data = currentData
+      this.$refs.dy_table.refresh()
     },
-
+    cc() {
+      this.chartSetting_dialog = true
+    },
+    tree_confirm() {
+      this.$refs.tree.refresh()
+    },
+    tree_add() {
+      this.tree_flag = 'add'
+      this.add_group_tree_dialog = true
+    },
+    tree_edit() {
+      this.tree_flag = 'edit'
+      this.add_group_tree_dialog = true
+    },
+    tree_del(open) {
+      if (!this.current_tree_node_data.id) {
+        this.$message.warning('请选择一个节点')
+        return
+      }
+      open()
+    },
+    async tree_del_next(flag) {
+      // if (flag === 'Y') {
+      // const {code,data} = await this.$api.controlGroup_delete()
+      // } else {
+      //   this.$message.warning('操作取消')
+      // }
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+      const { code, data } = await this.$api.controlGroup_delete([this.current_tree_node_key])
+      if (code === '200' && data) {
+        this.$message.success('删除成功！')
+      }
+      this.$refs.tree.refresh()
+    },
+    tree_dialog_close() {
+      this.add_group_tree_dialog = false
+    },
+    node_click(data, node, com) {
+      this.current_tree_node_data = data
+    },
     click_link(data) {
       console.log(data)
-    },
-
-    async copy(name, title) {
-      if (!this.can_copy) return
-
-      await this.can_copy.writeText(`<icon name="${name}" title="${title}" />`)
-      this.$message.success('按钮已到剪贴板')
     },
     current_change(val) {
       console.log('current_change')
       console.log(val)
     },
     request_data({ page_no, page_size, data }) {
-      console.log('------------------', page_no, page_size)
-      const total = 60
-      page_no = Number(page_no)
-      page_size = Number(page_size)
-      const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            data: Array(list_num).fill({
-              date: '2016-05-02',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1518 弄'
-            }).map((i, index) => {
-              const id = (page_no - 1) * page_size + index
-              console.log(id)
-              return {
-                ...i,
-                id
-              }
-            }),
-            total
-          })
-        }, 1000)
-      })
+      // console.log('------------------', page_no, page_size)
+      // const total = 60
+      // page_no = Number(page_no)
+      // page_size = Number(page_size)
+      // const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
+      // return new Promise((resolve) => {
+      //   setTimeout(() => {
+      //     resolve({
+      //       data: Array(list_num).fill({
+      //         date: '2016-05-02',
+      //         name: '王小虎',
+      //         address: '上海市普陀区金沙江路 1518 弄'
+      //       }).map((i, index) => {
+      //         const id = (page_no - 1) * page_size + index
+      //         console.log(id)
+      //         return {
+      //           ...i,
+      //           id
+      //         }
+      //       }),
+      //       total
+      //     })
+      //   }, 1000)
+      // })
     },
     select_callback(data) {
       console.log('select_callback：  ', JSON.stringify(data))

@@ -6,19 +6,21 @@
     @confirm="confirm"
     @opened="opened"
   >
-    <el-form
-      ref="form"
-      :model="form"
-      label-width="auto"
-    >
-      <el-form-item
-        prop="hierarchicalName"
-        label="类型名称:"
+    <div style="padding: 10px 20px;">
+      <el-form
+        ref="form"
+        :model="form"
+        label-width="auto"
       >
-        <el-input v-model="form.hierarchicalName" />
-      </el-form-item>
+        <el-form-item
+          prop="hierarchicalName"
+          label="类型名称:"
+        >
+          <el-input v-model="form.hierarchicalName" />
+        </el-form-item>
+      </el-form>
+    </div>
 
-    </el-form>
   </ki-dialog>
 </template>
 

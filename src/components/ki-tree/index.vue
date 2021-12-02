@@ -1,5 +1,18 @@
 <template>
-  <el-tree :data="data" :props="props" :node-key="nodeKey" @node-click="handleNodeClick">
+  <el-tree
+    ref="tree"
+    :data="data"
+    :props="props"
+    :node-key="nodeKey"
+    :default-expand-all="defaultExpandAll"
+    :default-expanded-keys="expandedList"
+    :current-node-key="currentNodeKey"
+    :highlight-current="true"
+    :expand-on-click-node="false"
+    @node-click="handleNodeClick"
+    @node-expand="nodeExpand"
+    @node-collapse="nodeCollapse"
+  >
     <slot />
   </el-tree>
 </template>
@@ -30,22 +43,55 @@ export default {
     defaultExpandAll: {
       type: Boolean,
       default: false
+    },
+    defaultExpandedKeys: {
+      type: Array,
+      default: () => ([])
+    },
+    currentNodeKey: {
+      type: [String, Number],
+      default: ''
     }
   },
   data() {
     return {
+      expandedList: [],
       loadingStatus: false
+    }
+  },
+  watch: {
+    defaultExpandedKeys(keys) {
+      this.expandedList.push(...this.defaultExpandedKeys)
     }
   },
   methods: {
     handleNodeClick(...args) {
-      this.$emit('row-click', ...args)
+      this.$emit('node-click', ...args)
+    },
+    setCurrentKey(key) {
+      this.$refs.tree.setCurrentKey(key)
+    },
+    getCurrentKey() {
+      return this.$refs.tree.getCurrentKey()
+    },
+    getNode(key_or_data) {
+      return this.$refs.tree.getNode(key_or_data)
+    },
+    nodeExpand(data) {
+      this.expandedList.push(data.id) // 在节点展开是添加到默认展开数组
+    },
+    nodeCollapse(data) {
+      this.expandedList.splice(this.expandedList.indexOf(data.id), 1) // 收起时删除数组里对应选项
     }
+
   }
 }
 </script>
 
 <style lang="scss" scoped>
+::v-deep.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
+    background-color: #ffe48d;
+}
 
 </style>
 

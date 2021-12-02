@@ -2,6 +2,7 @@ import hierarchicalType from './hierarchical-type'
 import keywordValue from './keyword-value'
 import inspectionItems from './inspection-items'
 import badDefinition from './bad-definition'
+import controlGroup from './control-group'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -12,5 +13,6 @@ export default {
   ...hierarchicalType,
   ...keywordValue,
   ...inspectionItems,
-  ...badDefinition
+  ...badDefinition,
+  ...controlGroup
 }

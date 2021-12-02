@@ -100,6 +100,7 @@ export default {
     closed() {
       this.flag = ''
       this.loading = false
+      this.$emit('closed')
     }
   }
 }

@@ -84,15 +84,13 @@ export default {
       }
       this.handleClose()
     },
-    async open({ loading }) {
+    async open({ load }) {
       this.flag = this.$attrs.flag
       if (this.flag !== 'add') {
-        loading(true)
-        const { code, data } = await this.$api.inspectionItems_info({ id: this.selectRow.id })
+        const { code, data } = await load(() => this.$api.inspectionItems_info({ id: this.selectRow.id }))
         if (code === '200' && data) {
           this.form.inspectionName = data.inspectionName
         }
-        loading(false)
       }
       this.$refs['ipt'].focus()
     },

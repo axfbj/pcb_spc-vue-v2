@@ -1,6 +1,6 @@
 <template>
   <div
-    style="display: inline-block;"
+    style="display: inline-block; line-height: normal;"
     @click="open_click"
   >
     <slot />

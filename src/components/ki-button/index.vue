@@ -3,6 +3,7 @@
     v-bind="$attrs"
     :loading="loadingStatus"
     :type="type"
+    :icon="icon"
     @click="handleClick"
   >
     <slot />
@@ -14,6 +15,10 @@ export default {
   name: 'KiButton',
   props: {
     type: {
+      type: String,
+      default: ''
+    },
+    icon: {
       type: String,
       default: ''
     },

@@ -1,6 +1,7 @@
 export default {
   data() {
     return {
+
       form: {
         date: ['2021-01-01 00:00:00', '2021-12-01 00:00:00'],
         state: '',

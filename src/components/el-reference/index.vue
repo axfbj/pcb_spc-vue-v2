@@ -38,6 +38,8 @@
       </div>
 
       <!-- 模板 -->
+      <inspection-items v-if="type==='inspection-items'" :display="dialog_display && type==='inspection-items'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
+      <!-- 检测项目 -->
       <select-dialog-template v-if="type==='select-dialog-template'" :display="dialog_display && type==='select-dialog-template'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
 
     </div>
@@ -46,13 +48,15 @@
 </template>
 
 <script>
-import selectDialogTemplate from './select-dialog-template'
+import SelectDialogTemplate from './select-dialog-template'
+import InspectionItems from './inspection-items'
 
 export default {
   name: 'ElReference',
   components: {
     // 模板
-    selectDialogTemplate
+    SelectDialogTemplate,
+    InspectionItems
 
   },
   model: {
@@ -113,7 +117,10 @@ export default {
         let title = ''
         switch (!this.extra.custom_title && type) {
           case 'select-dialog-template':
-            title = item.doccode
+            title = item.id
+            break
+          case 'inspection-items':
+            title = item.id
             break
           default:
             title = typeof this.extra.custom_title === 'function' ? (this.extra.custom_title(item) || '') : (item[this.extra.custom_title] || '')

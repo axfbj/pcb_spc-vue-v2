@@ -36,6 +36,24 @@
           </ki-message-box>
         </div>
       </template>
+      <template v-slot:form>
+        <el-form-item
+          label="检测项目名称："
+          prop="inspectionName"
+        >
+          <el-input
+            v-model="add_form.inspectionName"
+            style="width: 150px"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            icon="el-icon-search"
+            @click="query"
+          >查询</el-button>
+        </el-form-item>
+      </template>
       <template v-slot:custum_content>
         <dynamic-table
           ref="dy_table"
@@ -76,15 +94,8 @@ export default {
         { prop: 'id', label: '检测项目ID', width: '180' },
         { prop: 'inspectionName', label: '检测项目名称', width: '280' }
       ],
-      form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+      add_form: {
+        inspectionName: ''
       },
       select_row: {}
     }
@@ -151,6 +162,9 @@ export default {
     },
     select_callback(data) {
       console.log('select_callback：  ', JSON.stringify(data))
+    },
+    query() {
+      this.$refs.dy_table.refresh()
     }
   }
 }

@@ -4,6 +4,8 @@ import inspectionItems from './inspection-items'
 import badDefinition from './bad-definition'
 import controlGroup from './control-group'
 import controlChart from './control-chart'
+import controlChartSon from './control-chart-son'
+import discriminationRules from './discrimination-rules'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -16,5 +18,7 @@ export default {
   ...inspectionItems,
   ...badDefinition,
   ...controlGroup,
-  ...controlChart
+  ...controlChart,
+  ...controlChartSon,
+  ...discriminationRules
 }

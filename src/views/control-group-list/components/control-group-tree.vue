@@ -6,7 +6,9 @@
     v-bind="$attrs"
     node-key="id"
     :default-expanded-keys="defaultExpandedKeys"
+    :current-key="currentKey"
     @node-click="node_click"
+    @path-change="path_change"
   />
   <!-- :default-expand-all="true" -->
   <!-- :current-node-key="'1460868489119117313'" -->
@@ -43,6 +45,10 @@ export default {
     })
   },
   methods: {
+    path_change(path) {
+      console.log(path)
+      this.$emit('path-change', path)
+    },
     async refresh(callback) {
       const { code, data } = await this.$api.controlGroup_tree()
       if (code === '200' && data) {

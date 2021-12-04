@@ -81,7 +81,7 @@ export default {
       this.$emit('handleClose')
     },
     confirm() {
-      if (this.loading) return
+      if (this.loading || !this.footer) return
       this.$emit('confirm', { loading: this.setLoadingState, load: this.load })
     },
     setLoadingState(state) {

@@ -51,21 +51,29 @@ export default {
     currentNodeKey: {
       type: [String, Number],
       default: ''
+    },
+    currentKey: {
+      type: [String, Number],
+      default: ''
     }
   },
   data() {
     return {
       expandedList: [],
-      loadingStatus: false
+      path: ''
     }
   },
   watch: {
-    defaultExpandedKeys(keys) {
+    defaultExpandedKeys() {
       this.expandedList.push(...this.defaultExpandedKeys)
+    },
+    currentKey() {
+      this.$emit('path-change', this.getTreePath())
     }
   },
   methods: {
     handleNodeClick(...args) {
+      // console.log(args)
       this.$emit('node-click', ...args)
     },
     setCurrentKey(key) {
@@ -77,11 +85,26 @@ export default {
     getNode(key_or_data) {
       return this.$refs.tree.getNode(key_or_data)
     },
+    getCurrentNode() {
+      return this.$refs.tree.getCurrentNode()
+    },
     nodeExpand(data) {
       this.expandedList.push(data.id) // 在节点展开是添加到默认展开数组
     },
     nodeCollapse(data) {
       this.expandedList.splice(this.expandedList.indexOf(data.id), 1) // 收起时删除数组里对应选项
+    },
+    getTreePath() {
+      const currentNode = this.getCurrentNode()
+      const arr = [currentNode.groupName]
+      const getName = (key) => {
+        if (key === '0') return arr.reverse().join('/')
+        const node = this.getNode(key)
+        arr.push(node.data.groupName)
+        return getName(node.data.parentId)
+      }
+      const path = `/${getName(currentNode.parentId)}`
+      return path
     }
 
   }

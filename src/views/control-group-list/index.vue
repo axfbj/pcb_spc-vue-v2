@@ -30,6 +30,7 @@
             :current-key="current_tree_node_key"
             @node-click="node_click"
             @render-after="render_after"
+            @path-change="path_change"
           />
         </template>
       </container-layout>
@@ -37,7 +38,10 @@
     <el-col :span="20">
       <container-layout ref="control-pic-list">
         <template v-slot:btns>
-          <div style="text-align: right;">
+          <div style="float: left;">
+            <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span>
+          </div>
+          <div style="text-align: right; overflow: hidden;">
             <ki-button
               type="primary"
               @click="cc"
@@ -213,6 +217,7 @@
     <control-chart-settings
       :visible="chartSetting_dialog"
       top="5vh"
+      :tree-path="path"
       @handleClose="chartSetting_dialog=false"
     />
     <add-group-tree-dialog
@@ -233,7 +238,7 @@ import RoundShape from './components/status-graph/round-shape'
 import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
-import hierarchicalTypeData from './components/mixins/hierarchicalType-data'
+import HierarchicalTypeData from './components/mixins/hierarchicalType-data'
 // import StatusFlag from './components/status-flag'
 export default {
   name: 'ControlGroupList',
@@ -246,7 +251,7 @@ export default {
     AddGroupTreeDialog
     // StatusFlag
   },
-  mixins: [hierarchicalTypeData],
+  mixins: [HierarchicalTypeData],
   data() {
     return {
       tree_flag: '',
@@ -295,7 +300,8 @@ export default {
         resource: '',
         desc: ''
       },
-      select: []
+      select: [],
+      path: ''
     }
   },
   computed: {
@@ -304,6 +310,10 @@ export default {
     }
   },
   methods: {
+    path_change(path) {
+      this.path = path
+      // console.log(path)
+    },
     formart_hierarchicalType() {},
     render_after(currentData) {
       this.current_tree_node_data = currentData

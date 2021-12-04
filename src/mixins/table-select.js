@@ -22,7 +22,7 @@ export default {
     },
     pageSizes: {
       type: Array,
-      default: () => ([20, 50, 100])
+      default: () => ([20, 60, 100])
     },
     summaryMethod: {
       type: Function,

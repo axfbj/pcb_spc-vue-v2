@@ -10,7 +10,7 @@ export default {
     return http.post('/spc/control/chart/son/delete', data)
   },
   controlChartSon_info(data) {
-    return http.post(`/spc/control/chart/son/info/${data.controlGroupId}`, data, 'form')
+    return http.post(`/spc/control/chart/son/info/${data.id}`, data, 'form')
   },
   controlChartSon_generateCode(data) {
     return http.post('/spc/control/chart/son/proGenerateControlChartCode', data)

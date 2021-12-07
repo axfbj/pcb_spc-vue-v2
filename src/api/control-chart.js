@@ -11,5 +11,8 @@ export default {
   },
   controlChart_inspectionItems(data) {
     return http.post(`/spc/control/chart/queryInspectionItemsByControlGroupId/${data.controlGroupId}`, data, 'form')
+  },
+  controlChart_queryByControlChartId(data) {
+    return http.post(`/spc/control/chart/queryByControlChartId/${data.controlChartId}`, data, 'form')
   }
 }

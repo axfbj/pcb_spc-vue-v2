@@ -56,11 +56,12 @@ export default {
     },
     async confirm({ loading }) {
       loading(true)
-      const res = await this.$api.hierarchicalType_update({
+      const { code, data } = await this.$api.hierarchicalType_update({
         id: this.selectRow.id,
         hierarchicalName: this.form.hierarchicalName
       })
-      if (res.code === '200') {
+      if (code === '200' && data) {
+        this.$store.dispatch('hierarchicalTypesDefinition/changeHtypes', this)
         this.$emit('confirm')
       }
       this.handleClose()

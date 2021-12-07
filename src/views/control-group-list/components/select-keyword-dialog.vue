@@ -10,7 +10,21 @@
   >
     <div style="padding: 10px 40px; text-align: center;">
       <el-form ref="form" :model="form" label-width="auto" style="width: 60%; margin: 0 auto;">
-        <el-form-item label="产品型号:">
+        <div v-for="item in hierarchicalTypes" :key="item.id" class="keyword-type">
+          <el-checkbox v-model="form[`hierarchicalTypeCheckbox${item.serialNumber}`]" class="keyword-checkbox" />
+          <el-form-item :label="item.hierarchicalName">
+            <allow-create-select
+              v-model="form[`hierarchicalTypeValue${item.serialNumber}`]"
+              style="width:100%"
+              :props="keywordProps"
+              :options="options[`hierarchicalType${item.serialNumber}`]"
+              @focus="getHierarchicalType(item.id)"
+            />
+
+          </el-form-item>
+        </div>
+        <!-- hierarchicalTypes -->
+        <!-- <el-form-item label="产品型号:">
           <allow-create-select
             v-model="form.hierarchicalTypeValueOne"
             style="width:100%"
@@ -74,7 +88,7 @@
 
             @focus="getHierarchicalType(9)"
           />
-        </el-form-item>
+        </el-form-item> -->
 
       </el-form>
     </div>
@@ -83,6 +97,7 @@
 
 <script>
 import { AllowCreateSelect } from '@/components/form-item'
+import { mapGetters } from 'vuex'
 export default {
   name: 'SelectKeywordDialog',
   components: {
@@ -100,17 +115,54 @@ export default {
   },
   data() {
     return {
-      form: {
-        hierarchicalTypeValueOne: '',
-        hierarchicalTypeValueTwo: '',
-        hierarchicalTypeValueThree: '',
-        hierarchicalTypeValueFour: '',
-        hierarchicalTypeValueFive: '',
-        hierarchicalTypeValueSix: '',
-        hierarchicalTypeValueSeven: '',
-        hierarchicalTypeValueEight: '',
-        hierarchicalTypeValueNine: ''
+      form: {},
+      form_data: {
+        hierarchicalTypeValue1: '',
+        hierarchicalTypeValue2: '',
+        hierarchicalTypeValue3: '',
+        hierarchicalTypeValue4: '',
+        hierarchicalTypeValue5: '',
+        hierarchicalTypeValue6: '',
+        hierarchicalTypeValue7: '',
+        hierarchicalTypeValue8: '',
+        hierarchicalTypeValue9: '',
+
+        hierarchicalTypeCheckbox1: false,
+        hierarchicalTypeCheckbox2: false,
+        hierarchicalTypeCheckbox3: false,
+        hierarchicalTypeCheckbox4: false,
+        hierarchicalTypeCheckbox5: false,
+        hierarchicalTypeCheckbox6: false,
+        hierarchicalTypeCheckbox7: false,
+        hierarchicalTypeCheckbox8: false,
+        hierarchicalTypeCheckbox9: false
+      },
+      options: {
+        hierarchicalType1: [],
+        hierarchicalType2: [],
+        hierarchicalType3: [],
+        hierarchicalType4: [],
+        hierarchicalType5: [],
+        hierarchicalType6: [],
+        hierarchicalType7: [],
+        hierarchicalType8: [],
+        hierarchicalType9: []
+      },
+      keywordProps: {
+        value: 'id',
+        label: 'keywordName'
       }
+      // form: {
+      //   hierarchicalTypeValueOne: '',
+      //   hierarchicalTypeValueTwo: '',
+      //   hierarchicalTypeValueThree: '',
+      //   hierarchicalTypeValueFour: '',
+      //   hierarchicalTypeValueFive: '',
+      //   hierarchicalTypeValueSix: '',
+      //   hierarchicalTypeValueSeven: '',
+      //   hierarchicalTypeValueEight: '',
+      //   hierarchicalTypeValueNine: ''
+      // }
     }
   },
   computed: {
@@ -120,10 +172,44 @@ export default {
         'data': '数据点层次信息'
       }
       return title[this.keywordFlag] || ''
-    }
+    },
+    ...mapGetters(['hierarchicalTypes'])
+
+  },
+  created() {
+    Object.freeze(this.form_data)
+    this.form = JSON.parse(JSON.stringify(this.form_data))
   },
   methods: {
-    getHierarchicalType() {},
+    clear() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
+    set_checkboxData() {
+      const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.selectRow
+      const str1 = this.keywordFlag === 'level' ? chartHierarchicalTypeStr : pointHierarchicalTypeStr
+      const ruleArr1 = str1.split(',')
+      ruleArr1.forEach(item => {
+        const ruleNum = item.split('=')[0]
+        this.form[`hierarchicalTypeCheckbox${ruleNum}`] = true
+      })
+      const str2 = this.keywordFlag === 'level' ? pointHierarchicalTypeStr : chartHierarchicalTypeStr
+      const ruleArr2 = str2.split(',')
+      ruleArr2.forEach(item => {
+        const ruleNum = item.split('=')[0]
+        this.form[`hierarchicalTypeCheckbox${ruleNum}`] = false
+      })
+    },
+    async getHierarchicalType(id) {
+      const { code, data } = await this.$api.keywordValue_list({
+        page: '1',
+        limit: '20',
+        hierarchicalTypeId: id,
+        order: 'asc'
+      })
+      if (code === '200' && data) {
+        this.options[`hierarchicalType${id}`] = data.list
+      }
+    },
     handleClose() {
       this.$refs.form.resetFields()
       this.$emit('handleClose')
@@ -161,6 +247,7 @@ export default {
       // this.handleClose()
     },
     async open({ load }) {
+      this.set_checkboxData()
 
       // this.flag = this.$attrs.flag
       // if (this.flag !== 'add') {
@@ -177,6 +264,7 @@ export default {
       // this.$refs.ipt.focus()
     },
     closed() {
+      this.clear()
       // this.level = '0'
     }
   }
@@ -184,6 +272,17 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.keyword-type {
+  position: relative;
+  top: 0;
+  left: 0;
+  .keyword-checkbox {
+    position: absolute;
+    top: 50%;
+    left: -20px;
+    transform: translateY(-50%);
+  }
+}
 .fixed-select {
   ::v-deep .el-checkbox__input.is-disabled + span.el-checkbox__label {
     color: #1890ff;

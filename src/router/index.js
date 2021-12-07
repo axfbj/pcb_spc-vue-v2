@@ -221,6 +221,14 @@ export const asyncRoutes = [
         meta: {
           title: '失控点处理'
         }
+      },
+      {
+        path: 'control-chart-details',
+        component: () => import('@/views/control-chart-details/index'),
+        name: 'ControlChartDetails',
+        meta: {
+          title: '控制图详情'
+        }
       }
       // {
       //   path: 'role',

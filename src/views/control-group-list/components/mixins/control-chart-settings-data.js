@@ -4,11 +4,10 @@ export default {
       type: [String, Number],
       default: 0
     }
-
   },
   data() {
     return {
-      controlChartType: '',
+      controlChartType: 'XBar-R',
       options: [{
         value: 'XBar-R',
         label: 'XBar-R'
@@ -25,7 +24,6 @@ export default {
         value: 'nP',
         label: 'np'
       }],
-      value2: '',
       precisionOptiosn: [{
         value: '1',
         label: '1'
@@ -48,32 +46,32 @@ export default {
       }],
       form: {},
       form_data: {
-        'chartHierarchicalType': 0,
+        'chartHierarchicalType': '',
         'chartHierarchicalTypeStr': '',
         'controlChartCode': '',
-        'controlChartId': 0,
+        'controlChartId': 0, // 添加时为 0
         'customTitle': '',
         'description': '',
-        'digit': 0,
-        'discriminationRulesId': 0,
+        'digit': '',
+        'discriminationRulesId': '',
         'discriminationRulesStr': '',
-        'g1cl': 0,
-        'g1lcl': 0,
-        'g1ucl': 0,
-        'g2cl': 0,
-        'g2lcl': 0,
-        'g2ucl': 0,
-        'id': 0,
+        'g1cl': '',
+        'g1lcl': '',
+        'g1ucl': '',
+        'g2cl': '',
+        'g2lcl': '',
+        'g2ucl': '',
+        'id': '',
         'inspectionItemsId': '',
-        'lsl': 0,
-        'pointHierarchicalType': 0,
+        'lsl': '',
+        'pointHierarchicalType': '',
         'pointHierarchicalTypeStr': '',
-        'sampleSize': 0,
-        'sl': 0,
-        'status': 0,
+        'sampleSize': '',
+        'sl': '',
+        'status': '',
         'updateDate': '',
-        'updateUserId': 0,
-        'usl': 0
+        'updateUserId': '',
+        'usl': ''
       }
     }
   },
@@ -82,12 +80,22 @@ export default {
     this.form = JSON.parse(JSON.stringify(this.form_data))
   },
   methods: {
-    save_chart() {
+    clear() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+      this.t_data = []
+      this.select_row = {}
+      this.inspection_items_select = { }
+      this.controlChartType = 'XBar-R'
+      this.$refs.dy_table.refresh()
+    },
+    save_chart_data() {
+      // console.log('this.t_data', this.t_data)
       const params = {
         controlChartName: this.treePath,
-        controlChartType: this.form.controlChartType,
+        controlChartType: this.controlChartType,
         controlGroupId: this.controlGroupId,
         controlChartSonEntityS: [
+          ...this.t_data
           // {
           //   // 'chartHierarchicalType': 0,
           //   chartHierarchicalTypeStr: this.form.chartHierarchicalTypeStr,
@@ -118,7 +126,8 @@ export default {
           // }
         ]
       }
-      console.log(params)
+      return params
+      // console.log(params)
     //   this.$api.controlChartSon_save()
     },
     async get_ControlChartCode() {

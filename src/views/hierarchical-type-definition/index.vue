@@ -119,7 +119,7 @@ export default {
       open()
     },
     async del(flag) {
-      const ids = typeof this.select_row === 'object' ? [this.select_row.id] : this.select_row.map(item => item.id)
+      const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
       if (flag === 'N') {
         this.$message('操作取消')
         return
@@ -152,15 +152,17 @@ export default {
       console.log(val)
     },
     async request_data({ page_no, page_size, table_data }) {
-      const { data } = await this.$api.hierarchicalType_list({
+      const { code, data } = await this.$api.hierarchicalType_list({
         page: page_no,
         limit: page_size,
         sidx: 'id',
         order: 'asc'
       })
-      return {
-        data: data.list,
-        total: data.totalCount
+      if (code === '200' && data) {
+        return {
+          data: data.list,
+          total: data.totalCount
+        }
       }
     },
     select_callback(data) {

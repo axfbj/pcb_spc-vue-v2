@@ -35,16 +35,8 @@
         class="footer"
         :style="{height: typeof(footer_height) === 'string'? footer_height : footer_height + 'px',paddingTop: '4px'}"
       >
-        <div
-          v-if="adjustableHeight"
-          class="line-div-box"
-        >
-          <div
-            ref="lineDiv"
-            class="lineDiv"
-            style="top: 0"
-            @mousedown="line_down($event)"
-          />
+        <div v-if="adjustableHeight" class="line-div-box">
+          <div ref="lineDiv" class="lineDiv" style="top: 0" @mousedown="line_down($event)" />
         </div>
         <div style="height: 100%; overflow: auto;">
           <slot name="footer" />
@@ -92,6 +84,10 @@ export default {
     fixedHeight: {
       type: [Number, String],
       default: 0
+    },
+    afterCalc: {
+      type: Function,
+      default: () => {}
     }
   },
   data() {
@@ -100,7 +96,6 @@ export default {
       content_height2: '100%',
       table_height: '100%',
       footer_height: 'auto',
-      table_pagination_bottom: 0,
       // x: 0,
       y: 0,
       // l: 0,
@@ -198,21 +193,15 @@ export default {
     },
     // 重新计算表格的最大高度
     calc() {
-      // let content_height, content_height2, table_height
       let content_height, content_height2
-
       if (this.fixedHeight) {
         content_height = this.fixedHeight
-        // if (this.show && typeof this.fixedHeight === 'string') {
-        //   table_height = `calc(100% - ${this.$refs.pagination.$el.clientHeight}px)`
-        // }
         this.$nextTick(() => {
           this.content_height = content_height
-          // this.table_height = table_height
+          this.afterCalc()
         })
         return
       }
-      // if (!this.$refs.table && !this.$refs.content_box) return
       if (!this.$refs.content_box) return
       if (this.$refs.content_box) {
         content_height = window.innerHeight - this.$refs.content_box.getBoundingClientRect().top
@@ -232,19 +221,10 @@ export default {
           content_height2 = content_height - this.$refs.footer.clientHeight
         }
       }
-      // if (this.show) {
-      //   table_height = content_height - this.$refs.pagination.$el.clientHeight
-      // } else {
-      //   table_height = content_height
-      // }
-      if (this.$refs.main_footer) {
-        // table_height -= this.$refs.main_footer.clientHeight
-        // this.table_pagination_bottom = this.$refs.main_footer.clientHeight + 'px'
-      }
       this.$nextTick(() => {
         this.content_height = content_height
         this.content_height2 = content_height2
-        // this.table_height = table_height
+        this.afterCalc()
       })
     }
   }

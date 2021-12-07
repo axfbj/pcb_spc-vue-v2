@@ -32,7 +32,6 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
-
 Vue.use(Element, {
   size: Cookies.get('size') || 'mini'// set element-ui default size
   // locale: enLang // 如果使用中文，无需设置，请删除
@@ -41,6 +40,9 @@ Vue.use(Element, {
 import api from './api/api.js'
 // 定义全局变量
 Vue.prototype.$api = api
+
+import echarts from './utils/echartsUi'
+Vue.prototype.$echarts = echarts
 
 import ContainerLayout from '@/components/container-layout'
 import ContainerTitle from '@/components/container-title'
@@ -51,7 +53,6 @@ import KiMessageBox from '@/components/ki-message-box'
 import KiButton from '@/components/ki-button'
 import KiDialog from '@/components/ki-dialog'
 import KiTree from '@/components/ki-tree'
-
 Vue.use((Vue) => {
   Vue.component('container-layout', ContainerLayout)
   Vue.component('container-title', ContainerTitle)
@@ -63,15 +64,6 @@ Vue.use((Vue) => {
   Vue.component('ki-dialog', KiDialog)
   Vue.component('ki-tree', KiTree)
 })
-
-// const res = Vue.prototype.$api.hierarchicalType_list({
-//   page: '1',
-//   limit: '10',
-//   sidx: 'id',
-//   order: 'desc'
-// })
-// console.log('res', res)
-// post('/spc/hierarchicalType/list', {})
 
 // register global utility filters
 Object.keys(filters).forEach(key => {

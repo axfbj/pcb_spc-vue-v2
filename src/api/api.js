@@ -6,6 +6,7 @@ import controlGroup from './control-group'
 import controlChart from './control-chart'
 import controlChartSon from './control-chart-son'
 import discriminationRules from './discrimination-rules'
+import inspectionRecord from './inspection-record'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -20,5 +21,6 @@ export default {
   ...controlGroup,
   ...controlChart,
   ...controlChartSon,
-  ...discriminationRules
+  ...discriminationRules,
+  ...inspectionRecord
 }

@@ -7,6 +7,7 @@
     class="control-chart-settings"
     @handleClose="handleClose"
     @confirm="confirm"
+    @open="open"
     @opened="opened"
   >
     <div style="padding: 0px 20px; overflow:hidden;">
@@ -16,9 +17,9 @@
         :inline="true"
         style="float: left;"
       >
-        <el-row style="padding-bottom: 10px; color: #008040;">控制组名称: {{ treePath }}</el-row>
+        <el-row style="padding-bottom: 10px; color: #008040;">控制组名称: {{ settingFlag === 'add' ? treePath : tree_path }}</el-row>
         <el-form-item label="控制图类型:" style="margin-bottom: 10px;">
-          <el-select v-model="controlChartType" placeholder="请选择">
+          <el-select v-model="controlChartType" placeholder="请选择" @change="controlChartType_change">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -31,9 +32,15 @@
           <ki-button type="primary">添加</ki-button>
         </el-reference>
         <ki-button type="warning" style="margin-left: 10px;">克隆</ki-button>
-        <ki-button
-          type="danger"
-        >删除</ki-button>
+        <ki-message-box
+          :next="del"
+          @click="del_btn"
+        >
+          <ki-button
+            type="danger"
+            style="margin-left: 10px;"
+          >删除</ki-button>
+        </ki-message-box>
 
       </el-form>
 
@@ -51,6 +58,7 @@
         :page-sizes="[1000]"
         fixed-height="26vh"
         :one-page-show-pagination="false"
+        unique="rowNumber"
         @select="select_callback"
       />
     </div>
@@ -60,16 +68,16 @@
           <fieldset style="border: 1px solid #ccc; height: 264px;">
             <legend style="color:#606266">基本信息</legend>
             <el-form-item label="规格上限:" prop="usl">
-              <el-input v-model="form.usl" type="text" :disabled="['P','nP'].includes(form.controlChartType)" />
+              <el-input v-model.number="form.usl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="目标值:" prop="sl">
-              <el-input v-model="form.sl" type="text" :disabled="['P','nP'].includes(form.controlChartType)" />
+              <el-input v-model.number="form.sl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="规格下限:" prop="lsl">
-              <el-input v-model="form.lsl" type="text" :disabled="['P','nP'].includes(form.controlChartType)" />
+              <el-input v-model.number="form.lsl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="样本容量:" prop="sampleSize">
-              <el-input v-model="form.sampleSize" type="text" :disabled="['P','X-MR'].includes(form.controlChartType)" />
+              <el-input v-model.number="form.sampleSize" type="text" :disabled="['P','X-MR'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="小数位数:" prop="digit">
               <el-select v-model="form.digit" placeholder="请选择" style="width:100%;">
@@ -88,8 +96,8 @@
         <el-form :model="form" label-width="auto">
           <fieldset style="border: 1px solid #ccc;  height: 264px;">
             <legend style="color:#606266">控制图信息</legend>
-            <el-form-item label="判异规则:">
-              <el-input type="text" style="width: 80%;" />
+            <el-form-item label="判异规则:" prop="discriminationRulesStr">
+              <el-input v-model="form.discriminationRulesStr" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_discrimination_rules_dialog">
                 设置
               </ki-button>
@@ -100,8 +108,8 @@
                 设置
               </ki-button>
             </el-form-item>
-            <el-form-item label="数据点层次信息:">
-              <el-input type="text" style="width: 80%;" />
+            <el-form-item label="数据点层次信息:" prop="pointHierarchicalTypeStr">
+              <el-input v-model="form.pointHierarchicalTypeStr" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('data')">
                 设置
               </ki-button>
@@ -148,12 +156,13 @@
             <el-input v-model="form.description" type="text" />
           </el-form-item>
           <el-form-item label="自定义控制图标题:" prop="customTitle">
-            <el-input v-model="from.customTitle" type="text" />
+            <el-input v-model="form.customTitle" type="text" />
           </el-form-item>
         </fieldset>
       </el-form>
     </el-row>
     <discrimination-rules-dialog
+      :select-row="select_row"
       :visible="discrimination_rules_dialog"
       @handleClose="rules_dialog_close"
       @confirm="rules_confirm"
@@ -172,6 +181,7 @@
 import DiscriminationRulesDialog from './discrimination-rules-dialog'
 import SelectKeywordDialog from './select-keyword-dialog'
 import ControlChartSettingsData from './mixins/control-chart-settings-data'
+import { dateformat } from '@/utils/date-method'
 export default {
   name: 'ControlChartSettings',
   components: {
@@ -191,6 +201,10 @@ export default {
     treePath: {
       type: String,
       default: ''
+    },
+    settingFlag: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -200,19 +214,27 @@ export default {
       keyword_flag: '',
       inspection_items_select: { },
       select_row: {},
+      controlChartId: '',
+      tree_path: '',
       header_list: [
         { prop: 'controlChartCode', label: '编号', width: '180' },
         { prop: 'inspectionName', label: '检测项目', width: '180' },
-        { prop: 'address', label: '样本容量' },
-        { prop: 'address1', label: '小数位数' },
-        { prop: 'address2', label: '判异规则' },
-        { prop: 'address3', label: '更新用户' },
-        { prop: 'address4', label: '更新时间' }
+        { prop: 'sampleSize', label: '样本容量' },
+        { prop: 'digit', label: '小数位数' },
+        { prop: 'discriminationRulesStr', label: '判异规则' },
+        { prop: 'updateUser', label: '更新用户' },
+        { prop: 'updateDate', label: '更新时间' }
       ],
       t_data: []
     }
   },
+  created() {
+    console.log('Datejs', dateformat(new Date()))
+  },
   methods: {
+    controlChartType_change() {
+      this.clear()
+    },
     async add_inspection_items(select_data) {
       // const temp = {
       //   inspectionItemsId: select_data.id,
@@ -226,13 +248,13 @@ export default {
         inspectionItemsId: select_data.id,
         // ------------------------
         // 'chartHierarchicalType': 0, 不传
-        chartHierarchicalTypeStr: '1-1-test',
+        chartHierarchicalTypeStr: '1=1=test',
         // 'controlChartCode': '', 生成添加
         // 'controlChartId': 0, 不传
         customTitle: '',
         description: '',
         digit: 0,
-        'discriminationRulesStr': 'R0,R3-6',
+        'discriminationRulesStr': 'R0,R1-1-3',
         g1cl: 0,
         g1lcl: 0,
         g1ucl: 0,
@@ -242,13 +264,14 @@ export default {
         id: 0,
         // 'inspectionItemsId': '',
         lsl: 0,
-        'pointHierarchicalType': 0,
-        'pointHierarchicalTypeStr': '',
+        // 'pointHierarchicalType': 0, //不传
+        pointHierarchicalTypeStr: '2=2=data', //	数据点层次信息(示例：层次类型序号=层次类型ID=值)
         sampleSize: 0,
         sl: 0,
         status: 1,
-        updateDate: new Date(),
-        'updateUserId': 0,
+        updateDate: dateformat(new Date()),
+        updateUser: 'admin',
+        'updateUserId': 1, // 暂时固定传1
         usl: 0
       }
       const { code, data } = await this.$api.controlChartSon_generateCode()
@@ -261,11 +284,34 @@ export default {
       this.t_data.push(temp)
       this.t_data = this.t_data.map((item, index) => ({
         ...item,
-        id: index + 1
+        rowNumber: index + 1
       }))
-      this.form = temp
-      this.select_show = { id: this.t_data[this.t_data.length - 1].id }
+      // this.form = temp
+      this.select_row = { rowNumber: this.t_data[this.t_data.length - 1].rowNumber }
       this.$refs.dy_table.refresh()
+    },
+    del_btn(open) {
+      if (!this.$refs.dy_table.one_row_select()) return
+      open()
+    },
+    async del(flag) {
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+      if (this.select_row.id) {
+        const { code, data } = await this.$api.controlChartSon_delete([this.select_row.id])
+        if (code === '200' && data) {
+          this.select_row = {}
+          this.$message.success('删除成功！')
+          this.form = JSON.parse(JSON.stringify(this.form_data))
+          this.$refs.dy_table.refresh()
+        }
+      } else {
+        this.t_data.splice(this.select_row.rowNumber - 1, 1)
+        this.form = JSON.parse(JSON.stringify(this.form_data))
+        this.$refs.dy_table.refresh()
+      }
     },
     open_select_keyword_dialog(flag) {
       this.keyword_flag = flag
@@ -283,26 +329,105 @@ export default {
     rules_dialog_close() {
       this.discrimination_rules_dialog = false
     },
-    rules_confirm() {
+    rules_confirm(discriminationRulesStr) {
       this.discrimination_rules_dialog = false
+      this.form.discriminationRulesStr = discriminationRulesStr
     },
     handleClose() {
       this.$refs.form.resetFields()
+      this.clear()
       this.$emit('handleClose')
     },
-    confirm() {
-      // alert(1)
-      this.$emit('confirm')
+    async confirm({ loading }) {
+      loading(true)
+      const parmas = this.save_chart_data()
+      if (this.settingFlag !== 'update') {
+        parmas.controlChartId = 0
+      } else {
+        parmas.controlChartId = this.controlChartId
+        parmas.controlChartSonEntityS = parmas.controlChartSonEntityS.filter(item => !Object.hasOwnProperty.call(item, 'controlChartId'))
+      }
+      // const p = this.t_data.filter(item => Object.hasOwnProperty.call(item, 'controlChartId'))
+      if (parmas.controlChartSonEntityS.length) {
+        const { code, data } = await this.$api.controlChartSon_save(parmas)
+        if (code === '200' && data) {
+          const atchUpdate = await this.controlChartSon_batchUpdate()
+          if (atchUpdate === '0') {
+            this.$emit('confirm')
+          }
+        } else {
+          loading(false)
+        }
+      } else {
+        this.controlChartSon_batchUpdate()
+      }
+    },
+    async controlChartSon_batchUpdate() {
+      const p = this.t_data.filter(item => Object.hasOwnProperty.call(item, 'controlChartId'))
+      if (!p.length) return '0'
+      const { code, data } = await this.$api.controlChartSon_batchUpdate(p)
+      if (code === '200' && data) {
+        this.$emit('confirm')
+      }
+    },
+    formatNullValue(obj) {
+      const o = {}
+      for (const key in obj) {
+        if (Object.hasOwnProperty.call(obj, key)) {
+          o[key] = obj[key] === null ? '' : obj[key]
+        }
+      }
+      return o
+    },
+    async open() {
+      // alert(this.settingFlag)
+      if (this.settingFlag !== 'update') return
+      const { id, controlChartId } = this.selectRow[0]
+      this.controlChartId = controlChartId
+      // const { code, data } = await this.$api.controlChartSon_info({ id })
+      const { code, data } = await this.$api.controlChart_queryByControlChartId({ controlChartId })
+      if (code === '200' && data) {
+        console.log('data1322', data)
+        const t_data = data.map((item, index) => ({
+          ...this.formatNullValue(item),
+          discriminationRulesStr: item.discriminationRules,
+          rowNumber: index + 1
+        }))
+        // this.select_row = { rowNumber: 1 }
+        this.tree_path = t_data.length > 0 ? t_data[0].controlChartName : ''
+        this.controlChartType = t_data.length > 0 ? t_data[0].controlChartType : ''
+        this.t_data = t_data
+        this.select_row = {
+          rowNumber: t_data.find(item => item.id === id).rowNumber
+        }
+        this.$refs.dy_table.refresh()
+      }
     },
     opened() {
-      this.form.hierarchicalName = this.selectRow.hierarchicalName
+      // this.form.hierarchicalName = this.selectRow.hierarchicalName
     },
-    select_callback(data) {
-      console.log('select_callback：  ', JSON.stringify(data))
+    async select_callback(select_data) {
+      // data.id
+      console.log('select_data', select_data)
+      if (select_data.id) {
+        const { code, data } = await this.$api.controlChartSon_info({ id: select_data.id })
+        if (code === '200' && data) {
+          const idx = this.t_data.findIndex(item => select_data.rowNumber === item.rowNumber)
+          const d = {
+            ...this.t_data[idx],
+            ...data
+          }
+          this.$set(this.t_data, idx, d)
+          this.form = this.t_data[idx]
+        }
+      } else {
+        console.log('select_data', select_data)
+        this.form = select_data
+      }
     },
     request_data({ page_no, page_size, table_data }) {
       return new Promise(resolve => {
-        console.log(this.t_data)
+        // console.log(this.t_data)
         return resolve(
 
           {
@@ -311,32 +436,6 @@ export default {
           }
         )
       })
-      // this.data = []
-      // console.log('------------------', page_no, page_size)
-      // page_no = Number(page_no)
-      // page_size = Number(page_size)
-      // const total = 6
-      // const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
-      // return new Promise((resolve) => {
-      //   setTimeout(() => {
-      //     resolve({
-      //       data: Array(list_num).fill({
-      //         date: '2016-05-02',
-      //         name: '王小虎',
-      //         address: '上海市普陀区金沙江路 1518 弄'
-      //       }).map((i, index) => {
-      //         const id = (page_no - 1) * page_size + index
-      //         console.log(id)
-      //         return {
-      //           ...i,
-      //           id
-      //         }
-      //       }),
-
-      //       total
-      //     })
-      //   }, 1000)
-      // })
     }
   }
 }

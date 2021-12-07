@@ -31,7 +31,6 @@
             <ki-button
               type="danger"
               style="margin-left: 10px;"
-              @click="del_btn"
             >删除</ki-button>
           </ki-message-box>
         </div>
@@ -116,7 +115,7 @@ export default {
       open()
     },
     async del(flag) {
-      const ids = typeof this.select_row === 'object' ? [this.select_row.id] : this.select_row.map(item => item.id)
+      const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
       if (flag === 'N') {
         this.$message('操作取消')
         return

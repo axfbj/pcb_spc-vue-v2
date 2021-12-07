@@ -46,10 +46,16 @@
               type="primary"
               @click="cc"
             >控制图设置</ki-button>
-            <ki-button type="warning">单项目输入</ki-button>
-            <ki-button
-              type="danger"
-            >删除</ki-button>
+            <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
+            <ki-message-box
+              :next="del"
+              @click="del_btn"
+            >
+              <ki-button
+                type="danger"
+                style="margin-left: 10px;"
+              >删除</ki-button>
+            </ki-message-box>
           </div>
         </template>
         <template v-slot:form>
@@ -184,7 +190,7 @@
         <template v-slot:custum_content>
           <dynamic-table
             ref="dy_table"
-            v-model="select"
+            v-model="select_row"
             :auto-init="false"
             :header-list="header_list"
             :request="request_data"
@@ -215,10 +221,14 @@
       </container-layout>
     </el-col>
     <control-chart-settings
+      :control-group-id="current_tree_node_key"
       :visible="chartSetting_dialog"
       top="5vh"
       :tree-path="path"
+      :setting-flag="control_chart_settings_flag"
+      :select-row="select_row"
       @handleClose="chartSetting_dialog=false"
+      @confirm="control_chart_settings_confirm"
     />
     <add-group-tree-dialog
       :visible="add_group_tree_dialog"
@@ -239,7 +249,6 @@ import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
 import HierarchicalTypeData from './components/mixins/hierarchicalType-data'
-// import StatusFlag from './components/status-flag'
 export default {
   name: 'ControlGroupList',
   components: {
@@ -255,6 +264,7 @@ export default {
   data() {
     return {
       tree_flag: '',
+      control_chart_settings_flag: '',
       // current_tree_node_key: '',
       current_tree_node_data: {},
       add_group_tree_dialog: false,
@@ -286,7 +296,7 @@ export default {
         { prop: 'usl', label: '规格上限', width: '150' },
         { prop: 'sl', label: '目标值', width: '150' },
         { prop: 'lsl', label: '规格下限', width: '150' },
-        { prop: 'lsl', label: '判异规则', width: '150' },
+        { prop: 'discriminationRules', label: '判异规则', width: '150' },
         { prop: 'userName', label: '更新用户', width: '150' },
         { prop: 'updateDate', label: '更新时间', width: '150' }
       ],
@@ -300,7 +310,7 @@ export default {
         resource: '',
         desc: ''
       },
-      select: [],
+      select_row: [],
       path: ''
     }
   },
@@ -310,9 +320,23 @@ export default {
     }
   },
   methods: {
+    inspectionr_record_btn() {
+      // 单项目输入跳转
+      if (this.select_row.length === 0) {
+        this.$message.warning('请选择一行数据')
+      }
+      if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+        this.$message.warning('查看控制图设置详情只能选择一行')
+        return
+      }
+      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id }})
+    },
+    control_chart_settings_confirm() {
+      this.chartSetting_dialog = false
+      this.$refs.dy_table.refresh()
+    },
     path_change(path) {
       this.path = path
-      // console.log(path)
     },
     formart_hierarchicalType() {},
     render_after(currentData) {
@@ -320,6 +344,15 @@ export default {
       this.$refs.dy_table.refresh({ keep: true })
     },
     cc() {
+      if (['[]', '{}'].includes(JSON.stringify(this.select_row))) {
+        this.control_chart_settings_flag = 'add'
+      } else {
+        if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+          this.$message.warning('查看控制图设置详情只能选择一行')
+          return
+        }
+        this.control_chart_settings_flag = 'update'
+      }
       this.chartSetting_dialog = true
     },
     search_btn() {
@@ -361,12 +394,27 @@ export default {
       this.current_tree_node_data = data
       this.$refs.dy_table.refresh()
     },
-    click_link(data) {
-      console.log(data)
-    },
     current_change(val) {
       console.log('current_change')
       console.log(val)
+    },
+    del_btn(open) {
+      if (!this.$refs.dy_table.one_row_select()) return
+      open()
+    },
+    async del(flag) {
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+
+      const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
+      const { code, data } = await this.$api.controlChartSon_delete(ids)
+      if (code === '200' && data) {
+        this.select_row = []
+        this.$message.success('删除成功！')
+        this.$refs.dy_table.refresh()
+      }
     },
     async request_data({ page_no, page_size, table_data }) {
       const { controlChartCode,
@@ -397,7 +445,7 @@ export default {
         hierarchicalTypeValueEight,
         hierarchicalTypeValueNine,
         'limit': page_size,
-        'order': '',
+        'order': 'asc',
         'page': page_no,
         // 'sidx': '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',

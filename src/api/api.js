@@ -7,6 +7,8 @@ import controlChart from './control-chart'
 import controlChartSon from './control-chart-son'
 import discriminationRules from './discrimination-rules'
 import inspectionRecord from './inspection-record'
+import controlChartAbnorma from './control-chart-abnorma'
+import abnormalPointExcel from './abnormal-point-excel'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -22,5 +24,7 @@ export default {
   ...controlChart,
   ...controlChartSon,
   ...discriminationRules,
-  ...inspectionRecord
+  ...inspectionRecord,
+  ...controlChartAbnorma,
+  ...abnormalPointExcel
 }

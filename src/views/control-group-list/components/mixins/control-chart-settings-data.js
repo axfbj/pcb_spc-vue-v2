@@ -53,7 +53,8 @@ export default {
         'customTitle': '',
         'description': '',
         'digit': '',
-        'discriminationRulesId': '',
+        // 'discriminationRulesId': '',
+        'discriminationRules': '',
         'discriminationRulesStr': '',
         'g1cl': '',
         'g1lcl': '',
@@ -81,21 +82,28 @@ export default {
   },
   methods: {
     clear() {
+      this.controlChartType = 'XBar-R'
       this.form = JSON.parse(JSON.stringify(this.form_data))
       this.t_data = []
       this.select_row = {}
       this.inspection_items_select = { }
-      this.controlChartType = 'XBar-R'
+      this.disabledSelectArr = []
       this.$refs.dy_table.refresh()
     },
     save_chart_data() {
+      const t_data = JSON.parse(JSON.stringify(this.t_data))
       // console.log('this.t_data', this.t_data)
       const params = {
         controlChartName: this.treePath,
         controlChartType: this.controlChartType,
         controlGroupId: this.controlGroupId,
         controlChartSonEntityS: [
-          ...this.t_data
+          ...t_data.map(item => {
+            delete item.chartHierarchicalType
+            delete item.pointHierarchicalType
+            delete item.discriminationRules
+            return item
+          })
           // {
           //   // 'chartHierarchicalType': 0,
           //   chartHierarchicalTypeStr: this.form.chartHierarchicalTypeStr,

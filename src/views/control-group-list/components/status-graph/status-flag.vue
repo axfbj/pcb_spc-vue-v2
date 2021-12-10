@@ -1,5 +1,5 @@
 <template>
-  <rectangle :state="states[0]">
+  <rectangle v-if="show" :state="states[0]">
     <round-shape :state="states[1]" />
   </rectangle>
 </template>
@@ -18,6 +18,12 @@ export default {
     states: {
       type: Array,
       default: () => (['0', '0'])
+    }
+  },
+  computed: {
+    show() {
+      return !this.states.includes('-1')
+      // return true
     }
   }
 }

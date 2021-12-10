@@ -29,12 +29,23 @@
               <ki-button
                 type="primary"
                 icon="el-icon-search"
+                @click="query"
               >查询</ki-button>
             </el-form-item>
           </el-form>
         </div>
         <div style="overflow: hidden; text-align: right;">
-          <ki-button type="primary" @click="add_data_btn">添加数据</ki-button>
+          <ki-button type="primary" @click="add_data_dialog_btn('add')">添加数据</ki-button>
+          <ki-button type="warning" @click="add_data_dialog_btn('edit')">修改数据</ki-button>
+          <ki-message-box
+            :next="del"
+            @click="del_btn"
+          >
+            <ki-button
+              type="danger"
+              style="margin: 0 10px;"
+            >删除</ki-button>
+          </ki-message-box>
           <ki-button type="primary">导入数据</ki-button>
           <ki-button type="primary">下载模板</ki-button>
           <ki-button type="primary">导出</ki-button>
@@ -89,7 +100,7 @@
         </div>
 
         <dynamic-table
-          ref="lists"
+          ref="dy_table"
           v-model="select_row"
           style="padding-top:38px;"
           :request="request_data"
@@ -97,13 +108,43 @@
           fixed-height="100%"
           :one-page-show-pagination="false"
           :page-sizes="[999999]"
-        />
+          :auto-init="false"
+        >
+          <template
+            slot="header-template"
+            slot-scope="data"
+          >
+            <template v-if="data.list.header_template === 'states'">
+              <span style="color: #eb0808;">{{ data.label }}</span>
+            </template>
+            <template v-else-if="data.list.header_template === 'hierarchicalTypeValue'">
+              <span style="color: #0303e5;">{{ data.label }}</span>
+            </template>
+            <template v-else>{{ data.label }}</template>
+          </template>
+          <template slot="cell-template" slot-scope="data">
+            <template v-if="data.list.template === 'states'">
+              <span v-if="data.cellValue === 0" style="color: green;">正常</span>
+              <span v-if="data.cellValue === 1" style="color: red;">失控</span>
+              <span v-if="data.cellValue === 2" style="color: pink;">已处理</span>
+            </template>
+            <!-- <status-flag v-if="data.list.template === 'states'" :states="data.cellValue" /> -->
+            <template v-else>{{ data.cellValue }}</template>
+          </template>
+        </dynamic-table>
       </div>
     </template>
     <add-data-dialog
+      :control-chart-son-id="controlChartSonId "
       :visible="add_data_dialog"
+      :point-hierarchical-type-ids="pointHierarchicalTypeIds"
+      :sample-size="sampleSize"
+      :select-row="select_row"
+      :flag="add_dialog_flag"
+      :inspection-records-data="inspectionRecords_data"
+      :control-chart-type="controlChartType"
       @handleClose="add_data_close"
-      @confirm="add_data_confirm"
+      @confirm="add_data_dialog_confirm"
     />
 
   </container-layout>
@@ -112,6 +153,8 @@
 <script>
 import chart from './mixins/chart'
 import AddDataDialog from './components/add-data-dialog'
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'ControlChartDetails',
   components: {
@@ -120,10 +163,22 @@ export default {
   mixins: [chart],
   data() {
     return {
+      add_dialog_flag: '',
+      controlChartSonId: '',
+      controlChartType: '',
+      pointHierarchicalTypeIds: [],
+      sampleSize: 0,
       add_data_dialog: false,
       form: {
         dataType: '1',
         date: []
+      },
+      parseChartType: {
+        'XBar-R': 1,
+        'Xbar-s': 2,
+        'X-MR': 3,
+        'p': 4,
+        'np': 5
       },
       options: [{
         value: '1',
@@ -135,41 +190,168 @@ export default {
       activeName: 'bar',
       myEcharts: {},
       select_row: {},
-      header_list: [
-        { prop: 'id', label: '序号', width: '100' },
-        { prop: 'name', label: '抽检时间', width: '180' },
-        { prop: 'address', label: '录入时间', width: '180' },
+      header_list_data: [
+        { prop: 'inspectionSerial', label: '序号', width: '100' },
+        { prop: 'id', label: 'ID', width: '180' },
+        { prop: 'inspectionData', label: '抽检时间', width: '180' },
+        { prop: 'createData', label: '录入时间', width: '180' },
         // 数据点层次信息与样本值
-        { prop: 'address', label: '状态', width: '120' },
-        { prop: 'address1', label: '平均值', width: '120' },
-        { prop: 'address1', label: '极差值', width: '120' },
-        { prop: 'address1', label: '标准差', width: '120' },
-        { prop: 'address1', label: '最大值', width: '120' },
-        { prop: 'address1', label: '最小值', width: '120' },
-        { prop: 'address1', label: '录入用户', width: '120' },
-        { prop: 'address1', label: '最小值' }
-      ]
+        { prop: 'inspectionStatus', label: '状态', width: '120', template: 'states', header_template: 'states' },
+        { prop: 'average', label: '平均值', width: '120' },
+        { prop: 'range', label: '极差值', width: '120' },
+        { prop: 'sd', label: '标准差', width: '120' },
+        { prop: 'max', label: '最大值', width: '120' },
+        { prop: 'min', label: '最小值', width: '120' },
+        { prop: 'createUser', label: '录入用户', width: '120' }
+      ],
+      header_list: [],
+      inspectionRecords_data: {}
     }
+  },
+  computed: {
+    ...mapGetters(['hierarchicalTypes'])
+  },
+  watch: {
+    '$route.query.controlChartSonId': {
+      immediate: true,
+      handler(controlChartSonId) {
+        if (controlChartSonId) {
+          if (this.controlChartSonId === controlChartSonId) return
+          this.controlChartSonId = controlChartSonId
+          this.controlChartType = this.$route.query.controlChartType
+          this.init()
+        }
+      }
+    }
+  },
+  async created() {
+    Object.freeze(this.header_list_data)
+    this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
   },
   mounted() {
     this.initEcharts3()
     this.chart_resize()
   },
-  activated() {
-    if (this.controlChartSonId === this.$route.query.controlChartSonId) return
-    this.controlChartSonId = this.$route.query.controlChartSonId
-    // const params = { controlChartSonId: this.controlChartSonId }
-    // this.get_inspectionRecord_query(params)
-  },
-  created() {},
+
   methods: {
-    add_data_btn() {
+    async query() {
+      await this.set_new_inspectionRecords_data()
+    },
+    async init() {
+      this.clear()
+      await this.get_inspectionRecords_data((data) => {
+        this.inspectionRecords_data = data
+        this.get_final_header_list()
+        this.$refs.dy_table && this.$refs.dy_table.refresh()
+      }, 'init')
+    },
+    clear() {
+      this.inspectionRecords_data = {}
+      this.pointHierarchicalTypeIds = []
+      this.sampleSize = 0
+      this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
+      this.$refs.dy_table && this.$refs.dy_table.refresh()
+    },
+    del_btn(open) {
+      if (!this.$refs.dy_table.one_row_select()) return
+      open()
+    },
+    async del(flag) {
+      if (flag === 'N') {
+        this.$message('操作取消')
+        return
+      }
+
+      const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
+      const { code, data } = await this.$api.inspectionRecord_delete(ids)
+      if (code === '200' && data) {
+        this.select_row = {}
+        this.$message.success('删除成功！')
+        await this.init()
+      }
+    },
+    get_final_header_list() {
+      const parseNum = {
+        1: 'One',
+        2: 'Two',
+        3: 'Three',
+        4: 'Four',
+        5: 'Five',
+        6: 'Six',
+        7: 'Seven',
+        8: 'Eight',
+        9: 'Nine'
+      }
+      const { pointHierarchicalTypeIds, inspectionRecords } = this.inspectionRecords_data
+      this.pointHierarchicalTypeIds = pointHierarchicalTypeIds
+      const arr = []
+      pointHierarchicalTypeIds.forEach(id => {
+        const hierarchicalItem = this.hierarchicalTypes.find(item => item.id === id)
+        if (hierarchicalItem) {
+          const list = {}
+          list.prop = `hierarchicalTypeValue${parseNum[id]}`
+          list.label = hierarchicalItem.hierarchicalName
+          list.width = '180'
+          list.header_template = 'hierarchicalTypeValue'
+          // this.header_list.push(list)
+          arr.push(list)
+        }
+      })
+      const sampleSize = inspectionRecords[0].sampleSize
+      this.sampleSize = sampleSize || 0
+      if (!this.sampleSize) return
+
+      for (let i = 1; i <= this.sampleSize; i++) {
+        const list = {}
+        list.prop = `value${i}`
+        list.label = `样本${i}`
+        list.width = '120'
+        arr.push(list)
+        // this.header_list.push(list)
+      }
+      // console.log('this.header_list', this.header_list)
+
+      this.header_list.splice(4, 0, ...arr)
+    },
+    async set_new_inspectionRecords_data() {
+      await this.get_inspectionRecords_data((data) => {
+        this.inspectionRecords_data = data
+        this.$refs.dy_table && this.$refs.dy_table.refresh()
+      })
+    },
+    async get_inspectionRecords_data(callback, flag) {
+      let params = {
+        controlChartType: this.parseChartType[this.controlChartType],
+        'controlChartSonId': this.controlChartSonId || 0,
+        'dataType': this.form.dataType || '',
+        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : ''
+      }
+      if (flag === 'init') {
+        params = {
+          controlChartType: this.parseChartType[this.controlChartType],
+          'controlChartSonId': this.controlChartSonId || 0
+        }
+      }
+      const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
+      if (code === '200' && data) {
+        if (callback) callback(data)
+
+        if (flag === 'init') {
+          this.form.date = [data.thisMonthStart, data.thisMonthEnd]
+        }
+      }
+    },
+    add_data_dialog_btn(flag) {
+      this.add_dialog_flag = flag
       this.add_data_dialog = true
     },
     add_data_close() {
       this.add_data_dialog = false
     },
-    add_data_confirm() {
+    async add_data_dialog_confirm() {
+      // await this.set_new_inspectionRecords_data()
+      await this.init()
       this.add_data_dialog = false
     },
     handleClick() {
@@ -188,26 +370,16 @@ export default {
         this.chart_resize()
       })
     },
-    async get_inspectionRecord_query(params) {
-      const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
-      if (code === '200' && data) {
-        console.log('data', data)
-      }
-    },
     async request_data({ page_no, page_size, table_data }) {
-      const params = {
-        'controlChartSonId': this.controlChartSonId || 0,
-        'dataType': this.form.dataType || '',
-        'thisMonthEnd': this.form.date ? (this.form.date[0] || '') : '',
-        'thisMonthStart': this.form.date ? (this.form.date[1] || '') : ''
-      }
-      const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
-      if (code === '200' && data) {
-        return {
-          data: data.list,
-          total: data.totalCount
-
-        }
+      if (!Object.hasOwnProperty.call(this.inspectionRecords_data, 'inspectionRecords')) return
+      // console.log(this.inspectionRecords_data)
+      const { inspectionRecords } = this.inspectionRecords_data
+      return {
+        data: inspectionRecords.map((item, index) => ({
+          ...item,
+          inspectionSerial: index + 1
+        })),
+        total: inspectionRecords[0].id ? inspectionRecords.length : 0
       }
     },
     chart_resize() {

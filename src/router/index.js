@@ -229,6 +229,22 @@ export const asyncRoutes = [
         meta: {
           title: '控制图详情'
         }
+      },
+      {
+        path: 'upload-excel',
+        component: () => import('@/views/excel/upload-excel'),
+        name: 'UploadExcel',
+        meta: {
+          title: '上传excel'
+        }
+      },
+      {
+        path: 'report-summary',
+        component: () => import('@/views/report-summary'),
+        name: 'ReportSummary',
+        meta: {
+          title: '报表汇总'
+        }
       }
       // {
       //   path: 'role',

@@ -1,6 +1,7 @@
 <template>
   <el-select
     v-model="final_value"
+    :disabled="disabled"
     filterable
     allow-create
     clearable
@@ -26,8 +27,12 @@ export default {
     event: 'change'
   },
   props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     value: {
-      type: String,
+      type: [String, Number],
       default: ''
     },
     props: {
@@ -51,15 +56,10 @@ export default {
       }])
     }
   },
-  data() {
-    return {
-      internal_value: this.value || ''
-    }
-  },
   computed: {
     final_value: {
       get() {
-        return this.internal_value
+        return this.value
       },
       set() {}
     }
@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     change_val(val) {
-      this.internal_value = val
       this.$emit('change', val)
     },
     focus(...args) {

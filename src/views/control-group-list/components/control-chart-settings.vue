@@ -9,6 +9,7 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
+    @closed="closed"
   >
     <div style="padding: 0px 20px; overflow:hidden;">
       <el-form
@@ -31,7 +32,7 @@
         <el-reference v-model="inspection_items_select" type="inspection-items" @change="add_inspection_items">
           <ki-button type="primary">添加</ki-button>
         </el-reference>
-        <ki-button type="warning" style="margin-left: 10px;">克隆</ki-button>
+        <!-- <ki-button type="warning" style="margin-left: 10px;">克隆</ki-button> -->
         <ki-message-box
           :next="del"
           @click="del_btn"
@@ -43,7 +44,6 @@
         </ki-message-box>
 
       </el-form>
-
       <!-- <div style="overflow:hidden; text-align: right;">
         <ki-button type="primary">添加</ki-button>
         <ki-button type="danger">删除</ki-button>
@@ -102,14 +102,14 @@
                 设置
               </ki-button>
             </el-form-item>
-            <el-form-item label="控制图层次信息:" prop="chartHierarchicalTypeStr">
-              <el-input v-model="form.chartHierarchicalTypeStr" type="text" style="width: 80%;" />
+            <el-form-item label="控制图层次信息:" prop="chartHierarchicalType">
+              <el-input v-model="form.chartHierarchicalType" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('level')">
                 设置
               </ki-button>
             </el-form-item>
-            <el-form-item label="数据点层次信息:" prop="pointHierarchicalTypeStr">
-              <el-input v-model="form.pointHierarchicalTypeStr" type="text" style="width: 80%;" />
+            <el-form-item label="数据点层次信息:" prop="pointHierarchicalType">
+              <el-input v-model="form.pointHierarchicalType" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('data')">
                 设置
               </ki-button>
@@ -168,8 +168,10 @@
       @confirm="rules_confirm"
     />
     <select-keyword-dialog
+      :disabled-select-arr="disabledSelectArr"
       :visible="select_keyword_dialog"
       :keyword-flag="keyword_flag"
+      :form-data="form"
       @handleClose="keyword_dialog_close"
       @confirm="keyword_dialog_confirm"
     />
@@ -209,6 +211,9 @@ export default {
   },
   data() {
     return {
+
+      disabledSelectArr: [],
+
       discrimination_rules_dialog: false,
       select_keyword_dialog: false,
       keyword_flag: '',
@@ -248,13 +253,15 @@ export default {
         inspectionItemsId: select_data.id,
         // ------------------------
         // 'chartHierarchicalType': 0, 不传
+        chartHierarchicalType: '产品型号=test',
         chartHierarchicalTypeStr: '1=1=test',
         // 'controlChartCode': '', 生成添加
         // 'controlChartId': 0, 不传
         customTitle: '',
         description: '',
         digit: 0,
-        'discriminationRulesStr': 'R0,R1-1-3',
+        'discriminationRules': 'R0',
+        'discriminationRulesStr': 'R0',
         g1cl: 0,
         g1lcl: 0,
         g1ucl: 0,
@@ -265,6 +272,7 @@ export default {
         // 'inspectionItemsId': '',
         lsl: 0,
         // 'pointHierarchicalType': 0, //不传
+        pointHierarchicalType: '产品名称=data',
         pointHierarchicalTypeStr: '2=2=data', //	数据点层次信息(示例：层次类型序号=层次类型ID=值)
         sampleSize: 0,
         sl: 0,
@@ -315,13 +323,29 @@ export default {
     },
     open_select_keyword_dialog(flag) {
       this.keyword_flag = flag
+      this.disabledSelectArr = []
+      const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.form
+      const str1 = this.keyword_flag === 'level' ? pointHierarchicalTypeStr : chartHierarchicalTypeStr
+      const ruleArr = str1.split(',')
+      ruleArr.forEach(item => {
+        const arr = item.split('=')
+        if (arr[0]) this.disabledSelectArr.push(arr[0])
+      })
       this.select_keyword_dialog = true
     },
     keyword_dialog_close() {
       this.select_keyword_dialog = false
+      this.disabledSelectArr = []
     },
-    keyword_dialog_confirm() {
+    keyword_dialog_confirm(info) {
       this.select_keyword_dialog = false
+      if (info) {
+        for (const key in info) {
+          if (Object.hasOwnProperty.call(info, key)) {
+            this.form[key] = info[key]
+          }
+        }
+      }
     },
     open_discrimination_rules_dialog() {
       this.discrimination_rules_dialog = true
@@ -331,11 +355,11 @@ export default {
     },
     rules_confirm(discriminationRulesStr) {
       this.discrimination_rules_dialog = false
+      this.form.discriminationRules = discriminationRulesStr
       this.form.discriminationRulesStr = discriminationRulesStr
     },
     handleClose() {
       this.$refs.form.resetFields()
-      this.clear()
       this.$emit('handleClose')
     },
     async confirm({ loading }) {
@@ -363,7 +387,9 @@ export default {
       }
     },
     async controlChartSon_batchUpdate() {
-      const p = this.t_data.filter(item => Object.hasOwnProperty.call(item, 'controlChartId'))
+      const p = this.t_data.filter(item => {
+        return Object.hasOwnProperty.call(item, 'controlChartId') && Object.hasOwnProperty.call(item, 'pointHierarchicalType')
+      })
       if (!p.length) return '0'
       const { code, data } = await this.$api.controlChartSon_batchUpdate(p)
       if (code === '200' && data) {
@@ -384,16 +410,13 @@ export default {
       if (this.settingFlag !== 'update') return
       const { id, controlChartId } = this.selectRow[0]
       this.controlChartId = controlChartId
-      // const { code, data } = await this.$api.controlChartSon_info({ id })
       const { code, data } = await this.$api.controlChart_queryByControlChartId({ controlChartId })
       if (code === '200' && data) {
-        console.log('data1322', data)
         const t_data = data.map((item, index) => ({
           ...this.formatNullValue(item),
           discriminationRulesStr: item.discriminationRules,
           rowNumber: index + 1
         }))
-        // this.select_row = { rowNumber: 1 }
         this.tree_path = t_data.length > 0 ? t_data[0].controlChartName : ''
         this.controlChartType = t_data.length > 0 ? t_data[0].controlChartType : ''
         this.t_data = t_data
@@ -407,8 +430,6 @@ export default {
       // this.form.hierarchicalName = this.selectRow.hierarchicalName
     },
     async select_callback(select_data) {
-      // data.id
-      console.log('select_data', select_data)
       if (select_data.id) {
         const { code, data } = await this.$api.controlChartSon_info({ id: select_data.id })
         if (code === '200' && data) {
@@ -425,11 +446,12 @@ export default {
         this.form = select_data
       }
     },
+    closed() {
+      this.clear()
+    },
     request_data({ page_no, page_size, table_data }) {
       return new Promise(resolve => {
-        // console.log(this.t_data)
         return resolve(
-
           {
             data: this.t_data,
             total: this.t_data.length

@@ -12,7 +12,7 @@
     <div style="padding: 10px 40px;">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <el-checkbox v-model="form.rule0" class="fixed-select">规则0：落在规格线外</el-checkbox>
+          <el-checkbox v-model="form.rule0" disabled class="fixed-select">规则0：落在规格线外</el-checkbox>
         </el-form-item>
         <el-form-item>
           <el-checkbox v-model="form.rule1" class="fixed-select">规则1：有{{ form.rule1_data1 }}点落在{{ form.rule1_data2 }}倍标准差以外</el-checkbox>
@@ -60,7 +60,7 @@ export default {
     return {
       form: {
         rule0: true,
-        rule1: true,
+        rule1: false,
         rule2: false,
         rule3: false,
         rule4: false,
@@ -176,15 +176,15 @@ export default {
     async open({ load }) {
       // this.flag = this.$attrs.flag
       const json = {
-        'rules1': 'rulesOne',
-        'rules2': 'rulesTwo',
-        'rules3': 'rulesThree',
-        'rules4': 'rulesFour',
-        'rules5': 'rulesFive',
-        'rules6': 'rulesSix',
-        'rules7': 'rulesSeven',
-        'rules8': 'rulesEight',
-        'rules0': 'rulesNine'
+        'rule1': 'rulesOne',
+        'rule2': 'rulesTwo',
+        'rule3': 'rulesThree',
+        'rule4': 'rulesFour',
+        'rule5': 'rulesFive',
+        'rule6': 'rulesSix',
+        'rule7': 'rulesSeven',
+        'rule8': 'rulesEight',
+        'rule0': 'rulesNine'
       }
       if (Object.hasOwnProperty.call(this.selectRow, 'discriminationRulesId')) {
         const { discriminationRulesId } = this.selectRow

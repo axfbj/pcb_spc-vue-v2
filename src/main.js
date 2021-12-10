@@ -32,6 +32,8 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+Element.Dialog.props.closeOnClickModal.default = false
+
 Vue.use(Element, {
   size: Cookies.get('size') || 'mini'// set element-ui default size
   // locale: enLang // 如果使用中文，无需设置，请删除

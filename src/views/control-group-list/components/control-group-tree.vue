@@ -18,16 +18,16 @@
 <script>
 export default {
   name: 'ControlGroupTree',
-  props: {
-    currentKey: {
-      type: [String, Number],
-      default: ''
-    }
-  },
+  // props: {
+  //   currentKey: {
+  //     type: [String, Number],
+  //     default: ''
+  //   }
+  // },
   data() {
     return {
       tree_data: [],
-      current_tree_node: '',
+      current_tree_node: {},
       defaultExpandedKeys: [],
       defaultProps: {
         label: 'groupName',
@@ -35,18 +35,23 @@ export default {
       }
     }
   },
+  computed: {
+    currentKey() {
+      return this.current_tree_node.id
+    }
+  },
   async created() {
     this.refresh((data) => {
       if (data && data[0].id) {
         this.defaultExpandedKeys.push(data[0].id)
         this.$refs.tree.setCurrentKey(data[0].id)
+        this.current_tree_node = data[0]
         this.$emit('render-after', data[0])
       }
     })
   },
   methods: {
     path_change(path) {
-      console.log(path)
       this.$emit('path-change', path)
     },
     async refresh(callback) {
@@ -58,12 +63,15 @@ export default {
         if (callback) {
           callback(data)
         } else {
-          this.$refs.tree.setCurrentKey(this.currentKey)
-          this.$emit('render-after', this.$refs.tree.getNode(this.currentKey).data)
+          // this.$refs.tree.setCurrentKey(this.currentKey)
+          // this.$emit('render-after', this.$refs.tree.getNode(this.currentKey).data)
+          this.$refs.tree.setCurrentKey(this.current_tree_node.id)
+          this.$emit('render-after', this.current_tree_node)
         }
       })
     },
     node_click(...args) {
+      this.current_tree_node = args[0]
       this.$emit('node-click', ...args)
     }
   }

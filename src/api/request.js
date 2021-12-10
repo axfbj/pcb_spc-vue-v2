@@ -48,6 +48,13 @@ service.interceptors.response.use(
   response => {
     // console.log('response', response)
     const res = response.data
+    if (res.code !== '200') {
+      Message({
+        message: res.msg,
+        type: 'error',
+        duration: 5 * 1000
+      })
+    }
     return res
   },
   error => {

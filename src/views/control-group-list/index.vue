@@ -21,13 +21,10 @@
               </el-button-group>
             </el-col>
           </el-row>
-
         </template>
         <template v-slot:custum_content>
-          <!-- <ki-tree /> -->
           <control-group-tree
             ref="tree"
-            :current-key="current_tree_node_key"
             @node-click="node_click"
             @render-after="render_after"
             @path-change="path_change"
@@ -44,7 +41,7 @@
           <div style="text-align: right; overflow: hidden;">
             <ki-button
               type="primary"
-              @click="cc"
+              @click="check_setting_dialog"
             >控制图设置</ki-button>
             <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
             <ki-message-box
@@ -196,9 +193,14 @@
             :request="request_data"
             :page-sizes="[20,60,100]"
             fixed-height="100%"
-            @current-change="current_change"
             @select="select_callback"
-          />
+          >
+            <template slot="cell-template" slot-scope="data">
+              <status-flag v-if="data.list.template === 'states'" :states="data.cellValue" />
+              <!-- <el-link v-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
+              <template v-else>{{ data.cellValue }}</template>
+            </template>
+          </dynamic-table>
         </template>
         <template v-slot:footer>
           <div class="states-list">
@@ -245,6 +247,7 @@
 import { AllowCreateSelect } from '@/components/form-item'
 import Rectangle from './components/status-graph/rectangle'
 import RoundShape from './components/status-graph/round-shape'
+import StatusFlag from './components/status-graph/status-flag'
 import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
@@ -257,8 +260,8 @@ export default {
     AllowCreateSelect,
     ControlChartSettings,
     ControlGroupTree,
-    AddGroupTreeDialog
-    // StatusFlag
+    AddGroupTreeDialog,
+    StatusFlag
   },
   mixins: [HierarchicalTypeData],
   data() {
@@ -280,6 +283,7 @@ export default {
       item2: {},
       header_list: [
         { prop: 'id', label: '控制图ID', width: '180' },
+        { prop: 'states', label: '状态', width: '80', template: 'states' },
         { prop: 'controlChartCode', label: '编号', width: '180' },
         { prop: 'inspectionName', label: '检测项目', width: '150' },
         { prop: 'controlChartType', label: '图类', width: '150' },
@@ -320,6 +324,15 @@ export default {
     }
   },
   methods: {
+    formatter_states(row) {
+      const { historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle } = row
+      const { lastPointNotOutOfControl, lastPointNotHandle, lastPointHandle } = row
+      const historicalPoint = [historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle]
+      const lastPoint = [lastPointNotOutOfControl, lastPointNotHandle, lastPointHandle]
+      const state1 = historicalPoint.indexOf(1)
+      const state2 = lastPoint.indexOf(1)
+      return [String(state1), String(state2)]
+    },
     inspectionr_record_btn() {
       // 单项目输入跳转
       if (this.select_row.length === 0) {
@@ -329,7 +342,7 @@ export default {
         this.$message.warning('查看控制图设置详情只能选择一行')
         return
       }
-      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id }})
+      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id, controlChartType: this.select_row[0].controlChartType }})
     },
     control_chart_settings_confirm() {
       this.chartSetting_dialog = false
@@ -343,7 +356,7 @@ export default {
       this.current_tree_node_data = currentData
       this.$refs.dy_table.refresh({ keep: true })
     },
-    cc() {
+    check_setting_dialog() {
       if (['[]', '{}'].includes(JSON.stringify(this.select_row))) {
         this.control_chart_settings_flag = 'add'
       } else {
@@ -393,10 +406,6 @@ export default {
     node_click(data, node, com) {
       this.current_tree_node_data = data
       this.$refs.dy_table.refresh()
-    },
-    current_change(val) {
-      console.log('current_change')
-      console.log(val)
     },
     del_btn(open) {
       if (!this.$refs.dy_table.one_row_select()) return
@@ -454,7 +463,10 @@ export default {
       const { code, data } = await this.$api.controlChart_list(params)
       if (code === '200' && data) {
         return {
-          data: data.list,
+          data: data.list.map(item => ({
+            ...item,
+            states: this.formatter_states(item)
+          })),
           total: data.totalCount
 
         }

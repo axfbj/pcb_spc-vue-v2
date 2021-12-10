@@ -11,10 +11,11 @@
     <div style="padding: 10px 40px; text-align: center;">
       <el-form ref="form" :model="form" label-width="auto" style="width: 60%; margin: 0 auto;">
         <div v-for="item in hierarchicalTypes" :key="item.id" class="keyword-type">
-          <el-checkbox v-model="form[`hierarchicalTypeCheckbox${item.serialNumber}`]" class="keyword-checkbox" />
+          <el-checkbox v-model="form[`hierarchicalTypeCheckbox${item.serialNumber}`]" :disabled="disabled_select_arr.includes(String(item.serialNumber))" class="keyword-checkbox" />
           <el-form-item :label="item.hierarchicalName">
             <allow-create-select
               v-model="form[`hierarchicalTypeValue${item.serialNumber}`]"
+              :disabled="disabled_select_arr.includes(String(item.serialNumber))"
               style="width:100%"
               :props="keywordProps"
               :options="options[`hierarchicalType${item.serialNumber}`]"
@@ -111,10 +112,19 @@ export default {
     keywordFlag: {
       type: String,
       default: ''
+    },
+    formData: {
+      type: [Array, Object],
+      default: () => ({})
+    },
+    disabledSelectArr: {
+      type: Array,
+      default: () => ([])
     }
   },
   data() {
     return {
+      disabled_select_arr: [],
       form: {},
       form_data: {
         hierarchicalTypeValue1: '',
@@ -149,20 +159,9 @@ export default {
         hierarchicalType9: []
       },
       keywordProps: {
-        value: 'id',
+        value: 'keywordName',
         label: 'keywordName'
       }
-      // form: {
-      //   hierarchicalTypeValueOne: '',
-      //   hierarchicalTypeValueTwo: '',
-      //   hierarchicalTypeValueThree: '',
-      //   hierarchicalTypeValueFour: '',
-      //   hierarchicalTypeValueFive: '',
-      //   hierarchicalTypeValueSix: '',
-      //   hierarchicalTypeValueSeven: '',
-      //   hierarchicalTypeValueEight: '',
-      //   hierarchicalTypeValueNine: ''
-      // }
     }
   },
   computed: {
@@ -182,22 +181,19 @@ export default {
   },
   methods: {
     clear() {
+      this.disabled_select_arr = []
       this.form = JSON.parse(JSON.stringify(this.form_data))
     },
     set_checkboxData() {
-      const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.selectRow
+      const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.formData
       const str1 = this.keywordFlag === 'level' ? chartHierarchicalTypeStr : pointHierarchicalTypeStr
-      const ruleArr1 = str1.split(',')
-      ruleArr1.forEach(item => {
-        const ruleNum = item.split('=')[0]
-        this.form[`hierarchicalTypeCheckbox${ruleNum}`] = true
+      const ruleArr = str1.split(',')
+      ruleArr.forEach(item => {
+        const arr = item.split('=')
+        this.form[`hierarchicalTypeCheckbox${arr[0]}`] = true
+        this.form[`hierarchicalTypeValue${arr[0]}`] = arr[2]
       })
-      const str2 = this.keywordFlag === 'level' ? pointHierarchicalTypeStr : chartHierarchicalTypeStr
-      const ruleArr2 = str2.split(',')
-      ruleArr2.forEach(item => {
-        const ruleNum = item.split('=')[0]
-        this.form[`hierarchicalTypeCheckbox${ruleNum}`] = false
-      })
+      this.disabled_select_arr = this.disabledSelectArr
     },
     async getHierarchicalType(id) {
       const { code, data } = await this.$api.keywordValue_list({
@@ -215,57 +211,60 @@ export default {
       this.$emit('handleClose')
     },
     async confirm({ loading }) {
-      this.$refs.form.validate(valid => {
-        if (!valid) return
-        loading(true)
-        if (this.flag === 'add') {
-          this.add()
-        } else {
-          this.update()
+      this.$emit('confirm', this.get_final_info())
+      // this.get_final_info()
+      // console.log(this.level())
+      // this.$refs.form.validate(valid => {
+      //   if (!valid) return
+      //   if (this.flag === 'level') {
+      //     this.level()
+      //   } else {
+      //     this.data_point()
+      //   }
+      // })
+    },
+    get_final_info() {
+      let res1 = ''
+      let res2 = ''
+      for (let i = 1; i <= 9; i++) {
+        if (this.form[`hierarchicalTypeCheckbox${i}`]) {
+          if (res1 || res2) {
+            res1 += ','
+            res2 += ','
+          }
+          const hierarchicalItem = this.hierarchicalTypes.find(item => {
+            return item.serialNumber === i
+          })
+          // chartHierarchicalType
+          const { serialNumber, id, hierarchicalName } = hierarchicalItem
+          // console.log(i)
+          res1 += `${hierarchicalName}=${this.form[`hierarchicalTypeValue${i}`]}` || ''
+          res2 += `${serialNumber}=${id}=${this.form[`hierarchicalTypeValue${i}`]}` || ''
         }
-      })
+      }
+      if (this.keywordFlag === 'level') {
+        return {
+          chartHierarchicalType: res1,
+          chartHierarchicalTypeStr: res2
+        }
+      } else {
+        return {
+          pointHierarchicalType: res1,
+          pointHierarchicalTypeStr: res2
+        }
+      }
     },
-    async add() {
-      // console.log('node', this.nodeData)
-      // const { code, data } = await this.$api.controlGroup_save({
-      //   parentId: this.level === '0' ? this.nodeData.id : this.nodeData.parentId,
-      //   ...this.form
-      // })
-      // if (code === '200' && data) {
-      //   this.$emit('confirm')
-      // }
-      // this.handleClose()
-    },
-    async update() {
-      // const { code, data } = await this.$api.controlGroup_update({
-      //   id: this.nodeKey,
-      //   ...this.form
-      // })
-      // if (code === '200' && data) {
-      //   this.$emit('confirm')
-      // }
-      // this.handleClose()
+    async data_point() {
+
     },
     async open({ load }) {
+      console.log('formData', this.formData)
       this.set_checkboxData()
-
-      // this.flag = this.$attrs.flag
-      // if (this.flag !== 'add') {
-      //   const { code, data } = await load(() => this.$api.controlGroup_info({ id: this.nodeKey }))
-      //   if (code === '200' && data) {
-      //     const { groupName, erpCode, groupDescription } = data
-      //     this.form = {
-      //       groupName,
-      //       erpCode,
-      //       groupDescription
-      //     }
-      //   }
-      // }
-      // this.$refs.ipt.focus()
+      // this.set_checkboxData()
     },
     closed() {
+      // this.controlChartType = 'XBar-R'
       this.clear()
-      // this.level = '0'
     }
   }
 }

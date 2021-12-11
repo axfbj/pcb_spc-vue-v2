@@ -54,6 +54,7 @@ import ElReference from '@/components/el-reference'
 import KiMessageBox from '@/components/ki-message-box'
 import KiButton from '@/components/ki-button'
 import KiDialog from '@/components/ki-dialog'
+// import KoimyDialog from '@/components/koimy-dialog'
 import KiTree from '@/components/ki-tree'
 Vue.use((Vue) => {
   Vue.component('container-layout', ContainerLayout)
@@ -64,6 +65,7 @@ Vue.use((Vue) => {
   Vue.component('ki-message-box', KiMessageBox)
   Vue.component('ki-button', KiButton)
   Vue.component('ki-dialog', KiDialog)
+  // Vue.component('koimy-dialog', KoimyDialog)
   Vue.component('ki-tree', KiTree)
 })
 

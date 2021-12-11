@@ -23,7 +23,7 @@
       </div>
     </div>
     <span
-      v-if="footer"
+      v-if="defaultFooter"
       slot="footer"
       class="dialog-footer"
     >
@@ -34,6 +34,9 @@
         @click="confirm"
       >确 定</el-button>
     </span>
+    <template v-if="!defaultFooter" slot="footer">
+      <slot name="footer_custum" :setLoadingState="setLoadingState" :load="load" :loading="loading" />
+    </template>
   </el-dialog>
 </template>
 
@@ -44,7 +47,7 @@ export default {
       type: Boolean,
       default: false
     },
-    footer: {
+    defaultFooter: {
       type: Boolean,
       default: true
     },
@@ -81,11 +84,12 @@ export default {
       this.$emit('handleClose')
     },
     confirm() {
-      if (this.loading || !this.footer) return
+      if (this.loading || !this.defaultFooter) return
       this.$emit('confirm', { loading: this.setLoadingState, load: this.load })
     },
     setLoadingState(state) {
       this.loading = state
+      return this.loading
     },
     async load(func) {
       this.loading = true

@@ -4,6 +4,7 @@
     :loading="loadingStatus"
     :type="type"
     :icon="icon"
+    :size="size"
     @click="handleClick"
   >
     <slot />
@@ -22,6 +23,10 @@ export default {
       type: String,
       default: ''
     },
+    size: {
+      type: String,
+      default: 'mini'
+    },
     autoLoading: {
       type: Boolean,
       default: false
@@ -37,7 +42,7 @@ export default {
       if (this.autoLoading) {
         this.loadingStatus = true
       }
-      console.log('this.$listeners', this.$listeners)
+      // console.log('this.$listeners', this.$listeners)
       this.$emit('click', () => {
         this.loadingStatus = false
       })

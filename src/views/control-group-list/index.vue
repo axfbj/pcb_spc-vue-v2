@@ -35,25 +35,26 @@
     <el-col :span="20">
       <container-layout ref="control-pic-list">
         <template v-slot:btns>
-          <div style="float: left;">
+          <el-row>
             <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span>
-          </div>
-          <div style="text-align: right; overflow: hidden;">
-            <ki-button
-              type="primary"
-              @click="check_setting_dialog"
-            >控制图设置</ki-button>
-            <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
-            <ki-message-box
-              :next="del"
-              @click="del_btn"
-            >
+            <span style="float: right;">
               <ki-button
-                type="danger"
-                style="margin-left: 10px;"
-              >删除</ki-button>
-            </ki-message-box>
-          </div>
+                type="primary"
+                @click="check_setting_dialog"
+              >控制图设置</ki-button>
+              <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
+              <ki-message-box
+                :next="del"
+                @click="del_btn"
+              >
+                <ki-button
+                  type="danger"
+                  style="margin-left: 10px;"
+                >删除</ki-button>
+              </ki-message-box>
+            </span>
+          </el-row>
+
         </template>
         <template v-slot:form>
           <el-form-item label="日期:">
@@ -74,7 +75,7 @@
             />
           </el-form-item>
           <el-form-item label="编号:">
-            <el-input v-model="form.controlChartCode" />
+            <el-input v-model="form.controlChartCode" style="width: 100px;" />
           </el-form-item>
           <el-form-item label="检测项目:">
             <allow-create-select
@@ -94,88 +95,16 @@
               @focus="getChartTypes"
             />
           </el-form-item>
-          <el-form-item label="产品型号:">
+          <el-form-item v-for="item in hierarchicalTypes" :key="item.id" :label="item.hierarchicalName">
+            <!-- :disabled="disabled_select_arr.includes(String(item.serialNumber))" -->
             <allow-create-select
-              v-model="form.hierarchicalTypeValueOne"
+              v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}`]"
               style="width:100px"
-              :options="options.hierarchicalType1"
               :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(1)"
+              :options="options[`hierarchicalType${item.serialNumber}`]"
+              @focus="getHierarchicalType(item.id)"
             />
           </el-form-item>
-          <el-form-item label="产品名称:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueTwo"
-              style="width:100px"
-              :options="options.hierarchicalType2"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(2)"
-            />
-          </el-form-item>
-          <el-form-item label="产线:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueThree"
-              style="width:100px"
-              :options="options.hierarchicalType3"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(3)"
-            />
-          </el-form-item>
-          <el-form-item label="班次:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueFour"
-              style="width:100px"
-              :options="options.hierarchicalType4"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(4)"
-            />
-          </el-form-item>
-          <el-form-item label="设备:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueFive"
-              style="width:100px"
-              :options="options.hierarchicalType5"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(5)"
-            />
-          </el-form-item>
-          <el-form-item label="供应商:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueSix"
-              style="width:100px"
-              :options="options.hierarchicalType6"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(6)"
-            />
-          </el-form-item>
-          <el-form-item label="客户:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueSeven"
-              style="width:100px"
-              :options="options.hierarchicalType7"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(7)"
-            />
-          </el-form-item>
-          <el-form-item label="批次:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueEight"
-              style="width:100px"
-              :options="options.hierarchicalType8"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(8)"
-            />
-          </el-form-item>
-          <el-form-item label="工商编号:">
-            <allow-create-select
-              v-model="form.hierarchicalTypeValueNine"
-              style="width:100px"
-              :options="options.hierarchicalType9"
-              :props="hierarchicalTypeProps"
-              @focus="getHierarchicalType(9)"
-            />
-          </el-form-item>
-
           <el-form-item>
             <el-button
               type="primary"
@@ -183,6 +112,7 @@
               @click="search_btn"
             >查询</el-button>
           </el-form-item>
+
         </template>
         <template v-slot:custum_content>
           <dynamic-table
@@ -252,6 +182,7 @@ import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
 import HierarchicalTypeData from './components/mixins/hierarchicalType-data'
+import { mapGetters } from 'vuex'
 export default {
   name: 'ControlGroupList',
   components: {
@@ -272,6 +203,17 @@ export default {
       current_tree_node_data: {},
       add_group_tree_dialog: false,
       chartSetting_dialog: false,
+      parseNum: {
+        1: 'One',
+        2: 'Two',
+        3: 'Three',
+        4: 'Four',
+        5: 'Five',
+        6: 'Six',
+        7: 'Seven',
+        8: 'Eight',
+        9: 'Nine'
+      },
       states_text: [
         { flag: 'history', state: '0', text: '历史点未失控' },
         { flag: 'history', state: '1', text: '历史点未处理' },
@@ -319,6 +261,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['hierarchicalTypes']),
     current_tree_node_key() {
       return this.current_tree_node_data.id
     }

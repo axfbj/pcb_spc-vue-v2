@@ -124,9 +124,9 @@ export default {
         9: 'Nine'
       },
       form_data: {
-        hierarchicalTypeValueOne: '1',
+        hierarchicalTypeValueOne: '',
         hierarchicalTypeValueTwo: '',
-        hierarchicalTypeValueThree: '3',
+        hierarchicalTypeValueThree: '',
         hierarchicalTypeValueFour: '',
         hierarchicalTypeValueFive: '',
         hierarchicalTypeValueSix: '',

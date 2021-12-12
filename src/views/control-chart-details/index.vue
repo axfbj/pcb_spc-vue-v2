@@ -47,7 +47,7 @@
             >删除</ki-button>
           </ki-message-box>
           <ki-button type="primary">导入数据</ki-button>
-          <ki-button type="primary">下载模板</ki-button>
+          <ki-button type="primary" @click="download_template">下载模板</ki-button>
           <ki-button type="primary">导出</ki-button>
         </div>
       </div>
@@ -58,8 +58,7 @@
         <el-tabs v-model="activeName" tab-position="bottom" style="height: 100%" @tab-click="handleClick">
           <el-tab-pane label="控制图" name="line">
             <div style="height: 100%;width:100%;">
-              <div ref="line1" class="line" />
-              <div ref="line2" class="line" />
+              <div ref="line" class="line" />
             </div>
             <!-- 控制图 -->
           </el-tab-pane>
@@ -154,6 +153,7 @@
 import chart from './mixins/chart'
 import AddDataDialog from './components/add-data-dialog'
 import { mapGetters } from 'vuex'
+import XLSX from 'xlsx'
 
 export default {
   name: 'ControlChartDetails',
@@ -357,9 +357,9 @@ export default {
     handleClick() {
       this.$nextTick(() => {
         if (this.activeName === 'line') {
-          if (!Object.keys(this.myEcharts).includes('line1')) {
+          if (!Object.keys(this.myEcharts).includes('line')) {
             this.initEcharts()
-            this.initEcharts2()
+            // this.initEcharts2()
           }
         }
         if (this.activeName === 'bar') {
@@ -390,6 +390,84 @@ export default {
           }
         }
       })
+    },
+
+    get_column() {
+      const columnList = {}
+      this.header_list.forEach((header, index) => {
+        let str_big = String.fromCharCode('A'.charCodeAt(0) + index)
+        if (index > 25) {
+          str_big = String.fromCharCode('A'.charCodeAt(0) + parseInt(index / 26) - 1) + String.fromCharCode('A'.charCodeAt(0) + index - parseInt(index / 26) * 26)
+        }
+        columnList[str_big] = header.label
+      })
+      // console.log(columnList)
+
+      return columnList
+    },
+    download_template() {
+      const columnList = this.get_column()
+      // alert(1)
+      // var data = [{
+      //   'a': 1,
+      //   'x': 2,
+      //   'b': 3,
+      //   'y': 4,
+      //   'success': true
+      // }, {
+      //   'a': 1,
+      //   'x': 2,
+      //   'b': 3,
+      //   'y': 4,
+      //   'success': false
+      // }
+      // ]
+      // 数据表格
+      var table = []
+
+      // table.push({
+      //   A: '列A',
+      //   B: '列B',
+      //   C: '列C',
+      //   D: '列D',
+      //   E: '列E'
+      // })
+      table.push(columnList)
+
+      // data.forEach(function(item) {
+      //   var row = {
+      //     A: item.b,
+      //     B: item.y,
+      //     C: item.a,
+      //     D: item.x,
+      //     E: (item.success ? '成功' : '失败')
+      //   }
+      //   table.push(row)
+      // })
+      const header = Object.keys(columnList)
+      // 创建book
+      var wb = XLSX.utils.book_new()
+      // json转sheet
+      var ws = XLSX.utils.json_to_sheet(table, { header: header, skipHeader: true })
+      // 设置列宽
+      // console.log('header', header)
+      const colWidthArr = []
+      header.forEach(() => {
+        colWidthArr.push({ width: 15 })
+      })
+      ws['!cols'] = colWidthArr
+      // ws['!cols'] = [
+      //   { width: 15 },
+      //   { width: 15 },
+      //   { width: 15 },
+      //   { width: 15 },
+      //   { width: 15 }
+      // ]
+      var timestamp = (new Date()).getTime()
+      // sheet写入book
+      XLSX.utils.book_append_sheet(wb, ws, 'file')
+      // 输出
+      XLSX.writeFile(wb, 'file' + timestamp + '.xlsx')
     }
 
   }
@@ -399,7 +477,7 @@ export default {
 <style lang="scss" scoped>
 .line {
   width: 100%;
-  height: 50%;
+  height: 100%;
   min-height: 50px;
   margin: auto;
   margin-top: 5px;

@@ -27,10 +27,10 @@
 
       </el-row>
     </div>
-    <ki-button @click="controlGroup_filtering_dialog_btn">控制组过滤</ki-button>
+    <!-- <ki-button @click="controlGroup_filtering_dialog_btn">控制组过滤</ki-button>
     <ki-button @click="col_field_dialog_btn">列字段过滤</ki-button>
     <ki-button @click="hierarchicalType_filtering_btn">层次信息过滤</ki-button>
-    <ki-button @click="filter_options_btn">过滤选项</ki-button>
+    <ki-button @click="filter_options_btn">过滤选项</ki-button> -->
     <dynamic-table
       ref="dy_table"
       v-model="select_row"

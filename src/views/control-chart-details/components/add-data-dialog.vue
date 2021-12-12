@@ -50,7 +50,8 @@
 
           <el-col v-for="item in size" :key="item.val" :span="12">
             <el-form-item :label="`${item.label}:`">
-              <el-input v-model.number="form[item.val]" />
+              <el-input-number v-model="form[item.val]" :controls="false" @change="handleChange" />
+              <!-- <el-input v-model="form[item.val]" /> -->
             </el-form-item>
           </el-col>
 
@@ -292,7 +293,7 @@ export default {
       this.flag = this.$attrs.flag
       this.size = []
       for (let i = 1; i <= this.sampleSize; i++) {
-        this.$set(this.form, `value${i}`, '')
+        this.$set(this.form, `value${i}`, undefined)
         const o = {
           val: `value${i}`,
           label: `样本${i}`

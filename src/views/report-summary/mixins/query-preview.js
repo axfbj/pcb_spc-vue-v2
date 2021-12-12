@@ -16,7 +16,8 @@ export default {
       }
     },
 
-    get_processCapabilityQueryParams() {
+    get_processCapabilityQueryParams(form_data) {
+      const data = form_data
       const params = {
         'excelName': '',
 
@@ -58,18 +59,18 @@ export default {
         'hierarchicalTypeValueSix': '',
         'hierarchicalTypeValueThree': '',
         'hierarchicalTypeValueTwo': '',
-        'controlGroupIds': this.form.controlGroupKeys,
-        ...this.form.colFieldKeys.map(item => ({
+        'controlGroupIds': data.controlGroupKeys,
+        ...data.colFieldKeys.map(item => ({
           [item]: 1
         })),
-        ...this.form.hierarchicalTypeKeys,
-        ...this.form.filteOptions_data
+        ...data.hierarchicalTypeKeys,
+        ...data.filteOptions_data
       }
       return params
     },
 
     async processCapabilityExcelQuery_preview() {
-      // const { code, data } = await this.$api.processCapabilityExcelQuery(this.get_processCapabilityQueryParams())
+      // const { code, data } = await this.$api.processCapabilityExcelQuery(this.get_processCapabilityQueryParams(this.form))
       const { code, data } = {
         'data': [
           {
@@ -123,12 +124,13 @@ export default {
       }
     },
     async processCapabilityExcel_export() {
-      const { code, data } = await this.$api.processCapabilityExcel(this.get_processCapabilityQuery())
+      const { code, data } = await this.$api.processCapabilityExcel(this.get_processCapabilityQuery(this.export_form))
       if (code === '200' && data) {
         // window.open(data)
       }
     },
-    get_abnormalPointExcelQueryParams() {
+    get_abnormalPointExcelQueryParams(form_data) {
+      const data = this.form_data
       const params = {
         'hierarchicalTypeValueEight': '',
         'hierarchicalTypeValueFive': '',
@@ -141,15 +143,15 @@ export default {
         'hierarchicalTypeValueTwo': '',
 
         'excelName': '',
-        'controlGroupIds': this.form.controlGroupKeys,
-        ...this.form.filteOptions_data
+        'controlGroupIds': data.controlGroupKeys,
+        ...data.filteOptions_data
 
       }
 
       return params
     },
     async abnormalPointExcelQuery_preview() {
-      // const { code, data } = await this.$api.abnormalPointExcelQuery(this.get_abnormalPointExcelQueryParams())
+      // const { code, data } = await this.$api.abnormalPointExcelQuery(this.get_abnormalPointExcelQueryParams(this.form))
       const { code, data } = {
         'data': [
           {
@@ -241,12 +243,13 @@ export default {
       }
     },
     async abnormalPointExcel_export() {
-      const { code, data } = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams())
+      const { code, data } = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams(this.export_form))
       if (code === '200' && data) {
         // window.open(data)
       }
     },
-    get_yieldRateReportExcelQueryParams() {
+    get_yieldRateReportExcelQueryParams(form_data) {
+      const data = form_data
       const params = {
         'hierarchicalTypeValueEight': '',
         'hierarchicalTypeValueFive': '',
@@ -259,15 +262,15 @@ export default {
         'hierarchicalTypeValueTwo': '',
 
         'excelName': '',
-        'controlGroupIds': this.form.controlGroupKeys,
-        ...this.form.filteOptions_data
+        'controlGroupIds': data.controlGroupKeys,
+        ...data.filteOptions_data
 
       }
 
       return params
     },
     async yieldRateReportExcelQuery_preview() {
-      // const { code, data } = await this.$api.yieldRateReportExcelQuery(this.get_yieldRateReportExcelQueryParams())
+      // const { code, data } = await this.$api.yieldRateReportExcelQuery(this.get_yieldRateReportExcelQueryParams(this.form))
       const { code, data } = {
         'data': [
           {
@@ -351,7 +354,7 @@ export default {
       }
     },
     async yieldRateReportExcel_export() {
-      const { code, data } = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams())
+      const { code, data } = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams(this.export_form))
       if (code === '200' && data) {
         // window.open(data)
       }

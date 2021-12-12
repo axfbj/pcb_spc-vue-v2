@@ -21,7 +21,7 @@
         </el-col>
         <el-col :span="12">
           <div style="display: flex; align-items: flex-end;justify-content: flex-end;height: 117px; width: 100%;">
-            <ki-button type="primary" size="small" :disabled="export_disabled">导出</ki-button>
+            <ki-button type="primary" size="small" :disabled="export_disabled" @click="export_btn">导出</ki-button>
           </div>
         </el-col>
 
@@ -90,6 +90,7 @@ export default {
   data() {
     return {
       flag: '',
+      export_flag: '',
       parseNum: {
         1: 'One',
         2: 'Two',
@@ -114,7 +115,8 @@ export default {
         colFieldKeys: [],
         hierarchicalTypeKeys: [],
         filteOptions_data: []
-      }
+      },
+      export_form: {}
     }
   },
   computed: {
@@ -227,14 +229,18 @@ export default {
     filter_options_confirm(filteOptions_data) {
       this.filter_options_dialog = false
       this.form.filteOptions_data = filteOptions_data
+      this.export_form = JSON.parse(JSON.stringify(this.form))
       if (this.flag === 'control-group-filtering') {
         // console.log(this.form)
+        // this.export_form = JSON.parse(JSON.stringify(this.form))
         this.processCapabilityExcelQuery_preview()
       } else if (this.flag === 'abnormalPoint') {
         this.abnormalPointExcelQuery_preview()
+        this.export_flag = 'abnormalPoint'
         // abnormalPoint
       } else if (this.flag === 'yieldRateReport') {
         this.yieldRateReportExcelQuery_preview()
+        this.export_flag = 'yieldRateReport'
       }
     },
     filter_options_prev() {
@@ -243,7 +249,17 @@ export default {
         this.filter_options_close()
       }
     },
-    filter_options_next() {}
+    filter_options_next() {},
+    export_btn() {
+      if (this.export_flag === 'control-group-filtering') {
+        this.processCapabilityExcel_export()
+      } else if (this.export_flag === 'abnormalPoint') {
+        this.abnormalPointExcel_export()
+        // abnormalPoint
+      } else if (this.export_flag === 'yieldRateReport') {
+        this.yieldRateReportExcel_export()
+      }
+    }
   }
 }
 </script>

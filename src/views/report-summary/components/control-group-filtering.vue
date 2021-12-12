@@ -2,7 +2,7 @@
   <ki-dialog
     :visible="visible"
     title="报表生成向导"
-    width="30%"
+    width="35%"
     :default-footer="false"
     @closed="closed"
     @handleClose="handleClose"
@@ -64,12 +64,51 @@ export default {
   },
   data() {
     return {
+      // defaultProps: {
+      //   label: 'groupName',
+      //   children: 'children'
+      // },
+      // tree_data: [],
+      // flag: false,
+      tree_data: [{
+        id: 1,
+        label: '一级 1',
+        children: [{
+          id: 4,
+          label: '二级 1-1',
+          children: [{
+            id: 9,
+            label: '三级 1-1-1'
+          }, {
+            id: 10,
+            label: '三级 1-1-2'
+          }]
+        }]
+      }, {
+        id: 2,
+        label: '一级 2',
+        children: [{
+          id: 5,
+          label: '二级 2-1'
+        }, {
+          id: 6,
+          label: '二级 2-2'
+        }]
+      }, {
+        id: 3,
+        label: '一级 3',
+        children: [{
+          id: 7,
+          label: '二级 3-1'
+        }, {
+          id: 8,
+          label: '二级 3-2'
+        }]
+      }],
       defaultProps: {
-        label: 'groupName',
-        children: 'children'
-      },
-      tree_data: [],
-      flag: false
+        children: 'children',
+        label: 'label'
+      }
     }
   },
   methods: {
@@ -83,7 +122,6 @@ export default {
     next() {
       const checkboxKeys = this.$refs.chekbox_tree.getCheckedKeys()
       this.$emit('next', checkboxKeys)
-      this.clear()
     },
     test(scope) {
       console.log(scope)
@@ -138,7 +176,7 @@ export default {
     async opened({ loading }) {
     },
     closed() {
-
+      this.clear()
     }
   }
 }

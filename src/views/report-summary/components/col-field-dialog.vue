@@ -2,7 +2,7 @@
   <ki-dialog
     :visible="visible"
     title="报表生成向导"
-    width="30%"
+    width="35%"
     :default-footer="false"
     @closed="closed"
     @handleClose="handleClose"
@@ -17,16 +17,20 @@
         <span>请选择列名字段，被勾选的字段将成为所生成报表中的列 显示出来</span>
       </el-row>
       <el-row style="padding:10px 0px 10pxpx 20px;">
-        <el-col :span="18" style="border: 1px solid #ccc; height: 300px;">
+        <el-col :span="18" style="border: 1px solid #ccc; height: 334px;">
           <el-col :span="12" style="padding: 10px 20px;">
             <el-checkbox-group v-model="checklist1">
-              <el-checkbox v-for="label in checkbox_data1" :key="label" :label="label" style="display: block;margin-bottom: 10px;" />
+              <el-checkbox v-for="item in checkbox_data1" :key="item.key" :label="item.key" style="display: block;margin-bottom: 8px;">
+                {{ item.label }}
+              </el-checkbox>>
             </el-checkbox-group>
           </el-col>
 
           <el-col :span="12" style="padding: 10px 20px;">
             <el-checkbox-group v-model="checklist2">
-              <el-checkbox v-for="label in checkbox_data2" :key="label" :label="label" style="display: block;margin-bottom: 10px;" />
+              <el-checkbox v-for="item in checkbox_data2" :key="item.key" :label="item.key" style="display: block;margin-bottom: 8px;">
+                {{ item.label }}
+              </el-checkbox>>
             </el-checkbox-group>
           </el-col>
         </el-col>
@@ -43,11 +47,11 @@
       <ki-button style="float: left;" @click="handleClose">取 消</ki-button>
       <ki-button type="warning" @click="prev">上一步</ki-button>
       <ki-button type="warning" @click="next">下一步</ki-button>
-      <ki-button
+      <!-- <ki-button
         style="margin-left: 60px;"
         type="primary"
         @click="confirm"
-      >确 定</ki-button>
+      >确 定</ki-button> -->
     </template>
   </ki-dialog>
 </template>
@@ -67,8 +71,28 @@ export default {
   },
   data() {
     return {
-      checkbox_data1: ['Cpk', 'Cp', 'Cpl', 'CPU', 'Ppk', 'Pp', 'Ppl', 'PPU', 'Ca', '平均值'],
-      checkbox_data2: ['标准差(整体)', '标准差(组内)', '最大值', '最小值'],
+      checkbox_data1: [
+        { key: 'cpk', label: 'Cpk' },
+        { key: 'cp', label: 'Cp' },
+        { key: 'cpl', label: 'Cpl' },
+        { key: 'cpu', label: 'CPU' },
+        { key: 'ppk', label: 'Ppk' },
+        { key: 'Pp', label: 'pp' },
+        { key: 'ppl', label: 'Ppl' },
+        { key: 'ppu', label: 'Ppu' },
+        { key: 'ca', label: 'Ca' },
+        { key: 'average', label: '平均值' },
+        { key: 'r', label: '极差值' },
+        { key: 'allSD', label: '标准差(整体)' }
+      ],
+      checkbox_data2: [
+        { key: 'groupSD', label: '标准差(组内)' },
+        { key: 'max', label: '最大值' },
+        { key: 'min', label: '最小值' },
+        { key: 'records', label: '记录数' }
+      ],
+      // checkbox_data1: ['Cpk', 'Cp', 'Cpl', 'CPU', 'Ppk', 'Pp', 'Ppl', 'PPU', 'Ca', '平均值'],
+      // checkbox_data2: ['标准差(整体)', '标准差(组内)', '最大值', '最小值'],
       checklist1: [],
       checklist2: []
     }
@@ -96,13 +120,17 @@ export default {
     },
     checkAll() {
       this.checklist1 = []
-      this.checklist1 = [...this.checkbox_data1]
+      this.checklist1 = [...this.checkbox_data1.map(item => item.key)]
       this.checklist2 = []
-      this.checklist2 = [...this.checkbox_data2]
+      this.checklist2 = [...this.checkbox_data2.map(item => item.key)]
     },
     inverse() {
-      this.checklist1 = this.checkbox_data1.filter(item => !this.checklist1.includes(item))
-      this.checklist2 = this.checkbox_data2.filter(item => !this.checklist2.includes(item))
+      this.checklist1 = this.checkbox_data1.map(item => {
+        if (!this.checklist1.includes(item.key)) { return item.key }
+      })
+      this.checklist2 = this.checkbox_data2.map(item => {
+        if (!this.checklist2.includes(item.key)) { return item.key }
+      })
     },
     async add() {
 

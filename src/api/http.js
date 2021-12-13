@@ -33,15 +33,20 @@ async function apiAxios(method, url, params, contentType) {
   // console.log(params)
   // console.log(qs.stringify(params))
   try {
-    return await request({
+    const p = {
       method: method,
       // 拼接参数
       url: method === 'GET' || method === 'DELETE' ? helper.queryString(url, params) : url,
       data: method === 'POST' || method === 'PUT' ? (contentType === 'form' ? serialize(params) : JSON.stringify(params)) : null,
       // headers: { Authorization: `Bearer ${token}` },
       withCredentials: false
-    })
+    }
+    if (contentType === 'excel') {
+      p.responseType = 'blob'
+    }
+    return await request(p)
   } catch (error) {
+    console.log(error)
     return {
       code: 3000,
       data: false

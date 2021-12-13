@@ -23,5 +23,8 @@ export default {
   },
   cosaventrolChartSon_update(data) {
     return http.post('/spc/control/chart/son/update', data)
+  },
+  controlChartSon_data(data) {
+    return http.post('/spc/control/chart/son/data', data)
   }
 }

@@ -1,3 +1,4 @@
+import { dateformat } from '@/utils/date-method'
 export default {
   data() {
     return {
@@ -18,8 +19,13 @@ export default {
 
     get_processCapabilityQueryParams(form_data) {
       const data = form_data
+      const colFieldKeysObj = {}
+      data.colFieldKeys.forEach(item => {
+        colFieldKeysObj[item] = 1
+      })
+
       const params = {
-        'excelName': '',
+        'excelName': `工序能力报表${dateformat(new Date())}`,
 
         'allSD': 0,
         'average': 0,
@@ -60,9 +66,7 @@ export default {
         'hierarchicalTypeValueThree': '',
         'hierarchicalTypeValueTwo': '',
         'controlGroupIds': data.controlGroupKeys,
-        ...data.colFieldKeys.map(item => ({
-          [item]: 1
-        })),
+        ...colFieldKeysObj,
         ...data.hierarchicalTypeKeys,
         ...data.filteOptions_data
       }
@@ -70,38 +74,38 @@ export default {
     },
 
     async processCapabilityExcelQuery_preview() {
-      // const { code, data } = await this.$api.processCapabilityExcelQuery(this.get_processCapabilityQueryParams(this.form))
-      const { code, data } = {
-        'data': [
-          {
-            '序号': 1,
-            '控制组名称': '/金软vcp打金厚度',
-            '检测项目': '壁厚1（mm）',
-            '产品型号': '333',
-            '产品名称': '',
-            '产线': '',
-            '班次': '22',
-            '设备': '',
-            '供应商': '',
-            '客户': '',
-            '批次': '',
-            '工商单号': '',
-            'Cpk': '0.00',
-            'Cp': '0.00',
-            'Cpl': '0.67',
-            'CPU': '0.00',
-            'Ppk': '0.00',
-            'Pp': '0.00',
-            '平均值': '19.526066',
-            '极差值': '110.084',
-            '最大值': '111.0',
-            '最小值': '0.916',
-            '记录数': '6'
-          }
-        ],
-        'code': '200',
-        'msg': '操作成功'
-      }
+      const { code, data } = await this.$api.processCapabilityExcelQuery(this.get_processCapabilityQueryParams(this.form))
+      // const { code, data } = {
+      //   'data': [
+      //     {
+      //       '序号': 1,
+      //       '控制组名称': '/金软vcp打金厚度',
+      //       '检测项目': '壁厚1（mm）',
+      //       '产品型号': '333',
+      //       '产品名称': '',
+      //       '产线': '',
+      //       '班次': '22',
+      //       '设备': '',
+      //       '供应商': '',
+      //       '客户': '',
+      //       '批次': '',
+      //       '工商单号': '',
+      //       'Cpk': '0.00',
+      //       'Cp': '0.00',
+      //       'Cpl': '0.67',
+      //       'CPU': '0.00',
+      //       'Ppk': '0.00',
+      //       'Pp': '0.00',
+      //       '平均值': '19.526066',
+      //       '极差值': '110.084',
+      //       '最大值': '111.0',
+      //       '最小值': '0.916',
+      //       '记录数': '6'
+      //     }
+      //   ],
+      //   'code': '200',
+      //   'msg': '操作成功'
+      // }
       this.unique = '序号'
       if (code === '200' && data) {
         if (data.length === 0) {
@@ -112,6 +116,12 @@ export default {
           for (const key in data[0]) {
             if (Object.hasOwnProperty.call(data[0], key)) {
               const head = { prop: key, label: key }
+              if (key === '控制组名称') {
+                head.width = '180'
+              }
+              if (key === '检测项目') {
+                head.width = '180'
+              }
               this.header_list.push(head)
             }
           }
@@ -124,9 +134,19 @@ export default {
       }
     },
     async processCapabilityExcel_export() {
-      const { code, data } = await this.$api.processCapabilityExcel(this.get_processCapabilityQuery(this.export_form))
-      if (code === '200' && data) {
+      const data = await this.$api.processCapabilityExcel(this.get_processCapabilityQueryParams(this.export_form))
+      if (data) {
         // window.open(data)
+        const blob = new Blob([data])
+        console.log(blob)
+        const elink = document.createElement('a')
+        elink.download = `工序能力报表${dateformat(new Date())}.xls`
+        elink.style.display = 'none'
+        elink.href = URL.createObjectURL(blob)
+        document.body.appendChild(elink)
+        elink.click()
+        URL.revokeObjectURL(elink.href) // 释放URL 对象
+        document.body.removeChild(elink)
       }
     },
     get_abnormalPointExcelQueryParams(form_data) {

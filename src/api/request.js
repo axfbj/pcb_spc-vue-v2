@@ -46,16 +46,20 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    // console.log('response', response)
-    const res = response.data
-    if (res.code !== '200') {
-      Message({
-        message: res.msg,
-        type: 'error',
-        duration: 5 * 1000
-      })
+    if (response.status === 200) {
+      const res = response.data
+      if (res instanceof Blob) {
+        return res
+      }
+      if (res.code !== '200') {
+        Message({
+          message: res.msg,
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
+      return res
     }
-    return res
   },
   error => {
     console.log('err' + error) // for debug

@@ -234,6 +234,7 @@ export default {
         // console.log(this.form)
         // this.export_form = JSON.parse(JSON.stringify(this.form))
         this.processCapabilityExcelQuery_preview()
+        this.export_flag = 'control-group-filtering'
       } else if (this.flag === 'abnormalPoint') {
         this.abnormalPointExcelQuery_preview()
         this.export_flag = 'abnormalPoint'
@@ -251,6 +252,7 @@ export default {
     },
     filter_options_next() {},
     export_btn() {
+      alert(this.export_flag)
       if (this.export_flag === 'control-group-filtering') {
         this.processCapabilityExcel_export()
       } else if (this.export_flag === 'abnormalPoint') {

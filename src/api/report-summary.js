@@ -10,15 +10,15 @@ export default {
     return http.post('/spc/excel/inspectionRecordExcel', data)
   },
   processCapabilityExcel(data) {
-    return http.post('/spc/excel/processCapabilityExcel', data)
+    return http.post('/spc/excel/processCapabilityExcel', data, 'excel')
   },
   processCapabilityExcelQuery(data) {
     return http.post('/spc/excel/processCapabilityExcelQuery', data)
   },
   yieldRateReportExcel(data) {
-    return http.post('/spc/excel/yieldRateReportExcel', data)
+    return http.post('/spc/excel/yieldRateReportExcel', data, 'excel')
   },
   yieldRateReportExcelQuery(data) {
-    return http.post('/spc/excel/yieldRateReportExcelQuery', data)
+    return http.post('/spc/excel/yieldRateReportExcelQuery', data, 'excel')
   }
 }

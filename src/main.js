@@ -28,10 +28,10 @@ import * as filters from './filters' // global filters
  * Currently MockJs will be used in the production environment,
  * please remove it before going online ! ! !
  */
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
+// if (process.env.NODE_ENV === 'production') {
+//   const { mockXHR } = require('../mock')
+//   mockXHR()
+// }
 Element.Dialog.props.closeOnClickModal.default = false
 
 Vue.use(Element, {
@@ -44,6 +44,7 @@ import api from './api/api.js'
 Vue.prototype.$api = api
 
 import echarts from './utils/echartsUi'
+// import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
 
 import ContainerLayout from '@/components/container-layout'

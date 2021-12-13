@@ -176,15 +176,15 @@ export default {
     async open({ load }) {
       // this.flag = this.$attrs.flag
       const json = {
-        'rule1': 'rulesOne',
-        'rule2': 'rulesTwo',
-        'rule3': 'rulesThree',
-        'rule4': 'rulesFour',
-        'rule5': 'rulesFive',
-        'rule6': 'rulesSix',
-        'rule7': 'rulesSeven',
-        'rule8': 'rulesEight',
-        'rule0': 'rulesNine'
+        'rule0': 'rulesOne',
+        'rule1': 'rulesTwo',
+        'rule2': 'rulesThree',
+        'rule3': 'rulesFour',
+        'rule4': 'rulesFive',
+        'rule5': 'rulesSix',
+        'rule6': 'rulesSeven',
+        'rule7': 'rulesEight',
+        'rule8': 'rulesNine'
       }
       if (Object.hasOwnProperty.call(this.selectRow, 'discriminationRulesId')) {
         const { discriminationRulesId } = this.selectRow

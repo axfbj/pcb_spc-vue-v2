@@ -3,7 +3,7 @@
     :visible="visible"
     title="数据"
     v-bind="$attrs"
-    width="40%"
+    width="35%"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
@@ -11,7 +11,7 @@
   >
     <div style="padding: 10px 40px;">
       <el-form ref="form" :model="form" label-width="auto">
-        <el-row :gutter="20">
+        <el-row :gutter="40">
           <el-col :span="12">
             <el-form-item label="抽检时间:">
               <el-date-picker
@@ -50,7 +50,7 @@
 
           <el-col v-for="item in size" :key="item.val" :span="12">
             <el-form-item :label="`${item.label}:`">
-              <el-input-number v-model="form[item.val]" :controls="false" @change="handleChange" />
+              <el-input-number v-model="form[item.val]" :controls="false" style="width: 100%;" />
               <!-- <el-input v-model="form[item.val]" /> -->
             </el-form-item>
           </el-col>

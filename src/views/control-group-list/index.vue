@@ -98,7 +98,7 @@
           <el-form-item v-for="item in hierarchicalTypes" :key="item.id" :label="item.hierarchicalName">
             <!-- :disabled="disabled_select_arr.includes(String(item.serialNumber))" -->
             <allow-create-select
-              v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}`]"
+              v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}:`]"
               style="width:100px"
               :props="hierarchicalTypeProps"
               :options="options[`hierarchicalType${item.serialNumber}`]"

@@ -187,7 +187,7 @@ export default {
         value: '2',
         label: '抽检时间'
       }],
-      activeName: 'bar',
+      activeName: 'line',
       myEcharts: {},
       select_row: {},
       header_list_data: [
@@ -229,7 +229,7 @@ export default {
     this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
   },
   mounted() {
-    this.initEcharts3()
+    this.initEcharts1()
     this.chart_resize()
   },
 

@@ -8,7 +8,8 @@ import {
   TooltipComponent,
   GridComponent,
   LegendComponent,
-  MarkLineComponent
+  MarkLineComponent,
+  MarkPointComponent
   // GeoCoComponent
 } from 'echarts/components'
 // 引入 Canvas 渲染器，注意引入 CanvasRenderer 或者 SVGRenderer 是必须的一步
@@ -21,6 +22,7 @@ echarts.use([
   GridComponent,
   LegendComponent,
   MarkLineComponent,
+  MarkPointComponent,
   BarChart,
   PieChart,
   LineChart,

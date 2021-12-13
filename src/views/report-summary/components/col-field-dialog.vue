@@ -77,7 +77,7 @@ export default {
         { key: 'cpl', label: 'Cpl' },
         { key: 'cpu', label: 'CPU' },
         { key: 'ppk', label: 'Ppk' },
-        { key: 'Pp', label: 'pp' },
+        { key: 'pp', label: 'Pp' },
         { key: 'ppl', label: 'Ppl' },
         { key: 'ppu', label: 'Ppu' },
         { key: 'ca', label: 'Ca' },
@@ -141,8 +141,9 @@ export default {
     },
     async opened({ loading }) {
     },
+    clear() {},
     closed() {
-
+      this.clear()
     }
   }
 }

@@ -1,7 +1,7 @@
 import http from './http.js'
 export default {
   abnormalPointExcel(data) {
-    return http.post('/spc/excel/abnormalPointExcel', data)
+    return http.post('/spc/excel/abnormalPointExcel', data, 'excel')
   },
   abnormalPointExcelQuery(data) {
     return http.post('/spc/excel/abnormalPointExcelQuery', data)
@@ -19,6 +19,6 @@ export default {
     return http.post('/spc/excel/yieldRateReportExcel', data, 'excel')
   },
   yieldRateReportExcelQuery(data) {
-    return http.post('/spc/excel/yieldRateReportExcelQuery', data, 'excel')
+    return http.post('/spc/excel/yieldRateReportExcelQuery', data)
   }
 }

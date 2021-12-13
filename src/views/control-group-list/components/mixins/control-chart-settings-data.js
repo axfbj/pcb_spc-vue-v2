@@ -19,7 +19,7 @@ export default {
         label: 'X-MR'
       }, {
         value: 'P',
-        label: 'P'
+        label: 'p'
       }, {
         value: 'nP',
         label: 'np'

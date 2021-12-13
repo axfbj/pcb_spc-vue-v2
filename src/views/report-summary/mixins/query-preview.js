@@ -171,69 +171,69 @@ export default {
       return params
     },
     async abnormalPointExcelQuery_preview() {
-      // const { code, data } = await this.$api.abnormalPointExcelQuery(this.get_abnormalPointExcelQueryParams(this.form))
-      const { code, data } = {
-        'data': [
-          {
-            'controlChartSonId': '1463040139432431616',
-            'controlChartCode': '12345',
-            'controlChartName': '深圳和美spc\\test',
-            'inspectionName': '壁厚1（mm）',
-            'hierarchicalNameOne': '产品型号',
-            'hierarchicalNameTwo': '产品名称',
-            'hierarchicalNameThree': '产线',
-            'hierarchicalNameFour': '班次',
-            'hierarchicalNameFive': '设备',
-            'hierarchicalNameSix': '供应商',
-            'hierarchicalNameSeven': '客户',
-            'hierarchicalNameEight': '批次',
-            'hierarchicalNameNine': '工商单号',
-            'hierarchicalTypeValueOne': 'testAdd',
-            'hierarchicalTypeValueTwo': '',
-            'hierarchicalTypeValueThree': '',
-            'hierarchicalTypeValueFour': '',
-            'hierarchicalTypeValueFive': '',
-            'hierarchicalTypeValueSix': '',
-            'hierarchicalTypeValueSeven': '',
-            'hierarchicalTypeValueEight': '',
-            'hierarchicalTypeValueNine': '',
-            'abnormalInformation': 'R0:超出规格限',
-            'abnormalReason': null,
-            'handleProgramme': '1',
-            'processingDate': '2021-11-30 11:59:57'
-          },
-          {
-            'controlChartSonId': '1463040139432431616',
-            'controlChartCode': '12345',
-            'controlChartName': '深圳和美spc\\test',
-            'inspectionName': '壁厚1（mm）',
-            'hierarchicalNameOne': '产品型号',
-            'hierarchicalNameTwo': '产品名称',
-            'hierarchicalNameThree': '产线',
-            'hierarchicalNameFour': '班次',
-            'hierarchicalNameFive': '设备',
-            'hierarchicalNameSix': '供应商',
-            'hierarchicalNameSeven': '客户',
-            'hierarchicalNameEight': '批次',
-            'hierarchicalNameNine': '工商单号',
-            'hierarchicalTypeValueOne': 'testAdd',
-            'hierarchicalTypeValueTwo': '',
-            'hierarchicalTypeValueThree': '',
-            'hierarchicalTypeValueFour': '',
-            'hierarchicalTypeValueFive': '',
-            'hierarchicalTypeValueSix': '',
-            'hierarchicalTypeValueSeven': '',
-            'hierarchicalTypeValueEight': '',
-            'hierarchicalTypeValueNine': '',
-            'abnormalInformation': 'R0:超出规格限',
-            'abnormalReason': null,
-            'handleProgramme': '1',
-            'processingDate': '2021-11-30 11:59:57'
-          }
-        ],
-        'code': '200',
-        'msg': '操作成功'
-      }
+      const { code, data } = await this.$api.abnormalPointExcelQuery(this.get_abnormalPointExcelQueryParams(this.form))
+      // const { code, data } = {
+      //   'data': [
+      //     {
+      //       'controlChartSonId': '1463040139432431616',
+      //       'controlChartCode': '12345',
+      //       'controlChartName': '深圳和美spc\\test',
+      //       'inspectionName': '壁厚1（mm）',
+      //       'hierarchicalNameOne': '产品型号',
+      //       'hierarchicalNameTwo': '产品名称',
+      //       'hierarchicalNameThree': '产线',
+      //       'hierarchicalNameFour': '班次',
+      //       'hierarchicalNameFive': '设备',
+      //       'hierarchicalNameSix': '供应商',
+      //       'hierarchicalNameSeven': '客户',
+      //       'hierarchicalNameEight': '批次',
+      //       'hierarchicalNameNine': '工商单号',
+      //       'hierarchicalTypeValueOne': 'testAdd',
+      //       'hierarchicalTypeValueTwo': '',
+      //       'hierarchicalTypeValueThree': '',
+      //       'hierarchicalTypeValueFour': '',
+      //       'hierarchicalTypeValueFive': '',
+      //       'hierarchicalTypeValueSix': '',
+      //       'hierarchicalTypeValueSeven': '',
+      //       'hierarchicalTypeValueEight': '',
+      //       'hierarchicalTypeValueNine': '',
+      //       'abnormalInformation': 'R0:超出规格限',
+      //       'abnormalReason': null,
+      //       'handleProgramme': '1',
+      //       'processingDate': '2021-11-30 11:59:57'
+      //     },
+      //     {
+      //       'controlChartSonId': '1463040139432431616',
+      //       'controlChartCode': '12345',
+      //       'controlChartName': '深圳和美spc\\test',
+      //       'inspectionName': '壁厚1（mm）',
+      //       'hierarchicalNameOne': '产品型号',
+      //       'hierarchicalNameTwo': '产品名称',
+      //       'hierarchicalNameThree': '产线',
+      //       'hierarchicalNameFour': '班次',
+      //       'hierarchicalNameFive': '设备',
+      //       'hierarchicalNameSix': '供应商',
+      //       'hierarchicalNameSeven': '客户',
+      //       'hierarchicalNameEight': '批次',
+      //       'hierarchicalNameNine': '工商单号',
+      //       'hierarchicalTypeValueOne': 'testAdd',
+      //       'hierarchicalTypeValueTwo': '',
+      //       'hierarchicalTypeValueThree': '',
+      //       'hierarchicalTypeValueFour': '',
+      //       'hierarchicalTypeValueFive': '',
+      //       'hierarchicalTypeValueSix': '',
+      //       'hierarchicalTypeValueSeven': '',
+      //       'hierarchicalTypeValueEight': '',
+      //       'hierarchicalTypeValueNine': '',
+      //       'abnormalInformation': 'R0:超出规格限',
+      //       'abnormalReason': null,
+      //       'handleProgramme': '1',
+      //       'processingDate': '2021-11-30 11:59:57'
+      //     }
+      //   ],
+      //   'code': '200',
+      //   'msg': '操作成功'
+      // }
       const header_list = [
         { prop: 'serialNumber', label: '序号' },
         { prop: 'controlChartName', label: '控制组名称' },
@@ -290,52 +290,52 @@ export default {
       return params
     },
     async yieldRateReportExcelQuery_preview() {
-      // const { code, data } = await this.$api.yieldRateReportExcelQuery(this.get_yieldRateReportExcelQueryParams(this.form))
-      const { code, data } = {
-        'data': [
-          {
-            'serialNumber': 1,
-            'controlChartId': '1468899905694208000',
-            'controlChartName': '/金软vcp打金厚度',
-            'controlChartCode': '2112091639047689',
-            'value1': null,
-            'badDefinitionValue': null,
-            'badName': null,
-            'inspectionNum': 20,
-            'goodNum': 18,
-            'yieldRate': '90%',
-            'badNameOne': 'A1不良项目',
-            'badNumOne': '1',
-            'badPercentageOne': '50%',
-            'badNameTwo': 'B1不良项目',
-            'badNumTwo': '1',
-            'badPercentageTwo': '50%',
-            'badNameThree': null,
-            'badNumThree': null,
-            'badPercentageThree': null,
-            'hierarchicalNameOne': '产品型号',
-            'hierarchicalNameTwo': '产品名称',
-            'hierarchicalNameThree': '产线',
-            'hierarchicalNameFour': '班次',
-            'hierarchicalNameFive': '设备',
-            'hierarchicalNameSix': '供应商',
-            'hierarchicalNameSeven': '客户',
-            'hierarchicalNameEight': '批次',
-            'hierarchicalNameNine': '工商单号',
-            'hierarchicalTypeValueOne': 'test',
-            'hierarchicalTypeValueTwo': '',
-            'hierarchicalTypeValueThree': '',
-            'hierarchicalTypeValueFour': '',
-            'hierarchicalTypeValueFive': '',
-            'hierarchicalTypeValueSix': '',
-            'hierarchicalTypeValueSeven': '',
-            'hierarchicalTypeValueEight': '',
-            'hierarchicalTypeValueNine': ''
-          }
-        ],
-        'code': '200',
-        'msg': '操作成功'
-      }
+      const { code, data } = await this.$api.yieldRateReportExcelQuery(this.get_yieldRateReportExcelQueryParams(this.form))
+      // const { code, data } = {
+      //   'data': [
+      //     {
+      //       'serialNumber': 1,
+      //       'controlChartId': '1468899905694208000',
+      //       'controlChartName': '/金软vcp打金厚度',
+      //       'controlChartCode': '2112091639047689',
+      //       'value1': null,
+      //       'badDefinitionValue': null,
+      //       'badName': null,
+      //       'inspectionNum': 20,
+      //       'goodNum': 18,
+      //       'yieldRate': '90%',
+      //       'badNameOne': 'A1不良项目',
+      //       'badNumOne': '1',
+      //       'badPercentageOne': '50%',
+      //       'badNameTwo': 'B1不良项目',
+      //       'badNumTwo': '1',
+      //       'badPercentageTwo': '50%',
+      //       'badNameThree': null,
+      //       'badNumThree': null,
+      //       'badPercentageThree': null,
+      //       'hierarchicalNameOne': '产品型号',
+      //       'hierarchicalNameTwo': '产品名称',
+      //       'hierarchicalNameThree': '产线',
+      //       'hierarchicalNameFour': '班次',
+      //       'hierarchicalNameFive': '设备',
+      //       'hierarchicalNameSix': '供应商',
+      //       'hierarchicalNameSeven': '客户',
+      //       'hierarchicalNameEight': '批次',
+      //       'hierarchicalNameNine': '工商单号',
+      //       'hierarchicalTypeValueOne': 'test',
+      //       'hierarchicalTypeValueTwo': '',
+      //       'hierarchicalTypeValueThree': '',
+      //       'hierarchicalTypeValueFour': '',
+      //       'hierarchicalTypeValueFive': '',
+      //       'hierarchicalTypeValueSix': '',
+      //       'hierarchicalTypeValueSeven': '',
+      //       'hierarchicalTypeValueEight': '',
+      //       'hierarchicalTypeValueNine': ''
+      //     }
+      //   ],
+      //   'code': '200',
+      //   'msg': '操作成功'
+      // }
 
       const badNumTop = []
       for (let i = 1; i <= 3; i++) {

@@ -121,6 +121,10 @@ export default {
     prev() {},
     next() {
       const checkboxKeys = this.$refs.chekbox_tree.getCheckedKeys()
+      if (checkboxKeys.length === 0) {
+        this.$message.warning('至少选中一个控制组！')
+        return
+      }
       this.$emit('next', checkboxKeys)
     },
     test(scope) {

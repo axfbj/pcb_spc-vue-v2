@@ -1,39 +1,71 @@
 import chartData from './data'
 export default {
+  data() {
+    return {
+      arr: {
+        label59: '', // 样本数量
+        subgroupSize: '', // 子组容量
+        USL: '',
+        LSL: '',
+        Tol: '',
+        Cr: '',
+        Cp: '',
+        Cpk: '',
+        Zusl: '',
+        Zlsl: '',
+        Cpl: '',
+        Cpu: '',
+        Cpm: '',
+        Pr: '',
+        Pp: '',
+        Ppk: '',
+        std_dev: '',
+        Max: '',
+        Min: '',
+        Range: '',
+        r_bar: '',
+        est: '',
+        target: '',
+        label67: ''
+      }
+    }
+  },
   methods: {
+    chart_xbarr() {
+      this.chartData = chartData
+      this.setArrValue()
+    },
+    setArrValue() {
+      const res4 = chartData
+      this.arr.label59 = res4.data.label59
+      this.arr.subgroupSize = res4.data.label59
+      this.arr.USL = res4.data.USL
+      this.arr.LSL = res4.data.LSL
+      this.arr.Tol = res4.data['USL-LSL']
+      this.arr.Cr = res4.data.vCR
+      this.arr.Cp = res4.data.vCp
+      this.arr.Cpk = res4.data.vCPK
+      this.arr.Zusl = res4.data.vZusl
+      this.arr.Zlsl = res4.data.vZlsl
+      this.arr.Cpl = res4.data.vCPL
+      this.arr.Cpu = res4.data.vCPU
+      this.arr.Cpm = res4.data.vCpm
+      this.arr.Pr = res4.data.vPR
+      this.arr.Pp = res4.data.vPp
+      this.arr.Ppk = res4.data.vPpk
+      this.arr.std_dev = res4.data.vs0
+      this.arr.Max = res4.data.umax
+      this.arr.Min = res4.data.umin
+      this.arr.Range = res4.data['umax-umin']
+      this.arr.r_bar = res4.data.label73
+      this.arr.est = res4.data.vs
+      this.arr.target = res4.data.target
+      this.arr.label67 = res4.data.label67
+    },
     getLineData1() {
-      console.log()
+      this.setArrValue()
       const res = chartData.data
       const decimal = 2
-
-      // this.usl = res.USL.toFixed(2)
-      // this.lsl = res.LSL.toFixed(2)
-      // this.sl = Number(res.target).toFixed(2)
-      // this.ucl = res.vUCLx.toFixed(2)
-      // this.lcl = res.vLCLx.toFixed(2)
-      // this.xbb = res.vxbb.toFixed(2)
-      // this.min = this.lsl
-      // this.max = this.usl
-      // this.vUCLr = res.vUCLr.toFixed(2)
-      // this.max1 = res.vUCLr.toFixed(2)
-      // this.vLCLr = res.vLCLr.toFixed(2)
-      // this.vab = res.Series11[0].y.toFixed(2)
-      // res.LineSeries3.forEach((i) => {
-      //   if (i.exceptionInformation) {
-      //     this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark, '异常信息': i.exceptionInformation })
-      //   } else {
-      //     this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark })
-      //   }
-      //   // const aaa = i.tdate.split(' ')[0]
-      //   this.axisX.push(i.x)
-      //   this.xbar.push(i.y)
-      //   if (i.y < this.min) {
-      //     this.min = i.y
-      //   }
-      //   if (i.y > this.max) {
-      //     this.max = i.y
-      //   }
-      // })
 
       const p = {
         usl: res.USL.toFixed(decimal),
@@ -130,81 +162,28 @@ export default {
           p.max1 = i.y
         }
       })
-
-      // const usl = Number(res.label83).toFixed(2)
-      // const lsl = Number(res.label85).toFixed(2)
-      // const sl = Number(res.label93).toFixed(2)
-      // const ucl = Number(res.label87).toFixed(2)
-      // const lcl = Number(res.label89).toFixed(2)
-      // const xbb = Number(res.label81).toFixed(2)
-
       return p
     },
     initEcharts1() {
       const p = this.getLineData1()
-      console.log(p)
       this.myEcharts.line = this.$echarts.init(this.$refs.line)
-      // const option = {
-      //   grid: {
-      //     left: 10,
-      //     containLabel: true,
-      //     bottom: 10,
-      //     top: 10,
-      //     right: 30
-      //   },
-      //   xAxis: {
-      //     type: 'category',
-      //     data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      //   },
-      //   yAxis: {
-      //     type: 'value'
-      //   },
-      //   series: [
-      //     {
-      //       data: [150, 230, 224, 218, 135, 147, 260],
-      //       type: 'line'
-      //     }
-      //   ]
-      // }
-      // const markLine = {
-      //   data: [
-      //     { type: 'average', name: 'Avg' },
-      //     [
-      //       {
-      //         symbol: 'none',
-      //         x: '90%',
-      //         yAxis: 'max'
-      //       },
-      //       {
-      //         symbol: 'circle',
-      //         label: {
-      //           position: 'start',
-      //           formatter: 'Max'
-      //         },
-      //         type: 'max',
-      //         name: '最高点'
-      //       }
-      //     ]
-      //   ]
-      // }
       const options = {
         grid: [
           {
-            left: 10,
-            containLabel: true,
-            bottom: '52%',
-            right: 100,
+            left: 70,
+            // containLabel: true,
+            bottom: '55%',
+            right: 150,
             top: 10
           },
           {
-            left: 10,
-            containLabel: true,
-            top: '52%',
+            left: 70,
+            // containLabel: true,
+            top: '55%',
             bottom: 10,
-            right: 100
+            right: 150
           }
         ],
-        // grid: [{ bottom: '55%' }, { top: '55%' }],
         axisPointer: {
           link: [
             {
@@ -238,11 +217,6 @@ export default {
               // '备注：' + params[0].data.备注
             }
           }
-          // formatter: function(params) {
-          //   // console.log('params', params)
-
-          //   return '标准值: ' + params[0].value + '<br>平均值: ' + params[1].value + '<br>样本值: ' + params[1].data.myData
-          // }
         },
         legend: {
           show: false
@@ -257,8 +231,6 @@ export default {
               show: true
             },
             gridIndex: 0,
-            // yAxis.. show = true
-            // data: [1, 3, 5],
             max: p.max + 3,
             min: p.min - 3,
             type: 'value',
@@ -274,25 +246,11 @@ export default {
             type: 'value',
             splitLine: { show: false }
           }
-
-          // {
-          //   gridIndex: 0,
-          //   max: p.max + 3,
-          //   min: p.min - 3,
-          //   type: 'category',
-          //   splitLine: { show: false }
-          // },
-          // {
-          //   gridIndex: 1,
-          //   min: p.vLCLr,
-          //   max: p.max1 + 3,
-          //   type: 'category',
-          //   splitLine: { show: false }
-          // }
         ],
 
         series: [
           {
+            itemStyle: { normal: { label: { show: true }}},
             type: 'line',
             // p.LineSeries3,
             data: p.LineSeries3,
@@ -400,6 +358,7 @@ export default {
             // ]
           },
           {
+            itemStyle: { normal: { label: { show: true }}},
             type: 'line',
             xAxisIndex: 1,
             yAxisIndex: 1,
@@ -503,30 +462,174 @@ export default {
       // this.myEcharts.line2.setOption(option)
     },
     initEcharts3() {
+      // const p = this.getLineData1()
+      // this.normx = []
+      // this.normy = []
+      // this.normzz = []
+      // if (!res) {
+      //   this.wsj = true
+      //   return
+      // }
+      // if (!res.Series3 || !res.LineSeries3) {
+      //   this.wsj = true
+      //   return
+      // } else {
+      //   this.wsj = false
+      // }
+      const p = {
+        normx: [],
+        normy: [],
+        normzz: []
+      }
+      const res = chartData.data
+      res.Series5.forEach((i) => {
+        p.normx.push(Number(i.x) + 1)
+        p.normy.push(Number(i.y))
+      })
+      res.Series1.forEach((i) => {
+        if (i.y > this.max) {
+          p.max = i.y
+        }
+        p.normzz.push(i.y)
+      })
       this.myEcharts.bar1 = this.$echarts.init(this.$refs.bar1)
-      const option = {
+
+      // const option = {
+      //   grid: {
+      //     left: 10,
+      //     containLabel: true,
+      //     bottom: 10,
+      //     top: 10,
+      //     right: 30
+      //   },
+      //   xAxis: {
+      //     type: 'category',
+      //     data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+      //   },
+      //   yAxis: {
+      //     type: 'value'
+      //   },
+      //   series: [
+      //     {
+      //       data: [120, 200, 150, 80, 70, 110, 130],
+      //       type: 'bar'
+      //     }
+      //   ]
+      // }
+      const options = {
         grid: {
           left: 10,
           containLabel: true,
           bottom: 10,
-          top: 10,
+          top: 50,
           right: 30
         },
-        xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
+            crossStyle: {
+              color: '#C23531'
+            }
+          }
         },
-        yAxis: {
-          type: 'value'
+        toolbox: {
+          feature: {
+            dataView: { show: true, readOnly: false },
+            magicType: { show: true, type: ['line', 'bar'] },
+            restore: { show: true },
+            saveAsImage: { show: true }
+          }
         },
+        legend: {
+          // data: ['蒸发量', '平均温度']
+          show: false
+        },
+        xAxis: [
+          {
+            interval: 1,
+            type: 'value',
+            data: p.normx,
+            axisTick: {
+              alignWithLabel: true
+            },
+            splitLine: { // 网格线
+              show: false
+            }
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            name: '',
+            min: 0,
+            max: p.max + 10,
+            interval: 10,
+            axisLabel: {
+              formatter: '{value} '
+            },
+            splitLine: { // 网格线
+              show: false
+            }
+          }
+        ],
         series: [
           {
-            data: [120, 200, 150, 80, 70, 110, 130],
-            type: 'bar'
+            type: 'line',
+            markLine: {
+              data: [{
+                silent: false,
+                lineStyle: { // 警戒线的样式  ，虚实  颜色
+                  type: 'solid',
+                  color: '#3398DB'
+                },
+                xAxis: 7.5
+              }]
+            }
+          },
+          {
+            type: 'line',
+            markLine: {
+              data: [{
+                silent: false,
+                lineStyle: { // 警戒线的样式  ，虚实  颜色
+                  type: 'solid',
+                  color: '#3398DB'
+                },
+                xAxis: 15
+              }]
+            }
+          },
+          {
+            type: 'line',
+            markLine: {
+              data: [{
+                silent: false,
+                lineStyle: { // 警戒线的样式  ，虚实  颜色
+                  type: 'solid',
+                  color: '#3398DB'
+                },
+                xAxis: 22.5
+              }]
+            }
+          },
+          {
+            name: '',
+            type: 'bar',
+            data: p.normzz.map((item, index) => {
+              return [index, item]
+            })
+          },
+          {
+            name: '',
+            type: 'line',
+            data: p.normy.map((item, index) => {
+              return [index, item]
+            })
           }
         ]
       }
-      this.myEcharts.bar1.setOption(option)
+      this.myEcharts.bar1.setOption(options)
     }
 
   }

@@ -46,7 +46,7 @@
               style="margin: 0 10px;"
             >删除</ki-button>
           </ki-message-box>
-          <ki-button type="primary">导入数据</ki-button>
+          <ki-button type="primary" @click="excel_import_dialog_btn">导入数据</ki-button>
           <ki-button type="primary" @click="download_template">下载模板</ki-button>
           <ki-button type="primary">导出</ki-button>
         </div>
@@ -58,30 +58,65 @@
         <el-tabs v-model="activeName" tab-position="bottom" style="height: 100%" @tab-click="handleClick">
           <el-tab-pane label="控制图" name="line">
             <div style="height: 100%;width:100%;">
-              <div ref="line" class="line" />
+              <div v-if="controlChartType === 'Xbar-R'" ref="line" class="line" />
+              <xbars v-if="controlChartType === 'Xbar-S'" ref="xbars" />
+              <xbarmr v-if="controlChartType === 'X-MR'" ref="xbarmr" />
+              <pchart v-if="controlChartType === 'p'" ref="pchart" />
+              <npchart v-if="controlChartType === 'np'" ref="npchart" />
             </div>
             <!-- 控制图 -->
           </el-tab-pane>
-          <el-tab-pane label="正态分布图" name="bar">
+          <el-tab-pane v-if="controlChartType === 'Xbar-R'" label="正态分布图" name="bar">
             <div style="height: 100%;">
-              <div style="height: 100%; width:30%;float:left;">
+              <div style="height: 100%; width:50%;float:left;">
                 <div ref="bar1" class="bar" style="width:100%;height:100%;min-height: 50px;" />
               </div>
-              <div style="height: 100%; width:70%;float:left;">
-                <el-row>
-                  <el-col :span="12">
+              <div style="height: 100%; width:50%;float:left;">
+                <el-row :gutter="10">
+                  <el-col :span="8">
                     <el-card class="box-card">
                       <el-descriptions title="一般" direction="horizontal" :column="2">
-                        <el-descriptions-item label="样本数：">8</el-descriptions-item>
-                        <el-descriptions-item label="子组容量：">8</el-descriptions-item>
-                        <el-descriptions-item label="目标值">100</el-descriptions-item>
-                        <el-descriptions-item label="均值：">8</el-descriptions-item>
-                        <el-descriptions-item label="USL：">90</el-descriptions-item>
-                        <el-descriptions-item label="LSL">8</el-descriptions-item>
-                        <el-descriptions-item label="Tol">-20.00</el-descriptions-item>
+                        <el-descriptions-item label="样本数">{{ arr.label59 }}</el-descriptions-item>
+                        <el-descriptions-item label="子组容量">{{ arr.subgroupSize }}</el-descriptions-item>
+                        <el-descriptions-item label="目标值">{{ arr.target }}</el-descriptions-item>
+                        <el-descriptions-item label="均值">{{ arr.label67 }}</el-descriptions-item>
+                        <el-descriptions-item label="USL">{{ arr.USL }}</el-descriptions-item>
+                        <el-descriptions-item label="LSL">{{ arr.LSL }}</el-descriptions-item>
+                        <el-descriptions-item label="Tol">{{ arr.Tol }}</el-descriptions-item>
                       </el-descriptions>
                     </el-card>
-
+                  </el-col>
+                  <el-col :span="8">
+                    <el-card class="box-card">
+                      <el-descriptions title="能力" direction="horizontal" :column="2">
+                        <el-descriptions-item label="Cr">{{ arr.Cr }}</el-descriptions-item>
+                        <el-descriptions-item label="Cp">{{ arr.Cp }}</el-descriptions-item>
+                        <el-descriptions-item label="Cpk">{{ arr.Cpk }}</el-descriptions-item>
+                        <el-descriptions-item label="Z(usl)">{{ arr.Zusl }}</el-descriptions-item>
+                        <el-descriptions-item label="Z(lsl)">{{ arr.Zlsl }}</el-descriptions-item>
+                        <el-descriptions-item label="Cpl">{{ arr.Cpl }}</el-descriptions-item>
+                        <el-descriptions-item label="Tol">{{ arr.Tol }}</el-descriptions-item>
+                        <el-descriptions-item label="Cpu">{{ arr.Cpu }}</el-descriptions-item>
+                        <el-descriptions-item label="Cpm">{{ arr.Cpm }}</el-descriptions-item>
+                        <el-descriptions-item label="Pr">{{ arr.Pr }}</el-descriptions-item>
+                        <el-descriptions-item label="Pp">{{ arr.Pp }}</el-descriptions-item>
+                        <el-descriptions-item label="Ppk">{{ arr.Ppk }}</el-descriptions-item>
+                      </el-descriptions>
+                    </el-card>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-card class="box-card">
+                      <el-descriptions title="变差" direction="horizontal" :column="2">
+                        <el-descriptions-item label="Std Dev">{{ arr.std_dev }}</el-descriptions-item>
+                        <el-descriptions-item label="Max">{{ arr.Max }}</el-descriptions-item>
+                        <el-descriptions-item label="Min">{{ arr.Min }}</el-descriptions-item>
+                        <el-descriptions-item label="Range">{{ arr.Range }}</el-descriptions-item>
+                        <el-descriptions-item label="R-bar">{{ arr.r_bar }}</el-descriptions-item>
+                        <el-descriptions-item label="LSL">{{ arr.LSL }}</el-descriptions-item>
+                        <el-descriptions-item label="Tol">{{ arr.Tol }}</el-descriptions-item>
+                        <el-descriptions-item label="S(est)">{{ arr.est }}</el-descriptions-item>
+                      </el-descriptions>
+                    </el-card>
                   </el-col>
                 </el-row>
               </div>
@@ -95,7 +130,7 @@
 
       <div style="position: relative;height: 100%;">
         <div style="padding:10px 0 10px 10px;position: absolute;top:0; left:0;">
-          测试内容
+          <span style="float: left;">数据点数量 <el-input v-model="data_num" /></span>
         </div>
 
         <dynamic-table
@@ -146,21 +181,40 @@
       @confirm="add_data_dialog_confirm"
     />
 
+    <excel-import-dialog
+      :select-row="select_row"
+      :visible="excel_import_dialog"
+      @handleClose="excel_import_close"
+      @confirm="excel_import_confirm"
+    />
+
   </container-layout>
 </template>
 
 <script>
-import chart from './mixins/chart'
+import chart_xbarr from './mixins/chart-xbarr'
 import AddDataDialog from './components/add-data-dialog'
+import ExcelImportDialog from './components/excel-import-dialog'
 import { mapGetters } from 'vuex'
 import XLSX from 'xlsx'
+
+// import normal from './components/normal'
+import xbars from './components/xbars'
+import xbarmr from './components/xbarmr'
+import pchart from './components/pchart'
+import npchart from './components/npchart'
 
 export default {
   name: 'ControlChartDetails',
   components: {
-    AddDataDialog
+    AddDataDialog,
+    ExcelImportDialog,
+    xbars,
+    xbarmr,
+    pchart,
+    npchart
   },
-  mixins: [chart],
+  mixins: [chart_xbarr],
   data() {
     return {
       add_dialog_flag: '',
@@ -169,6 +223,9 @@ export default {
       pointHierarchicalTypeIds: [],
       sampleSize: 0,
       add_data_dialog: false,
+      excel_import_dialog: false,
+
+      data_num: '',
       form: {
         dataType: '1',
         date: []
@@ -228,12 +285,69 @@ export default {
     Object.freeze(this.header_list_data)
     this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
   },
-  mounted() {
+  async mounted() {
+    // await this.getData()
+
     this.initEcharts1()
     this.chart_resize()
   },
 
   methods: {
+    excel_import_dialog_btn() {
+      this.excel_import_dialog = true
+    },
+    excel_import_confirm() {
+      this.excel_import_dialog = false
+    },
+    excel_import_close() {
+      this.excel_import_dialog = false
+    },
+    getChartData() {
+      this.chartData = {}
+    },
+    setChart() {
+      const res4 = this.chartData // 请求
+      const type = this.parseChartType[this.controlChartType]
+      if (type === 1) {
+        // this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
+        // this.$refs['normal'].add_show1(res4.data)
+        // this.arr.label59 = res4.data.label59
+        // this.arr.subgroupSize = res4.data.label59
+        // this.arr.USL = res4.data.USL
+        // this.arr.LSL = res4.data.LSL
+        // this.arr.Tol = res4.data['USL-LSL']
+        // this.arr.Cr = res4.data.vCR
+        // this.arr.Cp = res4.data.vCp
+        // this.arr.Cpk = res4.data.vCPK
+        // this.arr.Zusl = res4.data.vZusl
+        // this.arr.Zlsl = res4.data.vZlsl
+        // this.arr.Cpl = res4.data.vCPL
+        // this.arr.Cpu = res4.data.vCPU
+        // this.arr.Cpm = res4.data.vCpm
+        // this.arr.Pr = res4.data.vPR
+        // this.arr.Pp = res4.data.vPp
+        // this.arr.Ppk = res4.data.vPpk
+        // this.arr.std_dev = res4.data.vs0
+        // this.arr.Max = res4.data.umax
+        // this.arr.Min = res4.data.umin
+        // this.arr.Range = res4.data['umax-umin']
+        // this.arr.r_bar = res4.data.label73
+        // this.arr.est = res4.data.vs
+        // this.arr.target = res4.data.target
+        // this.arr.label67 = res4.data.label67
+        // this.cpk = res4.data.vCPK
+      } else if (type === 2) {
+        this.mycharts.xbars = this.$refs['xbars'].add_show2(res4.data)
+        this.arr.Cpk = res4.data.vCPK
+      } else if (type === 3) {
+        this.mycharts.xbarmr = this.$refs['xbarmr'].add_show3(res4.data)
+        this.arr.Cpk = res4.data.vCPK
+      } else if (type === 4) {
+        this.mycharts.pchart = this.$refs['pchart'].add_show4(res4.data)
+      } else if (type === 5) {
+        this.mycharts.npchart = this.$refs['npchart'].add_show5(res4.data)
+      }
+    },
     async query() {
       await this.set_new_inspectionRecords_data()
     },
@@ -318,6 +432,7 @@ export default {
         this.inspectionRecords_data = data
         this.$refs.dy_table && this.$refs.dy_table.refresh()
       })
+      await this.setData()
     },
     async get_inspectionRecords_data(callback, flag) {
       let params = {
@@ -355,10 +470,12 @@ export default {
       this.add_data_dialog = false
     },
     handleClick() {
+      const type = this.parseChartType[this.controlChartType]
+      if (type !== 1) return
       this.$nextTick(() => {
         if (this.activeName === 'line') {
           if (!Object.keys(this.myEcharts).includes('line')) {
-            this.initEcharts()
+            this.initEcharts1()
             // this.initEcharts2()
           }
         }

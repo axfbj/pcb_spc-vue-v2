@@ -65,7 +65,7 @@
     <el-row>
       <el-col :span="6">
         <el-form :model="form" label-width="auto">
-          <fieldset style="border: 1px solid #ccc; height: 264px;">
+          <fieldset style="border: 1px solid #ccc; height: 300px;">
             <legend style="color:#606266">基本信息</legend>
             <el-form-item label="规格上限:" prop="usl">
               <el-input v-model.number="form.usl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
@@ -94,7 +94,7 @@
       </el-col>
       <el-col :span="18">
         <el-form :model="form" label-width="auto">
-          <fieldset style="border: 1px solid #ccc;  height: 264px;">
+          <fieldset style="border: 1px solid #ccc;  height: 300px;">
             <legend style="color:#606266">控制图信息</legend>
             <el-form-item label="判异规则:" prop="discriminationRulesStr">
               <el-input v-model="form.discriminationRulesStr" type="text" style="width: 80%;" />
@@ -111,6 +111,12 @@
             <el-form-item label="数据点层次信息:" prop="pointHierarchicalType">
               <el-input v-model="form.pointHierarchicalType" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('data')">
+                设置
+              </ki-button>
+            </el-form-item>
+            <el-form-item v-if="['P','nP'].includes(controlChartType)" label="不良分组:" prop="badGroup">
+              <el-input v-model="form.badGroup" type="text" style="width: 80%;" />
+              <ki-button type="warning" style="margin-left: 10px;" @click="badGroup_dialog_btn">
                 设置
               </ki-button>
             </el-form-item>
@@ -175,6 +181,13 @@
       @handleClose="keyword_dialog_close"
       @confirm="keyword_dialog_confirm"
     />
+
+    <bad-group-dialog
+      :select-row="select_row"
+      :visible="badGroup_dialog"
+      @handleClose="badGroup_close"
+      @confirm="badGroup_confirm"
+    />
   </ki-dialog>
 
 </template>
@@ -183,12 +196,14 @@
 import DiscriminationRulesDialog from './discrimination-rules-dialog'
 import SelectKeywordDialog from './select-keyword-dialog'
 import ControlChartSettingsData from './mixins/control-chart-settings-data'
+import BadGroupDialog from './bad-group-dialog'
 import { dateformat } from '@/utils/date-method'
 export default {
   name: 'ControlChartSettings',
   components: {
     DiscriminationRulesDialog,
-    SelectKeywordDialog
+    SelectKeywordDialog,
+    BadGroupDialog
   },
   mixins: [ControlChartSettingsData],
   props: {
@@ -213,7 +228,7 @@ export default {
     return {
 
       disabledSelectArr: [],
-
+      badGroup_dialog: false,
       discrimination_rules_dialog: false,
       select_keyword_dialog: false,
       keyword_flag: '',
@@ -237,8 +252,14 @@ export default {
     console.log('Datejs', dateformat(new Date()))
   },
   methods: {
+    badGroup_confirm() {},
+    badGroup_close() {},
+
     controlChartType_change() {
       this.clear()
+    },
+    badGroup_dialog_btn() {
+      this.badGroup_dialog = true
     },
     async add_inspection_items(select_data) {
       // const temp = {

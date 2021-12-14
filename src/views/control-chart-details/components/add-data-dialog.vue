@@ -55,6 +55,20 @@
             </el-form-item>
           </el-col>
 
+          <el-col v-if="['p'].includes(controlChartType)" :span="12">
+            <el-form-item label="抽检数">
+              <el-input-number v-model="form.numberOfGroups" :controls="false" style="width: 100%;" />
+              <!-- <el-input v-model="form[item.val]" /> -->
+            </el-form-item>
+          </el-col>
+
+          <el-col v-for="item in badNames_data" :key="item.id" :span="12">
+            <el-form-item :label="`${item.badName}:`">
+              <el-input-number v-model="form[`value${index + 1}`]" :controls="false" style="width: 100%;" />
+              <!-- <el-input v-model="form[item.val]" /> -->
+            </el-form-item>
+          </el-col>
+
           <el-col :span="24">
             <el-form-item label="录入用户:">
               admin
@@ -100,6 +114,10 @@ export default {
       type: [Array, Object],
       default: () => ({})
     },
+    badNames: {
+      type: [Array, Object],
+      default: () => ({})
+    },
     controlChartType: {
       type: String,
       default: ''
@@ -108,6 +126,8 @@ export default {
   data() {
     return {
       size: [],
+      badTemp: {},
+      badNames_data: [],
       // controlChartType: '',
       form: {},
       parseNum: {
@@ -170,6 +190,7 @@ export default {
   methods: {
     clear() {
       this.size = []
+      this.badNames_data = []
     },
     async getHierarchicalType(id) {
       const { code, data } = await this.$api.keywordValue_list({
@@ -246,6 +267,10 @@ export default {
           }
         ]
       }
+
+      if (['p'].includes(this.controlChartType)) {
+        p.badDefinitionMap = this.badNames_data
+      }
       // console.log(p)
       return p
     },
@@ -253,7 +278,6 @@ export default {
       this.$refs.form.resetFields()
       this.$emit('handleClose')
     },
-
     async confirm({ loading }) {
       loading(true)
       if (this.flag === 'add') {
@@ -291,6 +315,19 @@ export default {
     },
     async open({ load }) {
       this.flag = this.$attrs.flag
+      if (['p'].includes(this.controlChartType)) {
+        this.$set(this.form, 'numberOfGroups', undefined)
+        this.badNames.badDefinitionTitles.forEach((item, index) => {
+          this.$set(this.form, `value${index + 1}`, undefined)
+          const o = {}
+          o.id = this.badNames.badDefinitionIds[index]
+          o.badName = item
+          this.badNames_data.push(o)
+        })
+        // this.badNames.badDefinitionTitles
+        // this.badNames_data =
+      }
+      // badNames
       this.size = []
       for (let i = 1; i <= this.sampleSize; i++) {
         this.$set(this.form, `value${i}`, undefined)

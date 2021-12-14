@@ -93,8 +93,7 @@ export default {
       this.$refs.dy_table.refresh()
     },
     save_chart_data() {
-      const t_data = JSON.parse(JSON.stringify(this.t_data))
-      // console.log('this.t_data', this.t_data)
+      const t_data = Array.from(this.t_data)
       const params = {
         controlChartName: this.treePath,
         controlChartType: this.controlChartType,

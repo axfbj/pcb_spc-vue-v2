@@ -15,6 +15,7 @@
                 />
               </el-select>
             </el-form-item>
+            &nbsp;
             <el-form-item label="从" style="margin: 0;">
               <el-date-picker
                 v-model="form.date"
@@ -182,6 +183,7 @@
       :flag="add_dialog_flag"
       :inspection-records-data="inspectionRecords_data"
       :control-chart-type="controlChartType"
+      :bad-names="badNames"
       @handleClose="add_data_close"
       @confirm="add_data_dialog_confirm"
     />
@@ -226,6 +228,7 @@ export default {
       controlChartSonId: '',
       controlChartType: '',
       pointHierarchicalTypeIds: [],
+      badNames: [],
       sampleSize: 0,
       add_data_dialog: false,
       excel_import_dialog: false,
@@ -381,7 +384,8 @@ export default {
         this.inspectionRecords_data = data
         this.get_final_header_list()
         this.$refs.dy_table && this.$refs.dy_table.refresh()
-        this.get_controlChartSon_data()
+        this.setChart()
+        // this.get_controlChartSon_data()
       }, 'init')
     },
     clear() {
@@ -421,7 +425,7 @@ export default {
         8: 'Eight',
         9: 'Nine'
       }
-      const { pointHierarchicalTypeIds, inspectionRecords } = this.inspectionRecords_data
+      const { pointHierarchicalTypeIds, inspectionRecords, badDefinitionTitles, badDefinitionIds } = this.inspectionRecords_data
       this.pointHierarchicalTypeIds = pointHierarchicalTypeIds
       const arr = []
       pointHierarchicalTypeIds.forEach(id => {
@@ -436,9 +440,25 @@ export default {
           arr.push(list)
         }
       })
+
+      if (['p'].includes(this.controlChartType) && badDefinitionTitles.length !== 0) {
+        this.badNames = {
+          badDefinitionTitles,
+          badDefinitionIds
+        }
+        arr.push({ prop: 'numberOfGroups', label: '抽检数', width: '180' })
+        badDefinitionTitles.forEach((item, index) => {
+          const list = {}
+          list.prop = `badName${index + 1}`
+          list.label = item
+          list.width = '180'
+          arr.push(list)
+        })
+      }
+
       const sampleSize = inspectionRecords[0].sampleSize
       this.sampleSize = sampleSize || 0
-      if (!this.sampleSize) return
+      // if (!this.sampleSize) return
 
       for (let i = 1; i <= this.sampleSize; i++) {
         const list = {}

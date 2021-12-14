@@ -1,9 +1,9 @@
 
 <template>
   <!-- <div ref="chart" style="width:100%;height:100%"> -->
-  <el-row>
-    <el-col :span="24" style="height:50%">
-      <div ref="chart" style="width:100%;height:100%" />
+  <el-row style="height:100%">
+    <el-col :span="24" style="height:100%">
+      <div ref="chart" style="width:100%;height:calc(100% - 20px)" />
       <div style="text-align:center">
         Xbb：<span style="margin-right:20px">{{ xbb }}</span>
         USL：<span style="margin-right:20px">{{ usl }}</span>
@@ -36,7 +36,7 @@ export default {
     }
   },
   mounted() {
-    this.xbarsMychart = echarts.init(this.$refs.chart)
+    this.myChart = echarts.init(this.$refs.chart)
   },
   methods: {
     add_show2(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
@@ -293,7 +293,7 @@ export default {
             }
           }]
       })
-      return this.xbarsMychart
+      return this.myChart
       // this.myChart.on('click', (res) => {
       //   if (res.name === '异常点') {
       //     this.$router.push({ path: '/exception-handling', query: { mes_logintime_k: thisMonthStart, mes_logintime_j: MonthEnd, productCode: productCode, productTypeCode: productTypeCode, inspectionCode }})

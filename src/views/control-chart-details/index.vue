@@ -59,16 +59,18 @@
         <el-tabs v-model="activeName" tab-position="bottom" style="height: 100%" @tab-click="handleClick">
           <el-tab-pane label="控制图" name="line">
             <div style="height: 100%;width:100%;">
-              <div v-if="controlChartType === 'Xbar-R'" ref="line" class="line" />
-              <xbars v-if="controlChartType === 'Xbar-S'" ref="xbars" />
-              <xbarmr v-if="controlChartType === 'X-MR'" ref="xbarmr" />
-              <pchart v-if="controlChartType === 'p'" ref="pchart" />
-              <npchart v-if="controlChartType === 'np'" ref="npchart" />
+              <!-- <div v-if="controlChartType === 'Xbar-R'" ref="line" class="line" /> -->
+              <xbarr v-if="controlChartType === 'Xbar-R'" ref="xbarr" style="height: 100%;width:100%;" />
+              <xbars v-if="controlChartType === 'Xbar-s'" ref="xbars" style="height: 100%;width:100%;" />
+              <xbarmr v-if="controlChartType === 'X-MR'" ref="xbarmr" style="height: 100%;width:100%;" />
+              <pchart v-if="controlChartType === 'p'" ref="pchart" style="height: 100%;width:100%;" />
+              <npchart v-if="controlChartType === 'np'" ref="npchart" style="height: 100%;width:100%;" />
             </div>
             <!-- 控制图 -->
           </el-tab-pane>
           <el-tab-pane v-if="controlChartType === 'Xbar-R'" label="正态分布图" name="bar">
-            <div style="height: 100%;">
+            <normal ref="normal" style="height: 100%;width:100%;" />
+            <!-- <div style="height: 100%;">
               <div style="height: 100%; width:50%;float:left;">
                 <div ref="bar1" class="bar" style="width:100%;height:100%;min-height: 50px;" />
               </div>
@@ -121,7 +123,7 @@
                   </el-col>
                 </el-row>
               </div>
-            </div>
+            </div> -->
           </el-tab-pane>
         </el-tabs>
       </div>
@@ -199,31 +201,40 @@
 </template>
 
 <script>
-import chart_xbarr from './mixins/chart-xbarr'
+// import chart_xbarr from './mixins/chart-xbarr'
 import AddDataDialog from './components/add-data-dialog'
 import ExcelImportDialog from './components/excel-import-dialog'
 import { mapGetters } from 'vuex'
 import XLSX from 'xlsx'
 
-// import normal from './components/normal'
+import xbarr from './components/xbarr'
+import normal from './components/normal'
 import xbars from './components/xbars'
 import xbarmr from './components/xbarmr'
 import pchart from './components/pchart'
 import npchart from './components/npchart'
+
+import chartData from './mixins/data'
+import Xbars_data from './mixins/Xbars_data'
+import p_data from './mixins/p_data'
+import XMR_data from './mixins/XMR_data'
 
 export default {
   name: 'ControlChartDetails',
   components: {
     AddDataDialog,
     ExcelImportDialog,
+    xbarr,
+    normal,
     xbars,
     xbarmr,
     pchart,
     npchart
   },
-  mixins: [chart_xbarr],
+  // mixins: [chart_xbarr],
   data() {
     return {
+      arr: [],
       add_dialog_flag: '',
       controlChartSonId: '',
       controlChartType: '',
@@ -240,7 +251,7 @@ export default {
         inspectionNum: 30
       },
       parseChartType: {
-        'XBar-R': 1,
+        'Xbar-R': 1,
         'Xbar-s': 2,
         'X-MR': 3,
         'p': 4,
@@ -298,8 +309,8 @@ export default {
   async mounted() {
     // await this.getData()
 
-    this.initEcharts1()
-    this.chart_resize()
+    // this.initEcharts1()
+    // this.chart_resize()
   },
 
   methods: {
@@ -333,9 +344,46 @@ export default {
       this.chartData = {}
     },
     setChart() {
-      const res4 = this.chartData // 请求
+      // const res4 = this.chartData // 请求
+      const res4 = chartData// 请求
+
       const type = this.parseChartType[this.controlChartType]
+      // const type = 1
       if (type === 1) {
+        console.log('res4.data', res4.data)
+        const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
+
+        this.myEcharts.line1 = chart[0]
+        this.myEcharts.line2 = chart[1]
+
+        if (this.activeName === 'bar') {
+          this.$refs['normal'].add_show1(res4.data)
+        }
+        // this.arr.label59 = res4.data.label59
+        // this.arr.subgroupSize = res4.data.label59
+        // this.arr.USL = res4.data.USL
+        // this.arr.LSL = res4.data.LSL
+        // this.arr.Tol = res4.data['USL-LSL']
+        // this.arr.Cr = res4.data.vCR
+        // this.arr.Cp = res4.data.vCp
+        // this.arr.Cpk = res4.data.vCPK
+        // this.arr.Zusl = res4.data.vZusl
+        // this.arr.Zlsl = res4.data.vZlsl
+        // this.arr.Cpl = res4.data.vCPL
+        // this.arr.Cpu = res4.data.vCPU
+        // this.arr.Cpm = res4.data.vCpm
+        // this.arr.Pr = res4.data.vPR
+        // this.arr.Pp = res4.data.vPp
+        // this.arr.Ppk = res4.data.vPpk
+        // this.arr.std_dev = res4.data.vs0
+        // this.arr.Max = res4.data.umax
+        // this.arr.Min = res4.data.umin
+        // this.arr.Range = res4.data['umax-umin']
+        // this.arr.r_bar = res4.data.label73
+        // this.arr.est = res4.data.vs
+        // this.arr.target = res4.data.target
+        // this.arr.label67 = res4.data.label67
+
         // this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
         // this.$refs['normal'].add_show1(res4.data)
         // this.arr.label59 = res4.data.label59
@@ -364,29 +412,39 @@ export default {
         // this.arr.label67 = res4.data.label67
         // this.cpk = res4.data.vCPK
       } else if (type === 2) {
-        this.mycharts.xbars = this.$refs['xbars'].add_show2(res4.data)
+        const res4 = Xbars_data
+        this.myEcharts.xbars = this.$refs['xbars'].add_show2(res4.data)
         this.arr.Cpk = res4.data.vCPK
       } else if (type === 3) {
-        this.mycharts.xbarmr = this.$refs['xbarmr'].add_show3(res4.data)
+        const res4 = XMR_data
+        this.myEcharts.xbarmr = this.$refs['xbarmr'].add_show3(res4.data)
         this.arr.Cpk = res4.data.vCPK
       } else if (type === 4) {
-        this.mycharts.pchart = this.$refs['pchart'].add_show4(res4.data)
+        const res4 = p_data
+        this.myEcharts.pchart = this.$refs['pchart'].add_show4(res4.data)
       } else if (type === 5) {
-        this.mycharts.npchart = this.$refs['npchart'].add_show5(res4.data)
+        this.myEcharts.npchart = this.$refs['npchart'].add_show5(res4.data)
       }
+      this.chart_resize()
     },
     async query() {
       await this.set_new_inspectionRecords_data()
     },
     async init() {
       this.clear()
-      await this.get_inspectionRecords_data((data) => {
-        this.inspectionRecords_data = data
-        this.get_final_header_list()
-        this.$refs.dy_table && this.$refs.dy_table.refresh()
+      // await this.get_inspectionRecords_data((data) => {
+      //   this.inspectionRecords_data = data
+      //   this.get_final_header_list()
+      //   this.$refs.dy_table && this.$refs.dy_table.refresh()
+      //   this.$nextTick(() => {
+      //     // alert(1)
+      //     this.setChart()
+      //   })
+      //   // this.get_controlChartSon_data()
+      // }, 'init')
+      this.$nextTick(() => {
         this.setChart()
-        // this.get_controlChartSon_data()
-      }, 'init')
+      })
     },
     clear() {
       this.inspectionRecords_data = {}
@@ -518,17 +576,23 @@ export default {
       const type = this.parseChartType[this.controlChartType]
       if (type !== 1) return
       this.$nextTick(() => {
-        if (this.activeName === 'line') {
-          if (!Object.keys(this.myEcharts).includes('line')) {
-            this.initEcharts1()
-            // this.initEcharts2()
-          }
-        }
         if (this.activeName === 'bar') {
-          if (!Object.keys(this.myEcharts).includes('bar1')) {
-            this.initEcharts3()
-          }
+          this.myEcharts.bar1 = this.$refs['normal'].add_show1(chartData.data)
         }
+        // if (this.activeName === 'line') {
+        //   if (!Object.keys(this.myEcharts).includes('line')) {
+        //     if (this.activeName === 'bar') {
+        //       this.$refs['normal'].add_show1(chartData)
+        //     }
+        //     // this.initEcharts1()
+        //     // this.initEcharts2()
+        //   }
+        // }
+        // if (this.activeName === 'bar') {
+        //   if (!Object.keys(this.myEcharts).includes('bar1')) {
+        //     // this.initEcharts3()
+        //   }
+        // }
         this.chart_resize()
       })
     },

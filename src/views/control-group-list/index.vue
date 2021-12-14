@@ -40,6 +40,10 @@
             <span style="float: right;">
               <ki-button
                 type="primary"
+                @click="badGroup_btn"
+              >不良分组</ki-button>
+              <ki-button
+                type="primary"
                 @click="check_setting_dialog"
               >控制图设置</ki-button>
               <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
@@ -68,14 +72,22 @@
             />
           </el-form-item>
           <el-form-item label="状态:">
-            <allow-create-select
+            <el-select v-model="form.controlChartStatus" placeholder="请选择" clearable style="width: 100px;">
+              <el-option
+                v-for="item in options.states"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <!-- <allow-create-select
               v-model="form.state"
               style="width: 100px;"
               :options="options.states"
-            />
+            /> -->
           </el-form-item>
           <el-form-item label="编号:">
-            <el-input v-model="form.controlChartCode" style="width: 100px;" />
+            <el-input v-model="form.controlChartCode" style="width: 140px;" clearable />
           </el-form-item>
           <el-form-item label="检测项目:">
             <allow-create-select
@@ -98,7 +110,7 @@
           <el-form-item v-for="item in hierarchicalTypes" :key="item.id" :label="item.hierarchicalName">
             <!-- :disabled="disabled_select_arr.includes(String(item.serialNumber))" -->
             <allow-create-select
-              v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}:`]"
+              v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}`]"
               style="width:100px"
               :props="hierarchicalTypeProps"
               :options="options[`hierarchicalType${item.serialNumber}`]"
@@ -127,6 +139,9 @@
           >
             <template slot="cell-template" slot-scope="data">
               <status-flag v-if="data.list.template === 'states'" :states="data.cellValue" />
+              <template v-else-if="data.list.template === 'hierarchicalType'">
+                {{ data.cellValue || 'N/A' }}
+              </template>
               <!-- <el-link v-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
               <template v-else>{{ data.cellValue }}</template>
             </template>
@@ -169,6 +184,13 @@
       @handleClose="tree_dialog_close"
       @confirm="tree_confirm"
     />
+
+    <bad-group-dialog
+      :select-row="select_row"
+      :visible="badGroup_dialog"
+      @handleClose="badGroup_close"
+      @confirm="badGroup_confirm"
+    />
   </el-row>
 
 </template>
@@ -182,6 +204,7 @@ import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
 import HierarchicalTypeData from './components/mixins/hierarchicalType-data'
+import BadGroupDialog from './components/bad-group-dialog'
 import { mapGetters } from 'vuex'
 export default {
   name: 'ControlGroupList',
@@ -192,12 +215,15 @@ export default {
     ControlChartSettings,
     ControlGroupTree,
     AddGroupTreeDialog,
-    StatusFlag
+    StatusFlag,
+    BadGroupDialog
   },
   mixins: [HierarchicalTypeData],
   data() {
     return {
+      badGroup_dialog: false,
       tree_flag: '',
+      badGroup_flag: '',
       control_chart_settings_flag: '',
       // current_tree_node_key: '',
       current_tree_node_data: {},
@@ -230,15 +256,16 @@ export default {
         { prop: 'inspectionName', label: '检测项目', width: '150' },
         { prop: 'controlChartType', label: '图类', width: '150' },
         { prop: 'sampleSize', label: '样本容量', width: '150' },
-        { prop: 'hierarchicalTypeValueOne', label: '产品型号', width: '150' },
-        { prop: 'hierarchicalTypeValueTwo', label: '产品名称', width: '150' },
-        { prop: 'hierarchicalTypeValueThree', label: '产线', width: '150' },
-        { prop: 'hierarchicalTypeValueFour', label: '班次', width: '150' },
-        { prop: 'hierarchicalTypeValueFive', label: '设备', width: '150' },
-        { prop: 'hierarchicalTypeValueSix', label: '供应商', width: '150' },
-        { prop: 'hierarchicalTypeValueSeven', label: '客户', width: '150' },
-        { prop: 'hierarchicalTypeValueEight', label: '批次', width: '150' },
-        { prop: 'hierarchicalTypeValueNine', label: '工单编号', width: '150' },
+        '$1',
+        // { prop: 'hierarchicalTypeValueOne', label: '产品型号', width: '150' },
+        // { prop: 'hierarchicalTypeValueTwo', label: '产品名称', width: '150' },
+        // { prop: 'hierarchicalTypeValueThree', label: '产线', width: '150' },
+        // { prop: 'hierarchicalTypeValueFour', label: '班次', width: '150' },
+        // { prop: 'hierarchicalTypeValueFive', label: '设备', width: '150' },
+        // { prop: 'hierarchicalTypeValueSix', label: '供应商', width: '150' },
+        // { prop: 'hierarchicalTypeValueSeven', label: '客户', width: '150' },
+        // { prop: 'hierarchicalTypeValueEight', label: '批次', width: '150' },
+        // { prop: 'hierarchicalTypeValueNine', label: '工单编号', width: '150' },
         { prop: 'usl', label: '规格上限', width: '150' },
         { prop: 'sl', label: '目标值', width: '150' },
         { prop: 'lsl', label: '规格下限', width: '150' },
@@ -247,14 +274,14 @@ export default {
         { prop: 'updateDate', label: '更新时间', width: '150' }
       ],
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        // name: '',
+        // region: '',
+        // date1: '',
+        // date2: '',
+        // delivery: false,
+        // type: [],
+        // resource: '',
+        // desc: ''
       },
       select_row: [],
       path: ''
@@ -266,7 +293,37 @@ export default {
       return this.current_tree_node_data.id
     }
   },
+  created() {
+    const inx = this.header_list.indexOf('$1')
+    const headers = []
+    this.hierarchicalTypes.forEach(item => {
+      const o = {
+        prop: `hierarchicalTypeValue${this.parseNum[item.serialNumber]}`,
+        label: item.hierarchicalName,
+        width: '150',
+        template: 'hierarchicalType'
+      }
+      headers.push(o)
+    })
+    this.header_list.splice(inx, 1, ...headers)
+    // console.log(this.header_list)
+  },
   methods: {
+    badGroup_btn() {
+      this.badGroup_dialog = true
+    },
+    badGroup_confirm(flag) {
+      if (flag === 'link') {
+        this.toDetils()
+      }
+      this.badGroup_dialog = false
+    },
+    badGroup_close() {
+      this.badGroup_dialog = false
+    },
+    toDetils() {
+      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id, controlChartType: this.select_row[0].controlChartType }})
+    },
     formatter_states(row) {
       const { historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle } = row
       const { lastPointNotOutOfControl, lastPointNotHandle, lastPointHandle } = row
@@ -276,7 +333,7 @@ export default {
       const state2 = lastPoint.indexOf(1)
       return [String(state1), String(state2)]
     },
-    inspectionr_record_btn() {
+    async inspectionr_record_btn() {
       // 单项目输入跳转
       if (this.select_row.length === 0) {
         this.$message.warning('请选择一行数据')
@@ -285,7 +342,27 @@ export default {
         this.$message.warning('查看控制图设置详情只能选择一行')
         return
       }
-      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id, controlChartType: this.select_row[0].controlChartType }})
+
+      if (['p', 'np'].includes(this.select_row[0].controlChartType)) {
+        // this.controlChartSonId
+        const { code, data } = await this.$api.badDefinitionGroup_info({ id: this.select_row[0].id })
+        if (code === '200' && data) {
+          if (data.length === 0) {
+            this.$confirm('此控制图需要进行不良分组', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.badGroup_btn()
+            }).catch(() => {
+            })
+          } else {
+            this.toDetils()
+          }
+        }
+      } else {
+        this.toDetils()
+      }
     },
     control_chart_settings_confirm() {
       this.chartSetting_dialog = false
@@ -312,6 +389,10 @@ export default {
       this.chartSetting_dialog = true
     },
     search_btn() {
+      if (!this.form.date) {
+        this.$message.warning('必须选择一个时间段！！')
+        return
+      }
       this.$refs.dy_table.refresh()
     },
     tree_confirm() {
@@ -372,6 +453,7 @@ export default {
       const { controlChartCode,
         controlChartType,
         inspectionItemsId,
+        controlChartStatus,
         hierarchicalTypeValueOne,
         hierarchicalTypeValueTwo,
         hierarchicalTypeValueThree,
@@ -386,6 +468,7 @@ export default {
         'controlGroupId': this.current_tree_node_key,
         controlChartCode,
         controlChartType,
+        controlChartStatus,
         inspectionItemsId,
         hierarchicalTypeValueOne,
         hierarchicalTypeValueTwo,

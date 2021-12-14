@@ -189,3 +189,19 @@ aside {
 .multiselect--active {
   z-index: 1000 !important;
 }
+
+
+
+
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{
+ 
+  -webkit-appearance: none !important; 
+ 
+ }
+/* chrome */
+ 
+input[type="number"]{
+ 
+  -moz-appearance:textfield;/* firefox */
+ 
+}

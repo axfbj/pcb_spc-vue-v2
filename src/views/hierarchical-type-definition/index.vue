@@ -3,10 +3,10 @@
     <container-layout ref="contenter">
       <template v-slot:btns>
         <div style="text-align: right;">
-          <ki-button
+          <!-- <ki-button
             type="paimary"
             @click="add"
-          >添加</ki-button>
+          >添加</ki-button> -->
           <ki-button
             type="primary"
             @click="edit"
@@ -31,10 +31,10 @@
             :next="del"
             @click="del_btn"
           >
-            <ki-button
+            <!-- <ki-button
               type="danger"
               style="margin-left: 10px;"
-            >删除</ki-button>
+            >删除</ki-button> -->
           </ki-message-box>
         </div>
       </template>

@@ -13,6 +13,7 @@
         ref="form"
         :model="form"
         label-width="auto"
+        :rules="rules"
       >
         <el-form-item
           prop="hierarchicalName"
@@ -46,6 +47,10 @@ export default {
     return {
       form: {
         hierarchicalName: ''
+      },
+      rules: {
+        hierarchicalName: [{ required: true, message: '类型名称不能为空', trigger: 'change' }]
+        // badName: [{ required: true, message: '不良名称不能为空', trigger: 'change' }]
       }
     }
   },

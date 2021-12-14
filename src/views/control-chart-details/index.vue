@@ -129,10 +129,15 @@
     <template v-slot:footer>
 
       <div style="position: relative;height: 100%;">
-        <div style="padding:10px 0 10px 10px;position: absolute;top:0; left:0;">
-          <span style="float: left;">数据点数量 <el-input v-model="data_num" /></span>
+        <div style="position: absolute;top:0; left:0; width: 100%; height: 38px;z-index: 2;">
+          <div style="float: right;" class="r">
+            <el-form label-width="auto" inline :model="form">
+              <el-form-item label="数据点数量:">
+                <el-input-number v-model="form.inspectionNum" controls-position="right" />
+              </el-form-item>
+            </el-form>
+          </div>
         </div>
-
         <dynamic-table
           ref="dy_table"
           v-model="select_row"
@@ -228,7 +233,8 @@ export default {
       data_num: '',
       form: {
         dataType: '1',
-        date: []
+        date: [],
+        inspectionNum: 30
       },
       parseChartType: {
         'XBar-R': 1,
@@ -281,6 +287,7 @@ export default {
       }
     }
   },
+
   async created() {
     Object.freeze(this.header_list_data)
     this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
@@ -293,6 +300,23 @@ export default {
   },
 
   methods: {
+    async get_controlChartSon_data() {
+      if (!this.form.date || this.form.date.length === 0) {
+        return
+      }
+      const param = {
+        'controlChartSonId': this.controlChartSonId,
+        'controlChartType': this.parseChartType[this.controlChartType],
+        'dataType': this.form.dataType || '',
+        'inspectionNum': this.form.inspectionNum || '',
+        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : ''
+      }
+      const { code, data } = await this.$api.controlChartSon_data(param)
+      if (code === '200' && data) {
+        console.log(this.data)
+      }
+    },
     excel_import_dialog_btn() {
       this.excel_import_dialog = true
     },
@@ -357,6 +381,7 @@ export default {
         this.inspectionRecords_data = data
         this.get_final_header_list()
         this.$refs.dy_table && this.$refs.dy_table.refresh()
+        this.get_controlChartSon_data()
       }, 'init')
     },
     clear() {
@@ -432,7 +457,7 @@ export default {
         this.inspectionRecords_data = data
         this.$refs.dy_table && this.$refs.dy_table.refresh()
       })
-      await this.setData()
+      // await this.setData()
     },
     async get_inspectionRecords_data(callback, flag) {
       let params = {
@@ -603,6 +628,14 @@ export default {
   height: calc(100% - 50px);
   .el-tab-pane {
     height: 100%;
+  }
+}
+
+::v-deep .r {
+    margin-top: 5px;
+    margin-right: 10px;
+  .el-form--inline .el-form-item {
+    margin: 0;
   }
 }
 </style>

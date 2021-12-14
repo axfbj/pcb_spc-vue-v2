@@ -29,21 +29,23 @@ export default {
     }
   },
   data() {
-    const generateData = _ => {
-      const data = []
-      for (let i = 1; i <= 15; i++) {
-        data.push({
-          id: i,
-          badName: `备选项 ${i}`,
-          disabled: i % 4 === 0
-        })
-      }
-      return data
-    }
+    // const generateData = _ => {
+    //   const data = []
+    //   for (let i = 1; i <= 15; i++) {
+    //     data.push({
+    //       id: i,
+    //       badName: `备选项 ${i}`,
+    //       disabled: i % 4 === 0
+    //     })
+    //   }
+    //   return data
+    // }
     return {
+      hadData: [],
+      controlChartSonId: '',
       form: {
       },
-      data: generateData(),
+      data: [],
       value: [],
       props: {
         key: 'id',
@@ -52,8 +54,12 @@ export default {
     }
   },
   methods: {
+    clear() {
+      this.value = []
+      this.controlChartSonId = ''
+    },
     handleClose() {
-      this.$refs.form.resetFields()
+      // this.$refs.form.resetFields()
       this.$emit('handleClose')
     },
     async confirm({ loading }) {
@@ -65,8 +71,39 @@ export default {
           badGrupSelect.push(d)
         }
       })
-      console.log(badGrupSelect)
-      this.$emit('confirm', badGrupSelect)
+
+      const newGroup = badGrupSelect.map(item => {
+        return {
+          'badDefinitionId': item.id,
+          'controlChartSonId': this.controlChartSonId
+        }
+      })
+
+      this.hadData.forEach(item1 => {
+        const idx = newGroup.findIndex(item2 => {
+          return item1.badDefinitionId === item2.badDefinitionId
+        })
+        if (idx > -1) {
+          newGroup[idx].id = item1.id
+        }
+      })
+
+      const dels = this.hadData.filter(item => {
+        return newGroup.every(i => i.badDefinitionId !== item.id)
+      })
+      // console.log('newGroup', newGroup)
+      // console.log('dels', dels)
+      const { code, data } = await this.$api.badDefinitionGroup_saveOrUpdateBatch({
+        baDefinitionGroupDeletes: dels,
+        baDefinitionGroups: newGroup
+      })
+      if (code === '200' && data) {
+        if (this.hadData.length === 0) {
+          this.$emit('confirm', 'link')
+        } else {
+          this.$emit('confirm')
+        }
+      }
     },
     async add() {
 
@@ -75,15 +112,24 @@ export default {
 
     },
     async open({ load }) {
-      // const { code, data } = await this.$api.badDefinition_list({
-      //   page: '1',
-      //   limit: '300'
-      // })
-      // if (code === '200' && data) {
-      //   this.data = data.list
-      // }
+      this.controlChartSonId = this.selectRow[0].id
+      const { code, data } = await this.$api.badDefinitionGroup_info({ id: this.controlChartSonId })
+      if (code === '200' && data) {
+        this.hadData = data
+        this.value = data.map(item => item.badDefinitionId)
+        // console.log(this.value)
+      }
+
+      const res = await this.$api.badDefinition_list({
+        page: '1',
+        limit: '300'
+      })
+      if (res.code === '200' && res.data) {
+        this.data = res.data.list
+      }
     },
     closed() {
+      this.clear()
       // this.level = '0'
     }
   }

@@ -170,7 +170,8 @@ export default {
     // },
     async update(loading) {
       const res = await this.$api.controlChartAbnorma_update({
-        ...this.form
+        ...this.form,
+        abnormalStatus: '1'
       })
       if (res.code === '200') {
         this.$emit('confirm')
@@ -191,7 +192,6 @@ export default {
             this.form[key] = data[key] || ''
           }
         }
-        console.log()
         this.form.inspectionName = this.selectRow.inspectionName
         // this.form = {
         //   'abnormalCode': '',

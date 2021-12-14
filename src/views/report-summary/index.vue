@@ -230,6 +230,7 @@ export default {
       this.filter_options_dialog = false
       this.form.filteOptions_data = filteOptions_data
       this.export_form = JSON.parse(JSON.stringify(this.form))
+      console.log(this.export_form)
       if (this.flag === 'control-group-filtering') {
         // console.log(this.form)
         // this.export_form = JSON.parse(JSON.stringify(this.form))
@@ -252,7 +253,7 @@ export default {
     },
     filter_options_next() {},
     export_btn() {
-      alert(this.export_flag)
+      // alert(this.export_flag)
       if (this.export_flag === 'control-group-filtering') {
         this.processCapabilityExcel_export()
       } else if (this.export_flag === 'abnormalPoint') {

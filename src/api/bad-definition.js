@@ -14,5 +14,11 @@ export default {
   },
   badDefinition_delete(data) {
     return http.post('/spc/badDefinition/delete', data)
+  },
+  badDefinitionGroup_info(data) {
+    return http.post(`/spc/badDefinitionGroup/info/${data.id}`, data, 'form')
+  },
+  badDefinitionGroup_saveOrUpdateBatch(data) {
+    return http.post(`/spc/badDefinitionGroup/saveOrUpdateBatch`, data)
   }
 }

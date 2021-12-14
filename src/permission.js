@@ -37,7 +37,7 @@ router.beforeEach(async(to, from, next) => {
       } else {
         // console.log(444)
         try {
-          store.dispatch('hierarchicalTypesDefinition/changeHtypes')
+          await store.dispatch('hierarchicalTypesDefinition/changeHtypes')
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           // alert(1)

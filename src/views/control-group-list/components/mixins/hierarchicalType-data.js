@@ -1,12 +1,14 @@
+import { getMothStartAndEnd } from '@/utils/date-method'
 export default {
   data() {
     return {
 
       form: {
-        date: ['2021-01-01 00:00:00', '2021-12-30 00:00:00'],
+        date: getMothStartAndEnd(),
         state: '',
         controlChartCode: '',
         controlChartType: '',
+        controlChartStatus: '',
         inspectionItemsId: '',
         hierarchicalTypeValueOne: '',
         hierarchicalTypeValueTwo: '',
@@ -31,7 +33,20 @@ export default {
         label: 'hierarchicalTypeValue'
       },
       options: {
-        states: [],
+        states: [
+          {
+            value: 1,
+            label: '未失控'
+          },
+          {
+            value: 2,
+            label: '有失控'
+          },
+          {
+            value: 3,
+            label: '有处理'
+          }
+        ],
         inspectionNames: [],
         chartTypes: [],
         hierarchicalType1: [],

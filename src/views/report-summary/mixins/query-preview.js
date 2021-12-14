@@ -10,6 +10,18 @@ export default {
     }
   },
   methods: {
+    download_excel(data) {
+      const blob = new Blob([data])
+      const elink = document.createElement('a')
+      elink.download = `${dateformat(new Date())}.xls`
+      elink.style.display = 'none'
+      elink.href = URL.createObjectURL(blob)
+      document.body.appendChild(elink)
+      elink.click()
+      URL.revokeObjectURL(elink.href) // 释放URL 对象
+      document.body.removeChild(elink)
+    },
+
     async request_data({ page_no, page_size, table_data }) {
       return {
         data: this.t_data,
@@ -136,21 +148,21 @@ export default {
     async processCapabilityExcel_export() {
       const data = await this.$api.processCapabilityExcel(this.get_processCapabilityQueryParams(this.export_form))
       if (data) {
+        this.download_excel(data)
         // window.open(data)
-        const blob = new Blob([data])
-        console.log(blob)
-        const elink = document.createElement('a')
-        elink.download = `工序能力报表${dateformat(new Date())}.xls`
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob)
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href) // 释放URL 对象
-        document.body.removeChild(elink)
+        // const blob = new Blob([data])
+        // const elink = document.createElement('a')
+        // elink.download = `工序能力报表${dateformat(new Date())}.xls`
+        // elink.style.display = 'none'
+        // elink.href = URL.createObjectURL(blob)
+        // document.body.appendChild(elink)
+        // elink.click()
+        // URL.revokeObjectURL(elink.href) // 释放URL 对象
+        // document.body.removeChild(elink)
       }
     },
     get_abnormalPointExcelQueryParams(form_data) {
-      const data = this.form_data
+      const data = form_data
       const params = {
         'hierarchicalTypeValueEight': '',
         'hierarchicalTypeValueFive': '',
@@ -263,9 +275,10 @@ export default {
       }
     },
     async abnormalPointExcel_export() {
-      const { code, data } = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams(this.export_form))
-      if (code === '200' && data) {
+      const data = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams(this.export_form))
+      if (data) {
         // window.open(data)
+        this.download_excel(data)
       }
     },
     get_yieldRateReportExcelQueryParams(form_data) {
@@ -374,8 +387,10 @@ export default {
       }
     },
     async yieldRateReportExcel_export() {
-      const { code, data } = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams(this.export_form))
-      if (code === '200' && data) {
+      const data = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams(this.export_form))
+
+      if (data) {
+        this.download_excel(data)
         // window.open(data)
       }
     }

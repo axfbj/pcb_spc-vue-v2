@@ -17,7 +17,7 @@
       >
         <el-form-item
           prop="inspectionName"
-          label="备选值名称:"
+          label="检测项目名称:"
         >
           <el-input
             ref="ipt"

@@ -3,7 +3,7 @@
     :visible="visible"
     title="备选值"
     width="40%"
-    :footer="false"
+    :default-footer="false"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"

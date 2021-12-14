@@ -68,19 +68,20 @@
           <fieldset style="border: 1px solid #ccc; height: 300px;">
             <legend style="color:#606266">基本信息</legend>
             <el-form-item label="规格上限:" prop="usl">
-              <el-input v-model.number="form.usl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
+              <el-input-number v-model="form.usl" :precision="form.digit" style="width: 100%;" :controls="false" :disabled="['p','np'].includes(controlChartType)" />
+              <!-- <el-input v-model.number="form.usl" type="number" :disabled="['P','nP'].includes(controlChartType)" /> -->
             </el-form-item>
             <el-form-item label="目标值:" prop="sl">
-              <el-input v-model.number="form.sl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
+              <el-input-number v-model="form.sl" :precision="form.digit" style="width: 100%;" :controls="false" type="number" :disabled="['p','np'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="规格下限:" prop="lsl">
-              <el-input v-model.number="form.lsl" type="text" :disabled="['P','nP'].includes(controlChartType)" />
+              <el-input-number v-model="form.lsl" :precision="form.digit" style="width: 100%;" :controls="false" type="number" :disabled="['p','np'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="样本容量:" prop="sampleSize">
-              <el-input v-model.number="form.sampleSize" type="text" :disabled="['P','X-MR'].includes(controlChartType)" />
+              <el-input-number v-model="form.sampleSize" style="width: 100%;" :controls="false" type="number" :disabled="['p','X-MR'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="小数位数:" prop="digit">
-              <el-select v-model="form.digit" placeholder="请选择" style="width:100%;">
+              <el-select v-model="form.digit" placeholder="请选择" style="width:100%;" :disabled="['p','np'].includes(controlChartType)">
                 <el-option
                   v-for="item in precisionOptiosn"
                   :key="item.value"
@@ -97,57 +98,57 @@
           <fieldset style="border: 1px solid #ccc;  height: 300px;">
             <legend style="color:#606266">控制图信息</legend>
             <el-form-item label="判异规则:" prop="discriminationRulesStr">
-              <el-input v-model="form.discriminationRulesStr" type="text" style="width: 80%;" />
+              <el-input v-model="form.discriminationRulesStr" type="text" style="width: 80%;" readonly />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_discrimination_rules_dialog">
                 设置
               </ki-button>
             </el-form-item>
             <el-form-item label="控制图层次信息:" prop="chartHierarchicalType">
-              <el-input v-model="form.chartHierarchicalType" type="text" style="width: 80%;" />
+              <el-input v-model="form.chartHierarchicalType" type="text" style="width: 80%;" readonly />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('level')">
                 设置
               </ki-button>
             </el-form-item>
             <el-form-item label="数据点层次信息:" prop="pointHierarchicalType">
-              <el-input v-model="form.pointHierarchicalType" type="text" style="width: 80%;" />
+              <el-input v-model="form.pointHierarchicalType" type="text" style="width: 80%;" readonly />
               <ki-button type="warning" style="margin-left: 10px;" @click="open_select_keyword_dialog('data')">
                 设置
               </ki-button>
             </el-form-item>
-            <el-form-item v-if="['P','nP'].includes(controlChartType)" label="不良分组:" prop="badGroup">
+            <!-- <el-form-item v-if="['P','nP'].includes(controlChartType)" label="不良分组:" prop="badGroup">
               <el-input v-model="form.badGroup" type="text" style="width: 80%;" />
               <ki-button type="warning" style="margin-left: 10px;" @click="badGroup_dialog_btn">
                 设置
               </ki-button>
-            </el-form-item>
+            </el-form-item> -->
             <el-form :model="form" label-width="auto" :inline="true" style="margin-top: 30px;">
               <el-form-item>
                 <div style="width: 120px; text-align: right;">上图:</div>
               </el-form-item>
               <el-form-item class="col-label" prop="g1ucl">
                 <div class="top-label">上控制限</div>
-                <el-input v-model="form.g1ucl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g1ucl" :controls="false" type="number" style="width: 120px;" :disabled="['p'].includes(controlChartType)" />
               </el-form-item>
               <el-form-item class="col-label" prop="g1cl">
                 <div class="top-label">目标值</div>
-                <el-input v-model="form.g1cl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g1cl" :controls="false" type="number" style="width: 120px;" :max="0.99" @change="g1ucl_change" />
               </el-form-item>
               <el-form-item class="col-label" prop="g1lcl">
                 <div class="top-label">下控制限</div>
-                <el-input v-model="form.g1lcl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g1lcl" :controls="false" type="number" style="width: 120px;" :disabled="['p'].includes(controlChartType)" />
               </el-form-item>
               <br>
               <el-form-item>
                 <div style="width: 120px; text-align: right;">下图:</div>
               </el-form-item>
               <el-form-item prop="g2ucl">
-                <el-input v-model="form.g2ucl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g2ucl" :controls="false" type="number" style="width: 120px;" :disabled="['p','np'].includes(controlChartType)" />
               </el-form-item>
               <el-form-item prop="g2cl">
-                <el-input v-model="form.g2cl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g2cl" :controls="false" type="number" style="width: 120px;" :disabled="['p','np'].includes(controlChartType)" />
               </el-form-item>
               <el-form-item prop="g2lcl">
-                <el-input v-model="form.g2lcl" type="text" style="width: 120px;" />
+                <el-input-number v-model="form.g2lcl" :controls="false" type="number" style="width: 120px;" :disabled="['p','np'].includes(controlChartType)" />
               </el-form-item>
             </el-form>
           </fieldset>
@@ -182,12 +183,12 @@
       @confirm="keyword_dialog_confirm"
     />
 
-    <bad-group-dialog
+    <!-- <bad-group-dialog
       :select-row="select_row"
       :visible="badGroup_dialog"
       @handleClose="badGroup_close"
       @confirm="badGroup_confirm"
-    />
+    /> -->
   </ki-dialog>
 
 </template>
@@ -196,14 +197,14 @@
 import DiscriminationRulesDialog from './discrimination-rules-dialog'
 import SelectKeywordDialog from './select-keyword-dialog'
 import ControlChartSettingsData from './mixins/control-chart-settings-data'
-import BadGroupDialog from './bad-group-dialog'
+// import BadGroupDialog from './bad-group-dialog'
 import { dateformat } from '@/utils/date-method'
 export default {
   name: 'ControlChartSettings',
   components: {
     DiscriminationRulesDialog,
-    SelectKeywordDialog,
-    BadGroupDialog
+    SelectKeywordDialog
+    // BadGroupDialog
   },
   mixins: [ControlChartSettingsData],
   props: {
@@ -228,7 +229,7 @@ export default {
     return {
 
       disabledSelectArr: [],
-      badGroup_dialog: false,
+      // badGroup_dialog: false,
       discrimination_rules_dialog: false,
       select_keyword_dialog: false,
       keyword_flag: '',
@@ -248,15 +249,41 @@ export default {
       t_data: []
     }
   },
+  // computed: {
+  //   chartType() {
+  //     const parseChartType = {
+  //       'XBar-R': 1,
+  //       'Xbar-s': 2,
+  //       'X-MR': 3,
+  //       'p': 4,
+  //       'np': 5
+  //     }
+  //     return parseChartType[this.controlChartType]
+  //   },
+  //     //     parseChartType: {
+  //     //   'XBar-R': 1,
+  //     //   'Xbar-s': 2,
+  //     //   'X-MR': 3,
+  //     //   'p': 4,
+  //     //   'np': 5
+  //     // },
+  // },
   created() {
     console.log('Datejs', dateformat(new Date()))
   },
   methods: {
-    badGroup_confirm() {},
-    badGroup_close() {},
+    g1ucl_change(val) {
+      if (['p'].includes(this.controlChartType)) {
+        if (val >= 1) {
+          this.$message.warning('设置的目标值必须小于1')
+        }
+      }
+    },
+    // badGroup_confirm() {},
+    // badGroup_close() {},
 
     controlChartType_change() {
-      this.clear()
+      this.clear('change')
     },
     badGroup_dialog_btn() {
       this.badGroup_dialog = true
@@ -274,35 +301,52 @@ export default {
         inspectionItemsId: select_data.id,
         // ------------------------
         // 'chartHierarchicalType': 0, 不传
-        chartHierarchicalType: '产品型号=test',
-        chartHierarchicalTypeStr: '1=1=test',
+        // chartHierarchicalType: '产品型号=test',
+        // chartHierarchicalTypeStr: '1=1=test',
+        chartHierarchicalType: '',
+        chartHierarchicalTypeStr: '',
         // 'controlChartCode': '', 生成添加
         // 'controlChartId': 0, 不传
         customTitle: '',
         description: '',
-        digit: 0,
+        digit: 3,
         'discriminationRules': 'R0',
         'discriminationRulesStr': 'R0',
-        g1cl: 0,
-        g1lcl: 0,
-        g1ucl: 0,
-        g2cl: 0,
-        g2lcl: 0,
-        g2ucl: 0,
+        g1cl: undefined,
+        g1lcl: undefined,
+        g1ucl: undefined,
+        g2cl: undefined,
+        g2lcl: undefined,
+        g2ucl: undefined,
         id: 0,
         // 'inspectionItemsId': '',
-        lsl: 0,
+        lsl: undefined,
         // 'pointHierarchicalType': 0, //不传
-        pointHierarchicalType: '产品名称=data',
-        pointHierarchicalTypeStr: '2=2=data', //	数据点层次信息(示例：层次类型序号=层次类型ID=值)
-        sampleSize: 0,
-        sl: 0,
-        status: 1,
+        // pointHierarchicalType: '产品名称=data',
+        // pointHierarchicalTypeStr: '2=2=data', //	数据点层次信息(示例：层次类型序号=层次类型ID=值)
+        pointHierarchicalType: '',
+        pointHierarchicalTypeStr: '',
+        sampleSize: undefined,
+        sl: undefined,
+        status: 1, // 	状态 1显示 0隐藏
         updateDate: dateformat(new Date()),
         updateUser: 'admin',
         'updateUserId': 1, // 暂时固定传1
-        usl: 0
+        usl: undefined
       }
+      if (['XBar-R', 'Xbar-s'].includes(this.controlChartType)) {
+        temp.sampleSize = 5
+      }
+      if (['X-MR'].includes(this.controlChartType)) {
+        temp.sampleSize = 1
+      }
+      if (['p'].includes(this.controlChartType)) {
+        temp.sampleSize = undefined
+      }
+      if (['np'].includes(this.controlChartType)) {
+        temp.sampleSize = 100
+      }
+
       const { code, data } = await this.$api.controlChartSon_generateCode()
       if (code === '200' && data) {
         temp.controlChartCode = data

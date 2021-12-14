@@ -22,6 +22,33 @@
           </ki-message-box>
         </div>
       </template>
+      <template v-slot:form>
+        <el-form-item
+          label="不良代码："
+          prop="badCode"
+        >
+          <el-input
+            v-model="form.badCode"
+            style="width: 150px"
+          />
+        </el-form-item>
+        <el-form-item
+          label="不良名称："
+          prop="badName"
+        >
+          <el-input
+            v-model="form.badName"
+            style="width: 150px"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            icon="el-icon-search"
+            @click="query"
+          >查询</el-button>
+        </el-form-item>
+      </template>
       <template v-slot:custum_content>
         <dynamic-table
           ref="dy_table"
@@ -64,20 +91,27 @@ export default {
         { prop: 'badName', label: '不良名称', width: '240' },
         { prop: 'badDescription', label: '描述', width: '240' }],
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        badCode: '',
+        badName: ''
       },
+      // form: {
+      //   name: '',
+      //   region: '',
+      //   date1: '',
+      //   date2: '',
+      //   delivery: false,
+      //   type: [],
+      //   resource: '',
+      //   desc: ''
+      // },
       select_row: {}
     }
   },
 
   methods: {
+    query() {
+      this.$refs.dy_table.refresh()
+    },
     add() {
       this.dialog_flag = 'add'
       this.bad_item_dialog = true
@@ -115,6 +149,8 @@ export default {
     },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await this.$api.badDefinition_list({
+        badCode: this.form.badCode || '',
+        badName: this.form.badName || '',
         page: page_no,
         limit: page_size,
         order: 'asc'

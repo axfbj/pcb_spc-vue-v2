@@ -39,12 +39,12 @@
           <div style="float: left;">
             <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span>
           </div>
-          <div style="text-align: right;overflow: hidden;">
+          <div style="text-align: right;">
             <!-- <ki-button type="primary" @click="add">添加</ki-button> -->
             <ki-button type="warning" @click="exception_handling_btn">异常处理</ki-button>
-            <ki-message-box :next="del" @click="del_btn">
+            <!-- <ki-message-box :next="del" @click="del_btn">
               <ki-button type="danger" style="margin-left: 10px">删除</ki-button>
-            </ki-message-box>
+            </ki-message-box> -->
           </div>
         </template>
         <template v-slot:form>
@@ -69,8 +69,8 @@
           </el-form-item>
           <el-form-item label="处理状态:">
             <el-checkbox-group v-model="form.checkList">
-              <el-checkbox label="0">未提交</el-checkbox>
-              <el-checkbox label="1">待审核</el-checkbox>
+              <el-checkbox label="0">未处理</el-checkbox>
+              <el-checkbox label="1">已处理</el-checkbox>
             </el-checkbox-group>
           </el-form-item>
 
@@ -92,7 +92,17 @@
             fixed-height="100%"
             :auto-init="false"
             @select="select_callback"
-          />
+          >
+            <template slot="cell-template" slot-scope="data">
+              <template v-if="data.list.template === 'state'">
+                <span :style="{color: data.cellValue === 0 ? 'red': '#9932CC'}">
+                  {{ data.cellValue === 0? '未处理': '已处理' }}
+                </span>
+              </template>
+              <!-- <el-link v-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
+              <template v-else>{{ data.cellValue }}</template>
+            </template>
+          </dynamic-table>
         </template>
       </container-layout>
     </el-col>
@@ -110,6 +120,7 @@
 <script>
 import badItemDialog from './components/bad-item-dialog'
 import ControlGroupTree from '../control-group-list/components/control-group-tree'
+import { getMothStartAndEnd } from '@/utils/date-method'
 export default {
   name: 'ExceptionHandling',
   components: {
@@ -126,7 +137,7 @@ export default {
       header_list: [
         { prop: 'id', label: 'ID', width: '180' },
         { prop: 'abnormalCode', label: '失控编号', width: '180' },
-        { prop: 'abnormalStatus', label: '状态', width: '180' },
+        { prop: 'abnormalStatus', label: '状态', width: '180', template: 'state' },
         { prop: 'inspectionName', label: '检测项目', width: '180' },
         { prop: 'controlChartType', label: '图类', width: '180' },
         { prop: 'happenDate', label: '发生时间', width: '180' },
@@ -134,7 +145,7 @@ export default {
       ],
       form: {
         inspectionName: '',
-        date: [],
+        date: getMothStartAndEnd(),
         checkList: []
       },
       select_row: {}
@@ -147,7 +158,13 @@ export default {
   },
 
   methods: {
-    query() {},
+    query() {
+      if (!this.form.date) {
+        this.$message.warning('必须选择一个时间段！！')
+        return
+      }
+      this.refresh()
+    },
     path_change(path) {
       this.path = path
     },
@@ -172,25 +189,25 @@ export default {
     //   this.dialog_flag = 'edit'
     //   this.bad_item_dialog = true
     // },
-    del_btn(open) {
-      if (!this.$refs.dy_table.one_row_select()) return
-      open()
-    },
-    async del(flag) {
-      const ids =
-        typeof this.select_row === 'object'
-          ? [this.select_row.id]
-          : this.select_row.map((item) => item.id)
-      if (flag === 'N') {
-        this.$message('操作取消')
-        return
-      }
-      const { code, data } = await this.$api.controlChartAbnorma_delete(ids)
-      if (code === '200' && data) {
-        this.$message.success('删除成功！')
-      }
-      this.refresh()
-    },
+    // del_btn(open) {
+    //   if (!this.$refs.dy_table.one_row_select()) return
+    //   open()
+    // },
+    // async del(flag) {
+    //   const ids =
+    //     typeof this.select_row === 'object'
+    //       ? [this.select_row.id]
+    //       : this.select_row.map((item) => item.id)
+    //   if (flag === 'N') {
+    //     this.$message('操作取消')
+    //     return
+    //   }
+    //   const { code, data } = await this.$api.controlChartAbnorma_delete(ids)
+    //   if (code === '200' && data) {
+    //     this.$message.success('删除成功！')
+    //   }
+    //   this.refresh()
+    // },
     refresh() {
       this.$refs.dy_table.refresh()
     },
@@ -203,19 +220,28 @@ export default {
         limit: page_size,
         // order: 'asc',
         controlChartGroupId: this.current_tree_node_key,
-        // 'thisMonthStart': Array.isArray(this.form.date) ? (this.form.date[0] || '') : '',
-        // 'thisMonthEnd': Array.isArray(this.form.date) ? (this.form.date[1] || '') : '',
-        // 'abnormalStatus': this.form.checkList.length === 0 ? [0, 1] : this.form.checkList,
-        // 'inspectionName': this.inspectionName
-        'abnormalStatus': [
-          0,
-          1
-        ],
-        'inspectionName': '',
-        'thisMonthEnd': '2021-11-30 11:59:57',
-        'thisMonthStart': '2021-11-30 11:59:57',
-        'sidx': 'id',
-        'order': 'desc'
+        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
+        'abnormalStatus': this.form.checkList.length === 0 ? [0, 1] : this.form.checkList,
+        'inspectionName': this.inspectionName
+        // 'abnormalStatus': [
+        //   0,
+        //   1
+        // ],
+        // 'inspectionName': '',
+        // 'thisMonthEnd': '2021-11-30 11:59:57',
+        // 'thisMonthStart': '2021-11-30 11:59:57',
+        // 'sidx': 'id',
+        // 'order': 'desc'
+        // 'abnormalStatus': [
+        //   0,
+        //   1
+        // ],
+        // 'inspectionName': '',
+        // 'thisMonthEnd': '2021-11-30 11:59:57',
+        // 'thisMonthStart': '2021-11-30 11:59:57',
+        // 'sidx': 'id',
+        // 'order': 'desc'
       })
       if (code === '200' && data) {
         return {

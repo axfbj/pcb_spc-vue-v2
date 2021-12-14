@@ -147,6 +147,7 @@ export default {
     },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await this.$api.inspectionItems_list({
+        inspectionName: this.add_form.inspectionName || '',
         page: page_no,
         limit: page_size,
         order: 'asc'

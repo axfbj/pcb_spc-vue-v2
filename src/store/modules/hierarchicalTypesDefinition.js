@@ -13,11 +13,6 @@ const mutations = {
 const actions = {
 
   async changeHtypes({ dispatch, commit }) {
-    const a = true
-    if (a) {
-      return
-    }
-
     function saveList(p) {
       return api.hierarchicalType_save(p)
     }

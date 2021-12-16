@@ -55,8 +55,8 @@ async function apiAxios(method, url, params, contentType) {
 }
 
 export default {
-  get: function({ url, params }) {
-    return apiAxios('GET', url, params)
+  get: function(url, params, contentType) {
+    return apiAxios('GET', url, params, contentType)
   },
   post: function(url, params, contentType) {
     return apiAxios('POST', url, params, contentType)

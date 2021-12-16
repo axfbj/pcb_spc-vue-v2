@@ -78,7 +78,7 @@
               <el-input-number v-model="form.lsl" :precision="form.digit" style="width: 100%;" :controls="false" type="number" :disabled="['p','np'].includes(controlChartType)" />
             </el-form-item>
             <el-form-item label="样本容量:" prop="sampleSize">
-              <el-input-number v-model="form.sampleSize" style="width: 100%;" :controls="false" type="number" :disabled="['p','X-MR'].includes(controlChartType)" />
+              <el-input-number v-model="form.sampleSize" style="width: 100%;" :controls="false" type="number" :disabled="['p','X-MR'].includes(controlChartType) || (select_row.id && controlChartType === 'np')" />
             </el-form-item>
             <el-form-item label="小数位数:" prop="digit">
               <el-select v-model="form.digit" placeholder="请选择" style="width:100%;" :disabled="['p','np'].includes(controlChartType)">
@@ -229,6 +229,7 @@ export default {
     return {
 
       disabledSelectArr: [],
+      updateKeys: [],
       // badGroup_dialog: false,
       discrimination_rules_dialog: false,
       select_keyword_dialog: false,
@@ -269,7 +270,7 @@ export default {
   //     // },
   // },
   created() {
-    console.log('Datejs', dateformat(new Date()))
+    // console.log('Datejs', dateformat(new Date()))
   },
   methods: {
     g1ucl_change(val) {
@@ -334,7 +335,7 @@ export default {
         'updateUserId': 1, // 暂时固定传1
         usl: undefined
       }
-      if (['XBar-R', 'Xbar-s'].includes(this.controlChartType)) {
+      if (['Xbar-R', 'Xbar-s'].includes(this.controlChartType)) {
         temp.sampleSize = 5
       }
       if (['X-MR'].includes(this.controlChartType)) {
@@ -342,9 +343,12 @@ export default {
       }
       if (['p'].includes(this.controlChartType)) {
         temp.sampleSize = undefined
+        temp.discriminationRules = 'R1-1-3'
       }
       if (['np'].includes(this.controlChartType)) {
         temp.sampleSize = 100
+
+        temp.discriminationRulesStr = 'R1-1-3'
       }
 
       const { code, data } = await this.$api.controlChartSon_generateCode()
@@ -473,15 +477,19 @@ export default {
     async open() {
       // alert(this.settingFlag)
       if (this.settingFlag !== 'update') return
-      const { id, controlChartId } = this.selectRow[0]
+      const { id, controlChartId, controlChartType } = this.selectRow[0]
       this.controlChartId = controlChartId
-      const { code, data } = await this.$api.controlChart_queryByControlChartId({ controlChartId })
+      const { code, data } = await this.$api.controlChart_queryByControlChartId({
+        controlChartId,
+        type: controlChartType
+      })
       if (code === '200' && data) {
         const t_data = data.map((item, index) => ({
           ...this.formatNullValue(item),
           discriminationRulesStr: item.discriminationRules,
           rowNumber: index + 1
         }))
+        if (data.length === 0) return
         this.tree_path = t_data.length > 0 ? t_data[0].controlChartName : ''
         this.controlChartType = t_data.length > 0 ? t_data[0].controlChartType : ''
         this.t_data = t_data

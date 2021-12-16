@@ -7,7 +7,7 @@ export default {
     return http.post('/spc/excel/abnormalPointExcelQuery', data)
   },
   inspectionRecordExcel(data) {
-    return http.post('/spc/excel/inspectionRecordExcel', data)
+    return http.post('/spc/excel/inspectionRecordExcel', data, 'excel')
   },
   processCapabilityExcel(data) {
     return http.post('/spc/excel/processCapabilityExcel', data, 'excel')

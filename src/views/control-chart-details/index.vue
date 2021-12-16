@@ -49,7 +49,7 @@
           </ki-message-box>
           <ki-button type="primary" @click="excel_import_dialog_btn">导入数据</ki-button>
           <ki-button type="primary" @click="download_template">下载模板</ki-button>
-          <ki-button type="primary">导出</ki-button>
+          <ki-button type="primary" @click="export_inspection">导出</ki-button>
         </div>
       </div>
     </template>
@@ -215,9 +215,10 @@ import pchart from './components/pchart'
 import npchart from './components/npchart'
 
 import chartData from './mixins/data'
-import Xbars_data from './mixins/Xbars_data'
-import p_data from './mixins/p_data'
-import XMR_data from './mixins/XMR_data'
+// import Xbars_data from './mixins/Xbars_data'
+// import p_data from './mixins/p_data'
+// import XMR_data from './mixins/XMR_data'
+import { dateformat } from '@/utils/date-method'
 
 export default {
   name: 'ControlChartDetails',
@@ -267,19 +268,23 @@ export default {
       activeName: 'line',
       myEcharts: {},
       select_row: {},
+      dy_header_list: [
+        { prop: 'inspectionData', label: '抽检时间', width: '180' },
+        { prop: 'createData', label: '录入时间', width: '180' }
+      ],
       header_list_data: [
         { prop: 'inspectionSerial', label: '序号', width: '100' },
         { prop: 'id', label: 'ID', width: '180' },
         { prop: 'inspectionData', label: '抽检时间', width: '180' },
         { prop: 'createData', label: '录入时间', width: '180' },
         // 数据点层次信息与样本值
-        { prop: 'inspectionStatus', label: '状态', width: '120', template: 'states', header_template: 'states' },
-        { prop: 'average', label: '平均值', width: '120' },
-        { prop: 'range', label: '极差值', width: '120' },
-        { prop: 'sd', label: '标准差', width: '120' },
-        { prop: 'max', label: '最大值', width: '120' },
-        { prop: 'min', label: '最小值', width: '120' },
-        { prop: 'createUser', label: '录入用户', width: '120' }
+        { prop: 'inspectionStatus', label: '状态', width: '120', template: 'states', header_template: 'states' }
+        // { prop: 'average', label: '平均值', width: '120' },
+        // { prop: 'range', label: '极差值', width: '120' },
+        // { prop: 'sd', label: '标准差', width: '120' },
+        // { prop: 'max', label: '最大值', width: '120' },
+        // { prop: 'min', label: '最小值', width: '120' },
+        // { prop: 'createUser', label: '录入用户', width: '120' }
       ],
       header_list: [],
       inspectionRecords_data: {}
@@ -328,7 +333,10 @@ export default {
       }
       const { code, data } = await this.$api.controlChartSon_data(param)
       if (code === '200' && data) {
-        console.log(this.data)
+        // console.log(this.data)
+        return {
+          data
+        }
       }
     },
     excel_import_dialog_btn() {
@@ -343,14 +351,19 @@ export default {
     getChartData() {
       this.chartData = {}
     },
-    setChart() {
+    async setChart() {
       // const res4 = this.chartData // 请求
-      const res4 = chartData// 请求
+      // const res4 = chartData// 请求
+      // this.getChartData()
+      const res4 = await this.get_controlChartSon_data()
+      console.log('res4', res4)
 
       const type = this.parseChartType[this.controlChartType]
+      // if (this.controlChartType === 'XBar-R') {
+      //   type = '1'
+      // }
       // const type = 1
       if (type === 1) {
-        console.log('res4.data', res4.data)
         const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
 
         this.myEcharts.line1 = chart[0]
@@ -412,15 +425,15 @@ export default {
         // this.arr.label67 = res4.data.label67
         // this.cpk = res4.data.vCPK
       } else if (type === 2) {
-        const res4 = Xbars_data
+        // const res4 = Xbars_data
         this.myEcharts.xbars = this.$refs['xbars'].add_show2(res4.data)
-        this.arr.Cpk = res4.data.vCPK
+        // this.arr.Cpk = res4.data.vCPK
       } else if (type === 3) {
-        const res4 = XMR_data
+        // const res4 = XMR_data
         this.myEcharts.xbarmr = this.$refs['xbarmr'].add_show3(res4.data)
         this.arr.Cpk = res4.data.vCPK
       } else if (type === 4) {
-        const res4 = p_data
+        // const res4 = p_data
         this.myEcharts.pchart = this.$refs['pchart'].add_show4(res4.data)
       } else if (type === 5) {
         this.myEcharts.npchart = this.$refs['npchart'].add_show5(res4.data)
@@ -432,25 +445,29 @@ export default {
     },
     async init() {
       this.clear()
-      // await this.get_inspectionRecords_data((data) => {
-      //   this.inspectionRecords_data = data
-      //   this.get_final_header_list()
-      //   this.$refs.dy_table && this.$refs.dy_table.refresh()
-      //   this.$nextTick(() => {
-      //     // alert(1)
-      //     this.setChart()
-      //   })
-      //   // this.get_controlChartSon_data()
-      // }, 'init')
-      this.$nextTick(() => {
-        this.setChart()
-      })
+      await this.get_inspectionRecords_data((data) => {
+        this.inspectionRecords_data = data
+        this.get_final_header_list()
+        this.$refs.dy_table && this.$refs.dy_table.refresh()
+        this.$nextTick(() => {
+          // alert(1)
+          this.setChart()
+        })
+        // this.get_controlChartSon_data()
+      }, 'init')
+      // this.$nextTick(() => {
+      //   this.setChart()
+      // })
     },
     clear() {
       this.inspectionRecords_data = {}
       this.pointHierarchicalTypeIds = []
       this.sampleSize = 0
       this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
+      this.dy_header_list = [
+        { prop: 'inspectionData', label: '抽检时间', width: '180' },
+        { prop: 'createData', label: '录入时间', width: '180' }
+      ]
       this.$refs.dy_table && this.$refs.dy_table.refresh()
     },
     del_btn(open) {
@@ -472,6 +489,28 @@ export default {
       }
     },
     get_final_header_list() {
+      if (['p', 'np'].includes(this.controlChartType)) {
+        let h = ''
+        if (this.controlChartType === 'p') {
+          h = { prop: 'failureRate', label: '不合格率', width: '120' }
+        } else {
+          h = { prop: 'failureNum', label: '不合格数', width: '120' }
+        }
+        this.header_list.push(h)
+      } else {
+        const h = [
+          { prop: 'average', label: '平均值', width: '120' },
+          { prop: 'range', label: '极差值', width: '120' },
+          { prop: 'sd', label: '标准差', width: '120' },
+          { prop: 'max', label: '最大值', width: '120' },
+          { prop: 'min', label: '最小值', width: '120' }
+
+        ]
+        this.header_list.push(...h)
+      }
+      this.header_list.push({ prop: 'createUser', label: '录入用户', width: '120' })
+
+      // 动态表头
       const parseNum = {
         1: 'One',
         2: 'Two',
@@ -486,46 +525,56 @@ export default {
       const { pointHierarchicalTypeIds, inspectionRecords, badDefinitionTitles, badDefinitionIds } = this.inspectionRecords_data
       this.pointHierarchicalTypeIds = pointHierarchicalTypeIds
       const arr = []
+      console.log('pointHierarchicalTypeIds', pointHierarchicalTypeIds)
       pointHierarchicalTypeIds.forEach(id => {
         const hierarchicalItem = this.hierarchicalTypes.find(item => item.id === id)
         if (hierarchicalItem) {
           const list = {}
-          list.prop = `hierarchicalTypeValue${parseNum[id]}`
+          list.prop = `hierarchicalTypeValue${parseNum[hierarchicalItem.serialNumber]}`
           list.label = hierarchicalItem.hierarchicalName
           list.width = '180'
           list.header_template = 'hierarchicalTypeValue'
           // this.header_list.push(list)
           arr.push(list)
+          this.dy_header_list.push(list)
         }
       })
 
-      if (['p'].includes(this.controlChartType) && badDefinitionTitles.length !== 0) {
+      if (['p', 'np'].includes(this.controlChartType) && badDefinitionTitles.length !== 0) {
         this.badNames = {
           badDefinitionTitles,
           badDefinitionIds
         }
-        arr.push({ prop: 'numberOfGroups', label: '抽检数', width: '180' })
+        arr.push({ prop: 'value1', label: '抽检数', width: '180' })
+        if (this.controlChartType === 'p') {
+          this.dy_header_list.push({ prop: 'value1', label: '抽检数', width: '180' })
+        }
         badDefinitionTitles.forEach((item, index) => {
           const list = {}
-          list.prop = `badName${index + 1}`
+          list.prop = `badValue${index + 1}`
           list.label = item
           list.width = '180'
           arr.push(list)
+          this.dy_header_list.push(list)
         })
       }
 
+      // if (!this.sampleSize) return
       const sampleSize = inspectionRecords[0].sampleSize
       this.sampleSize = sampleSize || 0
-      // if (!this.sampleSize) return
 
-      for (let i = 1; i <= this.sampleSize; i++) {
-        const list = {}
-        list.prop = `value${i}`
-        list.label = `样本${i}`
-        list.width = '120'
-        arr.push(list)
+      if (!['p', 'np'].includes(this.controlChartType)) {
+        for (let i = 1; i <= this.sampleSize; i++) {
+          const list = {}
+          list.prop = `value${i}`
+          list.label = `样本${i}`
+          list.width = '120'
+          arr.push(list)
+          this.dy_header_list.push(list)
         // this.header_list.push(list)
+        }
       }
+
       // console.log('this.header_list', this.header_list)
 
       this.header_list.splice(4, 0, ...arr)
@@ -534,12 +583,19 @@ export default {
       await this.get_inspectionRecords_data((data) => {
         this.inspectionRecords_data = data
         this.$refs.dy_table && this.$refs.dy_table.refresh()
+        this.$nextTick(() => {
+          this.setData()
+        })
       })
       // await this.setData()
     },
     async get_inspectionRecords_data(callback, flag) {
+      const type = this.parseChartType[this.controlChartType]
+      // if (this.controlChartType === 'XBar-R') {
+      //   type = '1'
+      // }
       let params = {
-        controlChartType: this.parseChartType[this.controlChartType],
+        controlChartType: type,
         'controlChartSonId': this.controlChartSonId || 0,
         'dataType': this.form.dataType || '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
@@ -556,11 +612,14 @@ export default {
         if (callback) callback(data)
 
         if (flag === 'init') {
-          this.form.date = [data.thisMonthStart, data.thisMonthEnd]
+          this.form.date = !data.thisMonthStart ? null : [data.thisMonthStart, data.thisMonthEnd]
         }
       }
     },
     add_data_dialog_btn(flag) {
+      if (flag !== 'add') {
+        if (!this.$refs.dy_table.one_row_select()) return
+      }
       this.add_dialog_flag = flag
       this.add_data_dialog = true
     },
@@ -600,11 +659,39 @@ export default {
       if (!Object.hasOwnProperty.call(this.inspectionRecords_data, 'inspectionRecords')) return
       // console.log(this.inspectionRecords_data)
       const { inspectionRecords } = this.inspectionRecords_data
+      if (inspectionRecords[0].controlChartSonId === null) {
+        return {
+          data: [],
+          total: 0
+        }
+      }
+
+      console.log(this.inspectionRecords_data)
+      // if(controlChartSonId)
       return {
-        data: inspectionRecords.map((item, index) => ({
-          ...item,
-          inspectionSerial: index + 1
-        })),
+        data: inspectionRecords.map((item, index) => {
+          if (['p', 'np'].includes(this.controlChartType)) {
+            const badList = {}
+            console.log(item)
+            if (item.objectList) {
+              item.objectList.forEach((item, index) => {
+                badList[`badValue${index + 1}`] = item.value
+              })
+            }
+
+            return {
+              ...item,
+              ...badList,
+              inspectionSerial: index + 1
+            }
+          } else {
+            return {
+              ...item,
+
+              inspectionSerial: index + 1
+            }
+          }
+        }),
         total: inspectionRecords[0].id ? inspectionRecords.length : 0
       }
     },
@@ -620,7 +707,7 @@ export default {
 
     get_column() {
       const columnList = {}
-      this.header_list.forEach((header, index) => {
+      this.dy_header_list.forEach((header, index) => {
         let str_big = String.fromCharCode('A'.charCodeAt(0) + index)
         if (index > 25) {
           str_big = String.fromCharCode('A'.charCodeAt(0) + parseInt(index / 26) - 1) + String.fromCharCode('A'.charCodeAt(0) + index - parseInt(index / 26) * 26)
@@ -632,6 +719,7 @@ export default {
       return columnList
     },
     download_template() {
+      // dy_header_list
       const columnList = this.get_column()
       // alert(1)
       // var data = [{
@@ -694,6 +782,41 @@ export default {
       XLSX.utils.book_append_sheet(wb, ws, 'file')
       // 输出
       XLSX.writeFile(wb, 'file' + timestamp + '.xlsx')
+    },
+    download_excel(data, filename = '') {
+      const blob = new Blob([data])
+      const elink = document.createElement('a')
+      elink.download = `${filename}${dateformat(new Date())}.xls`
+      elink.style.display = 'none'
+      elink.href = URL.createObjectURL(blob)
+      document.body.appendChild(elink)
+      elink.click()
+      URL.revokeObjectURL(elink.href) // 释放URL 对象
+      document.body.removeChild(elink)
+    },
+    async export_inspection() {
+      const type = this.parseChartType[this.controlChartType]
+      const params = {
+        controlChartType: type,
+        'controlChartSonId': this.controlChartSonId || 0,
+        'dataType': this.form.dataType || '',
+        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
+        'excelName': `检验记录报表${dateformat(new Date())}`
+      }
+      const data = await this.$api.inspectionRecordExcel(params)
+      if (data) {
+        this.download_excel(data, '检验记录报表')
+      }
+      //       {
+      //   "controlChartSonId": 0,
+      //   "controlChartType": 0,
+      //   "dataType": "",
+      //   "excelName": "",
+      //   "isNoInspectionRecord": 0,
+      //   "thisMonthEnd": "",
+      //   "thisMonthStart": ""
+      // }
     }
 
   }

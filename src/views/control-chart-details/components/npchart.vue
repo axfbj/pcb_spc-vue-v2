@@ -3,7 +3,7 @@
   <!-- <div ref="chart" style="width:100%;height:100%"> -->
   <el-row style="height:100%">
     <el-col :span="24" style="height:100%">
-      <div ref="chart1" style="width:100%;height:100%" />
+      <div ref="chart1" style="width:100%;height:calc(100% - 20px)" />
       <div style="text-align:center">
         异常均值:<span style="margin-right:20px">{{ lable93 }}</span>
         <span><strong>NP图</strong></span>

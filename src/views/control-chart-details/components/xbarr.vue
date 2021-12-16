@@ -134,7 +134,7 @@ export default {
       })
       // 加入异常点
       if (res.Series8.R0) {
-        res.Series8.ruleOne.forEach((i) => {
+        res.Series8.R0.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }

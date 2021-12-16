@@ -71,48 +71,48 @@ export default {
         }
       })
       // 加入异常点
-      if (res.Series8.ruleOne) {
-        res.Series8.ruleOne.forEach((i) => {
+      if (res.Series8.R0) {
+        res.Series8.R0.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleTwo) {
-        res.Series8.ruleTwo.forEach((i) => {
+      if (res.Series8.R1) {
+        res.Series8.R1.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleThree) {
-        res.Series8.ruleThree.forEach((i) => {
+      if (res.Series8.R2) {
+        res.Series8.R2.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleFour) {
-        res.Series8.ruleFour.forEach((i) => {
+      if (res.Series8.R3) {
+        res.Series8.R3.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleFive) {
-        res.Series8.ruleFive.forEach((i) => {
+      if (res.Series8.R4) {
+        res.Series8.R4.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleSix) {
-        res.Series8.ruleSix.forEach((i) => {
+      if (res.Series8.R5) {
+        res.Series8.R5.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleSeven) {
-        res.Series8.ruleSeven.forEach((i) => {
+      if (res.Series8.R6) {
+        res.Series8.R6.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleEight) {
-        res.Series8.ruleEight.forEach((i) => {
+      if (res.Series8.R7) {
+        res.Series8.R7.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }
-      if (res.Series8.ruleNine) {
-        res.Series8.ruleNine.forEach((i) => {
+      if (res.Series8.R8) {
+        res.Series8.R8.forEach((i) => {
           this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
         })
       }

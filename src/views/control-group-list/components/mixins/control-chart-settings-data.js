@@ -7,13 +7,13 @@ export default {
   },
   data() {
     return {
-      controlChartType: 'XBar-R',
+      controlChartType: 'Xbar-R',
       options: [{
-        value: 'XBar-R',
-        label: 'XBar-R'
+        value: 'Xbar-R',
+        label: 'Xbar-R'
       }, {
-        value: 'XBar-S',
-        label: 'XBar-S'
+        value: 'Xbar-s',
+        label: 'Xbar-s'
       }, {
         value: 'X-MR',
         label: 'X-MR'
@@ -83,7 +83,7 @@ export default {
   methods: {
     clear(c) {
       if (c !== 'change') {
-        this.controlChartType = 'XBar-R'
+        this.controlChartType = 'Xbar-R'
       }
       this.form = JSON.parse(JSON.stringify(this.form_data))
       this.t_data = []

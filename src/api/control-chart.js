@@ -13,6 +13,7 @@ export default {
     return http.post(`/spc/control/chart/queryInspectionItemsByControlGroupId/${data.controlGroupId}`, data, 'form')
   },
   controlChart_queryByControlChartId(data) {
-    return http.post(`/spc/control/chart/queryByControlChartId/${data.controlChartId}`, data, 'form')
+    // return http.post(`/spc/control/chart/queryByControlChartId/${data.controlChartId}`, data, 'form')
+    return http.get(`/spc/control/chart/queryByControlChartId`, data, 'form')
   }
 }

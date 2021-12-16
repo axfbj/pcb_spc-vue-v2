@@ -78,7 +78,7 @@ export const constantRoutes = [
       {
         path: 'dashboard',
         component: () => import('@/views/control-group-list/index'),
-        name: 'ControlGroupList',
+        // name: 'ControlGroupList',
         meta: {
           title: '控制组列表'
         },
@@ -185,7 +185,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/permission/page',
     alwaysShow: true, // will always show the root menu
-    name: 'StatisticalProcessControl ',
+    name: 'StatisticalProcessControl',
     meta: {
       title: '统计过程控制',
       icon: 'lock'
@@ -240,14 +240,14 @@ export const asyncRoutes = [
           title: '控制图详情'
         }
       },
-      {
-        path: 'upload-excel',
-        component: () => import('@/views/excel/upload-excel'),
-        name: 'UploadExcel',
-        meta: {
-          title: '上传excel'
-        }
-      },
+      // {
+      //   path: 'upload-excel',
+      //   component: () => import('@/views/excel/upload-excel'),
+      //   name: 'UploadExcel',
+      //   meta: {
+      //     title: '上传excel'
+      //   }
+      // },
       {
         path: 'report-summary',
         component: () => import('@/views/report-summary'),

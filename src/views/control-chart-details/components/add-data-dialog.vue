@@ -436,7 +436,7 @@ export default {
             label: `样本${i}`
           }
           this.size.push(o)
-          this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
+          // this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
         }
         if (this.flag === 'add') return
         this.form = {

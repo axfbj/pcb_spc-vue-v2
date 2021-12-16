@@ -223,7 +223,7 @@ export default {
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
         'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
         'abnormalStatus': this.form.checkList.length === 0 ? [0, 1] : this.form.checkList,
-        'inspectionName': this.inspectionName
+        'inspectionName': this.form.inspectionName
         // 'abnormalStatus': [
         //   0,
         //   1

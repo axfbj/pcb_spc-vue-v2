@@ -343,12 +343,16 @@ export default {
       }
       if (['p'].includes(this.controlChartType)) {
         temp.sampleSize = undefined
+        //    'discriminationRules': 'R0',
+        // 'discriminationRulesStr': 'R0',
         temp.discriminationRules = 'R1-1-3'
+        temp.discriminationRulesStr = 'R1-1-3'
       }
       if (['np'].includes(this.controlChartType)) {
         temp.sampleSize = 100
-
+        temp.discriminationRules = 'R1-1-3'
         temp.discriminationRulesStr = 'R1-1-3'
+        // temp.discriminationRulesStr = 'R1-1-3'
       }
 
       const { code, data } = await this.$api.controlChartSon_generateCode()
@@ -432,7 +436,7 @@ export default {
       this.$emit('handleClose')
     },
     async confirm({ loading }) {
-      loading(true)
+      // loading(true)
       const parmas = this.save_chart_data()
       if (this.settingFlag !== 'update') {
         parmas.controlChartId = 0

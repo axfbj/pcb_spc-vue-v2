@@ -4,9 +4,7 @@
     :style="{height: !!fixedHeight ? (typeof fixedHeight ==='string' ? fixedHeight : 'auto') : (typeof content_height === 'string' ? content_height : content_height + 'px') }"
   >
     <!-- :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : '') : table_height" -->
-    <!-- border
-      stripe
-      fit -->
+    <!-- stripe -->
     <el-table
       ref="table"
       v-loading="loading"
@@ -20,6 +18,9 @@
       :summary-method="summary_func"
       :show-summary="showSummary"
       :cell-class-name="cell_class_name"
+      border
+
+      fit
       @row-click="click"
       @select="select"
       @select-all="select_all"

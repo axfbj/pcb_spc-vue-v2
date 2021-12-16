@@ -1,5 +1,5 @@
 <template>
-  <span class="rectangle" :style="{backgroundColor: backgroundColor,verticalAlign:'middle'} ">
+  <span class="rectangle" :style="{backgroundColor: backgroundColor,verticalAlign:'middle',width:`${size}px`,height: `${size}px`} ">
     <div class="flex-box">
       <slot />
     </div>
@@ -14,6 +14,10 @@ export default {
     state: {
       type: String,
       default: '0'
+    },
+    size: {
+      type: Number,
+      default: 22
     }
   },
   computed: {
@@ -34,8 +38,6 @@ export default {
 	display: inline-block;
 	justify-content: center;
 	align-items: center;
-	width: 22px;
-	height: 22px;
 	border: 1px solid #000;
 
 	.flex-box {

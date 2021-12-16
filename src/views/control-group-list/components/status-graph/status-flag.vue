@@ -1,6 +1,6 @@
 <template>
-  <rectangle v-if="show" :state="states[0]">
-    <round-shape :state="states[1]" />
+  <rectangle v-if="show" :state="states[0]" :size="sizes[0]">
+    <round-shape :state="states[1]" :size="sizes[1]" />
   </rectangle>
 </template>
 
@@ -18,6 +18,10 @@ export default {
     states: {
       type: Array,
       default: () => (['0', '0'])
+    },
+    sizes: {
+      type: Array,
+      default: () => ([22, 14])
     }
   },
   computed: {

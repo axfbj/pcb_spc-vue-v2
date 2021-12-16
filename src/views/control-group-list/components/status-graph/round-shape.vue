@@ -1,11 +1,15 @@
 <template>
-  <span class="round-shape" :style="{backgroundColor: backgroundColor,verticalAlign:'middle'}" />
+  <span class="round-shape" :style="{backgroundColor: backgroundColor,verticalAlign:'middle',width:`${size}px`,height: `${size}px`}" />
 </template>
 
 <script>
 export default {
   name: 'RoundShape',
   props: {
+    size: {
+      type: Number,
+      default: 18
+    },
     state: {
       type: String,
       default: '0'
@@ -27,8 +31,6 @@ export default {
 <style lang="scss" scoped>
 .round-shape {
 	display: inline-block;
-	width: 18px;
-	height: 18px;
 	border: 1px solid #000;
 	border-radius: 50%;
 }

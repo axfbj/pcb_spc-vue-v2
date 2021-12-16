@@ -1,7 +1,7 @@
 <template>
   <ki-dialog
     :visible="visible"
-    title="不良分组"
+    title="数据导出"
     v-bind="$attrs"
     width="80%"
     top="5vh"

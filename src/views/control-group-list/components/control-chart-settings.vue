@@ -442,8 +442,9 @@ export default {
       }
       // const p = this.t_data.filter(item => Object.hasOwnProperty.call(item, 'controlChartId'))
       if (parmas.controlChartSonEntityS.length) {
-        const { code, data } = await this.$api.controlChartSon_save(parmas)
-        if (code === '200' && data) {
+        // const { code, data } = await this.$api.controlChartSon_save(parmas)
+        const { code } = await this.$api.controlChartSon_save(parmas)
+        if (code === '200') {
           const atchUpdate = await this.controlChartSon_batchUpdate()
           if (atchUpdate === '0') {
             this.$emit('confirm')
@@ -460,8 +461,9 @@ export default {
         return Object.hasOwnProperty.call(item, 'controlChartId') && Object.hasOwnProperty.call(item, 'pointHierarchicalType')
       })
       if (!p.length) return '0'
-      const { code, data } = await this.$api.controlChartSon_batchUpdate(p)
-      if (code === '200' && data) {
+      const { code } = await this.$api.controlChartSon_batchUpdate(p)
+      // if (code === '200' && data) {
+      if (code === '200') {
         this.$emit('confirm')
       }
     },

@@ -12,7 +12,7 @@
     <div style="padding: 10px 40px;">
       <el-form ref="form" :model="form">
         <el-form-item>
-          <el-checkbox v-model="form.rule0" disabled class="fixed-select">R0：落在规格线外</el-checkbox>
+          <el-checkbox v-model="form.rule0" class="fixed-select">R0：落在规格线外</el-checkbox>
         </el-form-item>
         <el-form-item>
           <el-checkbox v-model="form.rule1" class="fixed-select">R1：有{{ form.rule1_data1 }}点落在{{ form.rule1_data2 }}倍标准差以外</el-checkbox>

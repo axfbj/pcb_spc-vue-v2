@@ -198,14 +198,14 @@ export default {
   },
   created() {
     Object.freeze(this.form_data)
-    Object.freeze(this.rules_data)
+    // Object.freeze(this.rules_data)
     this.form = JSON.parse(JSON.stringify(this.form_data))
-    this.rules = JSON.parse(JSON.stringify(this.rules_data))
+    // this.rules = JSON.parse(JSON.stringify(this.rules_data))
   },
   methods: {
     clear() {
       this.form = JSON.parse(JSON.stringify(this.form_data))
-      this.rules = JSON.parse(JSON.stringify(this.rules_data))
+      // this.rules = JSON.parse(JSON.stringify(this.rules_data))
       this.size = []
       this.badNames_data = []
     },
@@ -255,6 +255,8 @@ export default {
             value: form[`badValue${index + 1}`]
           }
         })
+      } else {
+        delete form.objectList
       }
 
       this.pointHierarchicalTypeIds.forEach(id => {
@@ -408,15 +410,15 @@ export default {
       this.flag = this.$attrs.flag
       if (['p', 'np'].includes(this.controlChartType)) {
         if (this.controlChartType === 'np') {
-          this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
+          // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
           this.$set(this.form, 'value1', this.sampleSize)
         } else {
-          this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
+          // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
           this.$set(this.form, 'value1', undefined)
         }
 
         this.badNames.badDefinitionTitles.forEach((item, index) => {
-          this.rules[`badValue${index + 1}`] = { required: true, message: `请填写${item}`, trigger: 'change' }
+          // this.rules[`badValue${index + 1}`] = { required: true, message: `请填写${item}`, trigger: 'change' }
           this.$set(this.form, `badValue${index + 1}`, undefined)
           const o = {}
           o.id = this.badNames.badDefinitionIds[index]

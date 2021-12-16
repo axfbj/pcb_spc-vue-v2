@@ -584,7 +584,7 @@ export default {
         this.inspectionRecords_data = data
         this.$refs.dy_table && this.$refs.dy_table.refresh()
         this.$nextTick(() => {
-          this.setData()
+          this.setChart()
         })
       })
       // await this.setData()

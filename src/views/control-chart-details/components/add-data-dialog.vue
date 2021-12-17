@@ -1,7 +1,7 @@
 <template>
   <ki-dialog
     :visible="visible"
-    title="数据"
+    title="检验数据"
     v-bind="$attrs"
     width="35%"
     @handleClose="handleClose"
@@ -148,7 +148,7 @@ export default {
         9: 'Nine'
       },
       parseChartType: {
-        'XBar-R': 1,
+        'Xbar-R': 1,
         'Xbar-s': 2,
         'X-MR': 3,
         'p': 4,
@@ -194,7 +194,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['hierarchicalTypes'])
+    ...mapGetters(['hierarchicalTypes']),
+    getChartNum() {
+      return this.parseChartType[this.controlChartType] || ''
+    }
   },
   created() {
     Object.freeze(this.form_data)
@@ -221,7 +224,6 @@ export default {
       }
     },
     getSaveParams() {
-      // alert(this.parseChartType[this.controlChartType])
       const form = {}
       const h_type = {
         'hierarchicalTypeValueEight': '',
@@ -280,7 +282,7 @@ export default {
       // }
       const p = {
         controlChartSonId: this.controlChartSonId,
-        controlChartType: this.parseChartType[this.controlChartType],
+        controlChartType: this.getChartNum,
         'inspectionRecordList': [
           {
             // badDefinitionMap: {},
@@ -439,6 +441,8 @@ export default {
           // this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
         }
         if (this.flag === 'add') return
+        console.log('this.selectRow', this.selectRow)
+
         this.form = {
           ...this.selectRow
         }

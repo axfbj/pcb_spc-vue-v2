@@ -114,7 +114,6 @@ export default {
       })
     },
     async add() {
-      console.log('node', this.nodeData)
       const { code, data } = await this.$api.controlGroup_save({
         parentId: this.level === '0' ? this.nodeData.id : this.nodeData.parentId,
         ...this.form

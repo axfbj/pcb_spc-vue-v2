@@ -170,7 +170,6 @@
               <span v-if="data.cellValue === 1" style="color: red;">失控</span>
               <span v-if="data.cellValue === 2" style="color: pink;">已处理</span>
             </template>
-            <!-- <status-flag v-if="data.list.template === 'states'" :states="data.cellValue" /> -->
             <template v-else>{{ data.cellValue }}</template>
           </template>
         </dynamic-table>
@@ -291,7 +290,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['hierarchicalTypes'])
+    ...mapGetters(['hierarchicalTypes']),
+    chartTypeNum() {
+      return this.parseChartType[this.controlChartType] || ''
+    }
   },
   watch: {
     '$route.query.controlChartSonId': {
@@ -306,18 +308,10 @@ export default {
       }
     }
   },
-
   async created() {
     Object.freeze(this.header_list_data)
     this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
   },
-  async mounted() {
-    // await this.getData()
-
-    // this.initEcharts1()
-    // this.chart_resize()
-  },
-
   methods: {
     async get_controlChartSon_data() {
       if (!this.form.date || this.form.date.length === 0) {
@@ -325,7 +319,7 @@ export default {
       }
       const param = {
         'controlChartSonId': this.controlChartSonId,
-        'controlChartType': this.parseChartType[this.controlChartType],
+        'controlChartType': this.chartTypeNum,
         'dataType': this.form.dataType || '',
         'inspectionNum': this.form.inspectionNum || '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
@@ -333,10 +327,7 @@ export default {
       }
       const { code, data } = await this.$api.controlChartSon_data(param)
       if (code === '200' && data) {
-        // console.log(this.data)
-        return {
-          data
-        }
+        return { data }
       }
     },
     excel_import_dialog_btn() {
@@ -348,94 +339,31 @@ export default {
     excel_import_close() {
       this.excel_import_dialog = false
     },
-    getChartData() {
-      this.chartData = {}
-    },
     async setChart() {
       // const res4 = this.chartData // 请求
       // const res4 = chartData// 请求
       // this.getChartData()
       const res4 = await this.get_controlChartSon_data()
       console.log('res4', res4)
-
-      const type = this.parseChartType[this.controlChartType]
-      // if (this.controlChartType === 'XBar-R') {
-      //   type = '1'
-      // }
-      // const type = 1
-      if (type === 1) {
+      if (this.chartTypeNum === 1) {
         const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
-
         this.myEcharts.line1 = chart[0]
         this.myEcharts.line2 = chart[1]
-
         if (this.activeName === 'bar') {
           this.$refs['normal'].add_show1(res4.data)
         }
-        // this.arr.label59 = res4.data.label59
-        // this.arr.subgroupSize = res4.data.label59
-        // this.arr.USL = res4.data.USL
-        // this.arr.LSL = res4.data.LSL
-        // this.arr.Tol = res4.data['USL-LSL']
-        // this.arr.Cr = res4.data.vCR
-        // this.arr.Cp = res4.data.vCp
-        // this.arr.Cpk = res4.data.vCPK
-        // this.arr.Zusl = res4.data.vZusl
-        // this.arr.Zlsl = res4.data.vZlsl
-        // this.arr.Cpl = res4.data.vCPL
-        // this.arr.Cpu = res4.data.vCPU
-        // this.arr.Cpm = res4.data.vCpm
-        // this.arr.Pr = res4.data.vPR
-        // this.arr.Pp = res4.data.vPp
-        // this.arr.Ppk = res4.data.vPpk
-        // this.arr.std_dev = res4.data.vs0
-        // this.arr.Max = res4.data.umax
-        // this.arr.Min = res4.data.umin
-        // this.arr.Range = res4.data['umax-umin']
-        // this.arr.r_bar = res4.data.label73
-        // this.arr.est = res4.data.vs
-        // this.arr.target = res4.data.target
-        // this.arr.label67 = res4.data.label67
-
-        // this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
-        // this.$refs['normal'].add_show1(res4.data)
-        // this.arr.label59 = res4.data.label59
-        // this.arr.subgroupSize = res4.data.label59
-        // this.arr.USL = res4.data.USL
-        // this.arr.LSL = res4.data.LSL
-        // this.arr.Tol = res4.data['USL-LSL']
-        // this.arr.Cr = res4.data.vCR
-        // this.arr.Cp = res4.data.vCp
-        // this.arr.Cpk = res4.data.vCPK
-        // this.arr.Zusl = res4.data.vZusl
-        // this.arr.Zlsl = res4.data.vZlsl
-        // this.arr.Cpl = res4.data.vCPL
-        // this.arr.Cpu = res4.data.vCPU
-        // this.arr.Cpm = res4.data.vCpm
-        // this.arr.Pr = res4.data.vPR
-        // this.arr.Pp = res4.data.vPp
-        // this.arr.Ppk = res4.data.vPpk
-        // this.arr.std_dev = res4.data.vs0
-        // this.arr.Max = res4.data.umax
-        // this.arr.Min = res4.data.umin
-        // this.arr.Range = res4.data['umax-umin']
-        // this.arr.r_bar = res4.data.label73
-        // this.arr.est = res4.data.vs
-        // this.arr.target = res4.data.target
-        // this.arr.label67 = res4.data.label67
-        // this.cpk = res4.data.vCPK
-      } else if (type === 2) {
+      } else if (this.chartTypeNum === 2) {
         // const res4 = Xbars_data
         this.myEcharts.xbars = this.$refs['xbars'].add_show2(res4.data)
         // this.arr.Cpk = res4.data.vCPK
-      } else if (type === 3) {
+      } else if (this.chartTypeNum === 3) {
         // const res4 = XMR_data
         this.myEcharts.xbarmr = this.$refs['xbarmr'].add_show3(res4.data)
         this.arr.Cpk = res4.data.vCPK
-      } else if (type === 4) {
+      } else if (this.chartTypeNum === 4) {
         // const res4 = p_data
         this.myEcharts.pchart = this.$refs['pchart'].add_show4(res4.data)
-      } else if (type === 5) {
+      } else if (this.chartTypeNum === 5) {
         this.myEcharts.npchart = this.$refs['npchart'].add_show5(res4.data)
       }
       this.chart_resize()
@@ -450,14 +378,9 @@ export default {
         this.get_final_header_list()
         this.$refs.dy_table && this.$refs.dy_table.refresh()
         this.$nextTick(() => {
-          // alert(1)
           this.setChart()
         })
-        // this.get_controlChartSon_data()
       }, 'init')
-      // this.$nextTick(() => {
-      //   this.setChart()
-      // })
     },
     clear() {
       this.inspectionRecords_data = {}
@@ -479,7 +402,6 @@ export default {
         this.$message('操作取消')
         return
       }
-
       const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
       const { code, data } = await this.$api.inspectionRecord_delete(ids)
       if (code === '200' && data) {
@@ -489,6 +411,7 @@ export default {
       }
     },
     get_final_header_list() {
+      // 非动态固定列（图类分类）
       if (['p', 'np'].includes(this.controlChartType)) {
         let h = ''
         if (this.controlChartType === 'p') {
@@ -504,13 +427,12 @@ export default {
           { prop: 'sd', label: '标准差', width: '120' },
           { prop: 'max', label: '最大值', width: '120' },
           { prop: 'min', label: '最小值', width: '120' }
-
         ]
         this.header_list.push(...h)
       }
       this.header_list.push({ prop: 'createUser', label: '录入用户', width: '120' })
 
-      // 动态表头
+      // 动态表头（样本值或不良项目分类）
       const parseNum = {
         1: 'One',
         2: 'Two',
@@ -525,7 +447,6 @@ export default {
       const { pointHierarchicalTypeIds, inspectionRecords, badDefinitionTitles, badDefinitionIds } = this.inspectionRecords_data
       this.pointHierarchicalTypeIds = pointHierarchicalTypeIds
       const arr = []
-      console.log('pointHierarchicalTypeIds', pointHierarchicalTypeIds)
       pointHierarchicalTypeIds.forEach(id => {
         const hierarchicalItem = this.hierarchicalTypes.find(item => item.id === id)
         if (hierarchicalItem) {
@@ -534,12 +455,10 @@ export default {
           list.label = hierarchicalItem.hierarchicalName
           list.width = '180'
           list.header_template = 'hierarchicalTypeValue'
-          // this.header_list.push(list)
           arr.push(list)
           this.dy_header_list.push(list)
         }
       })
-
       if (['p', 'np'].includes(this.controlChartType) && badDefinitionTitles.length !== 0) {
         this.badNames = {
           badDefinitionTitles,
@@ -550,7 +469,7 @@ export default {
           this.dy_header_list.push({ prop: 'value1', label: '抽检数', width: '180' })
         }
         badDefinitionTitles.forEach((item, index) => {
-          const list = {}
+          const list = {} // 自定义不良名 badValue + 数字
           list.prop = `badValue${index + 1}`
           list.label = item
           list.width = '180'
@@ -558,12 +477,11 @@ export default {
           this.dy_header_list.push(list)
         })
       }
-
-      // if (!this.sampleSize) return
       const sampleSize = inspectionRecords[0].sampleSize
       this.sampleSize = sampleSize || 0
 
       if (!['p', 'np'].includes(this.controlChartType)) {
+        // 不为p,np设置样本的动态表头
         for (let i = 1; i <= this.sampleSize; i++) {
           const list = {}
           list.prop = `value${i}`
@@ -571,11 +489,8 @@ export default {
           list.width = '120'
           arr.push(list)
           this.dy_header_list.push(list)
-        // this.header_list.push(list)
         }
       }
-
-      // console.log('this.header_list', this.header_list)
 
       this.header_list.splice(4, 0, ...arr)
     },
@@ -587,15 +502,10 @@ export default {
           this.setChart()
         })
       })
-      // await this.setData()
     },
     async get_inspectionRecords_data(callback, flag) {
-      const type = this.parseChartType[this.controlChartType]
-      // if (this.controlChartType === 'XBar-R') {
-      //   type = '1'
-      // }
       let params = {
-        controlChartType: type,
+        controlChartType: this.chartTypeNum,
         'controlChartSonId': this.controlChartSonId || 0,
         'dataType': this.form.dataType || '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
@@ -603,14 +513,13 @@ export default {
       }
       if (flag === 'init') {
         params = {
-          controlChartType: this.parseChartType[this.controlChartType],
+          controlChartType: this.chartTypeNum,
           'controlChartSonId': this.controlChartSonId || 0
         }
       }
       const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
       if (code === '200' && data) {
-        if (callback) callback(data)
-
+        if (callback) callback(data) // 添加和首次进入完成检验数据之后,需要重新设置时间
         if (flag === 'init') {
           this.form.date = !data.thisMonthStart ? null : [data.thisMonthStart, data.thisMonthEnd]
         }
@@ -627,37 +536,20 @@ export default {
       this.add_data_dialog = false
     },
     async add_data_dialog_confirm() {
-      // await this.set_new_inspectionRecords_data()
       await this.init()
       this.add_data_dialog = false
     },
     handleClick() {
-      const type = this.parseChartType[this.controlChartType]
-      if (type !== 1) return
+      if (this.chartTypeNum !== 1) return // 目前只有 X-bars能切换 tabs
       this.$nextTick(() => {
         if (this.activeName === 'bar') {
           this.myEcharts.bar1 = this.$refs['normal'].add_show1(chartData.data)
         }
-        // if (this.activeName === 'line') {
-        //   if (!Object.keys(this.myEcharts).includes('line')) {
-        //     if (this.activeName === 'bar') {
-        //       this.$refs['normal'].add_show1(chartData)
-        //     }
-        //     // this.initEcharts1()
-        //     // this.initEcharts2()
-        //   }
-        // }
-        // if (this.activeName === 'bar') {
-        //   if (!Object.keys(this.myEcharts).includes('bar1')) {
-        //     // this.initEcharts3()
-        //   }
-        // }
         this.chart_resize()
       })
     },
     async request_data({ page_no, page_size, table_data }) {
       if (!Object.hasOwnProperty.call(this.inspectionRecords_data, 'inspectionRecords')) return
-      // console.log(this.inspectionRecords_data)
       const { inspectionRecords } = this.inspectionRecords_data
       if (inspectionRecords[0].controlChartSonId === null) {
         return {
@@ -665,31 +557,21 @@ export default {
           total: 0
         }
       }
-
-      console.log(this.inspectionRecords_data)
-      // if(controlChartSonId)
       return {
         data: inspectionRecords.map((item, index) => {
+          // if
+          const badList = {} // objectList  装不良项目的 针对p,np
           if (['p', 'np'].includes(this.controlChartType)) {
-            const badList = {}
-            console.log(item)
             if (item.objectList) {
               item.objectList.forEach((item, index) => {
                 badList[`badValue${index + 1}`] = item.value
               })
             }
-
-            return {
-              ...item,
-              ...badList,
-              inspectionSerial: index + 1
-            }
-          } else {
-            return {
-              ...item,
-
-              inspectionSerial: index + 1
-            }
+          }
+          return {
+            ...item,
+            ...badList,
+            inspectionSerial: index + 1
           }
         }),
         total: inspectionRecords[0].id ? inspectionRecords.length : 0
@@ -705,7 +587,10 @@ export default {
       })
     },
 
-    get_column() {
+    get_excelColumn() {
+      // 获取excel的列号
+      // 1-26 A-Z
+      // 大于 26 AA AB AC 以此类推
       const columnList = {}
       this.dy_header_list.forEach((header, index) => {
         let str_big = String.fromCharCode('A'.charCodeAt(0) + index)
@@ -714,14 +599,10 @@ export default {
         }
         columnList[str_big] = header.label
       })
-      // console.log(columnList)
-
       return columnList
     },
     download_template() {
-      // dy_header_list
-      const columnList = this.get_column()
-      // alert(1)
+      const columnList = this.get_excelColumn()
       // var data = [{
       //   'a': 1,
       //   'x': 2,
@@ -747,7 +628,6 @@ export default {
       //   E: '列E'
       // })
       table.push(columnList)
-
       // data.forEach(function(item) {
       //   var row = {
       //     A: item.b,
@@ -808,15 +688,6 @@ export default {
       if (data) {
         this.download_excel(data, '检验记录报表')
       }
-      //       {
-      //   "controlChartSonId": 0,
-      //   "controlChartType": 0,
-      //   "dataType": "",
-      //   "excelName": "",
-      //   "isNoInspectionRecord": 0,
-      //   "thisMonthEnd": "",
-      //   "thisMonthStart": ""
-      // }
     }
 
   }

@@ -3,27 +3,8 @@
     <container-layout ref="contenter">
       <template v-slot:btns>
         <div style="text-align: right;">
-          <!-- <ki-button
-            type="primary"
-            :auto-loading="true"
-            @click="cc(...arguments,'1111')"
-          >修改</ki-button>
-          <el-reference
-            v-model="item2"
-            type="select-dialog-template"
-            style="margin:0 10px"
-          >
-            <ki-button type="warning">备选值</ki-button>
-          </el-reference> -->
-
-          <ki-button
-            type="primary"
-            @click="add"
-          >添加</ki-button>
-          <ki-button
-            type="warning"
-            @click="edit"
-          >修改</ki-button>
+          <ki-button type="primary" @click="add">添加</ki-button>
+          <ki-button type="warning" @click="edit">修改</ki-button>
           <ki-message-box
             :next="del"
             @click="del_btn"

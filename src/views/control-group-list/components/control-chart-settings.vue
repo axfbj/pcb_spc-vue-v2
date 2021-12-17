@@ -182,13 +182,6 @@
       @handleClose="keyword_dialog_close"
       @confirm="keyword_dialog_confirm"
     />
-
-    <!-- <bad-group-dialog
-      :select-row="select_row"
-      :visible="badGroup_dialog"
-      @handleClose="badGroup_close"
-      @confirm="badGroup_confirm"
-    /> -->
   </ki-dialog>
 
 </template>
@@ -197,14 +190,12 @@
 import DiscriminationRulesDialog from './discrimination-rules-dialog'
 import SelectKeywordDialog from './select-keyword-dialog'
 import ControlChartSettingsData from './mixins/control-chart-settings-data'
-// import BadGroupDialog from './bad-group-dialog'
 import { dateformat } from '@/utils/date-method'
 export default {
   name: 'ControlChartSettings',
   components: {
     DiscriminationRulesDialog,
     SelectKeywordDialog
-    // BadGroupDialog
   },
   mixins: [ControlChartSettingsData],
   props: {
@@ -227,6 +218,13 @@ export default {
   },
   data() {
     return {
+      parseChartType: {
+        'Xbar-R': 1,
+        'Xbar-s': 2,
+        'X-MR': 3,
+        'p': 4,
+        'np': 5
+      },
 
       disabledSelectArr: [],
       updateKeys: [],
@@ -270,7 +268,6 @@ export default {
   //     // },
   // },
   created() {
-    // console.log('Datejs', dateformat(new Date()))
   },
   methods: {
     g1ucl_change(val) {
@@ -290,13 +287,6 @@ export default {
       this.badGroup_dialog = true
     },
     async add_inspection_items(select_data) {
-      // const temp = {
-      //   inspectionItemsId: select_data.id,
-      //   inspectionName: select_data.inspectionName
-      // }
-      // 'controlChartName': this.treePath,
-      // 'controlChartType': ,
-      // 'controlGroupId': 0,
       const temp = {
         inspectionName: select_data.inspectionName,
         inspectionItemsId: select_data.id,
@@ -343,8 +333,6 @@ export default {
       }
       if (['p'].includes(this.controlChartType)) {
         temp.sampleSize = undefined
-        //    'discriminationRules': 'R0',
-        // 'discriminationRulesStr': 'R0',
         temp.discriminationRules = 'R1-1-3'
         temp.discriminationRulesStr = 'R1-1-3'
       }
@@ -352,7 +340,6 @@ export default {
         temp.sampleSize = 100
         temp.discriminationRules = 'R1-1-3'
         temp.discriminationRulesStr = 'R1-1-3'
-        // temp.discriminationRulesStr = 'R1-1-3'
       }
 
       const { code, data } = await this.$api.controlChartSon_generateCode()
@@ -367,7 +354,6 @@ export default {
         ...item,
         rowNumber: index + 1
       }))
-      // this.form = temp
       this.select_row = { rowNumber: this.t_data[this.t_data.length - 1].rowNumber }
       this.$refs.dy_table.refresh()
     },
@@ -436,7 +422,7 @@ export default {
       this.$emit('handleClose')
     },
     async confirm({ loading }) {
-      // loading(true)
+      loading(true)
       const parmas = this.save_chart_data()
       if (this.settingFlag !== 'update') {
         parmas.controlChartId = 0
@@ -444,9 +430,7 @@ export default {
         parmas.controlChartId = this.controlChartId
         parmas.controlChartSonEntityS = parmas.controlChartSonEntityS.filter(item => !Object.hasOwnProperty.call(item, 'controlChartId'))
       }
-      // const p = this.t_data.filter(item => Object.hasOwnProperty.call(item, 'controlChartId'))
       if (parmas.controlChartSonEntityS.length) {
-        // const { code, data } = await this.$api.controlChartSon_save(parmas)
         const { code } = await this.$api.controlChartSon_save(parmas)
         if (code === '200') {
           const atchUpdate = await this.controlChartSon_batchUpdate()
@@ -466,7 +450,6 @@ export default {
       })
       if (!p.length) return '0'
       const { code } = await this.$api.controlChartSon_batchUpdate(p)
-      // if (code === '200' && data) {
       if (code === '200') {
         this.$emit('confirm')
       }
@@ -481,7 +464,6 @@ export default {
       return o
     },
     async open() {
-      // alert(this.settingFlag)
       if (this.settingFlag !== 'update') return
       const { id, controlChartId, controlChartType } = this.selectRow[0]
       this.controlChartId = controlChartId
@@ -521,7 +503,6 @@ export default {
           this.form = this.t_data[idx]
         }
       } else {
-        console.log('select_data', select_data)
         this.form = select_data
       }
     },

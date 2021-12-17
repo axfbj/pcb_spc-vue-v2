@@ -110,47 +110,10 @@ export default {
             }
             return item
           })
-          // {
-          //   // 'chartHierarchicalType': 0,
-          //   chartHierarchicalTypeStr: this.form.chartHierarchicalTypeStr,
-          //   'controlChartCode': '',
-          //   'controlChartId': 0,
-          //   'customTitle': '',
-          //   'description': '',
-          //   'digit': 0,
-          //   'discriminationRulesId': 0,
-          //   'discriminationRulesStr': '1=1=test',
-          //   'g1cl': 0,
-          //   'g1lcl': 0,
-          //   'g1ucl': 0,
-          //   'g2cl': 0,
-          //   'g2lcl': 0,
-          //   'g2ucl': 0,
-          //   'id': 0,
-          //   'inspectionItemsId': '',
-          //   'lsl': 0,
-          //   'pointHierarchicalType': 0,
-          //   'pointHierarchicalTypeStr': '',
-          //   'sampleSize': 0,
-          //   'sl': 0,
-          //   'status': 0,
-          //   'updateDate': '',
-          //   'updateUserId': 0,
-          //   'usl': 0
-          // }
         ]
       }
       return params
-      // console.log(params)
-    //   this.$api.controlChartSon_save()
-    },
-    async get_ControlChartCode() {
-      const { code, data } = this.$api.controlChartSon_generateCode()
-      if (code === '200' && data) {
-        console.log(data)
-      }
     }
-
   }
 }
 

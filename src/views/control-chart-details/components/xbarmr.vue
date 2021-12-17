@@ -35,10 +35,11 @@ export default {
     }
   },
   mounted() {
-    this.xbarmrMychart = echarts.init(this.$refs.chart1)
+
   },
   methods: {
     add_show3(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+      this.xbarmrMychart = echarts.init(this.$refs.chart1)
       // 默认初始化（清空）
       this.vUCLr = ''
       this.vLCLr = ''

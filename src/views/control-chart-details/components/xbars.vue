@@ -36,10 +36,11 @@ export default {
     }
   },
   mounted() {
-    this.myChart = echarts.init(this.$refs.chart)
+
   },
   methods: {
     add_show2(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+      this.myChart = echarts.init(this.$refs.chart)
       // 默认初始化（清空）
       this.axisX = []
       this.xbar = []

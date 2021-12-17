@@ -306,7 +306,6 @@ export default {
       headers.push(o)
     })
     this.header_list.splice(inx, 1, ...headers)
-    // console.log(this.header_list)
   },
   methods: {
     badGroup_btn() {
@@ -494,12 +493,10 @@ export default {
             states: this.formatter_states(item)
           })),
           total: data.totalCount
-
         }
       }
     },
     select_callback(data) {
-      // console.log('select_callback：  ', JSON.stringify(data))
     }
   }
 }

@@ -27,10 +27,11 @@ export default {
     }
   },
   mounted() {
-    this.npMychart = echarts.init(this.$refs.chart1)
+
   },
   methods: {
     add_show5(res) {
+      this.npMychart = echarts.init(this.$refs.chart1)
       // 默认初始化（清空）
       this.Series3 = []
       this.axisX = []

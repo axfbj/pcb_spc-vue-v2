@@ -278,7 +278,7 @@ export default {
       //   }
       // }
       // else {
-      //   orm.numberOfGroups = in
+      //   orm.numberOfGroups = i
       // }
       const p = {
         controlChartSonId: this.controlChartSonId,
@@ -361,12 +361,6 @@ export default {
     async confirm({ loading }) {
       this.$refs.form.validate((valid) => {
         if (!valid) return
-        // if (valid) {
-        //   alert('submit!')
-        // } else {
-        //   console.log('error submit!!')
-        //   return false
-        // }
         loading(true)
         if (this.flag === 'add') {
           this.add(loading)
@@ -386,7 +380,7 @@ export default {
       // param.
       const { code, data } = await this.$api.inspectionRecord_save(param)
       if (code === '200' && data) {
-        this.$emit('confirm')
+        this.$emit('confirm', data)
       } else {
         loading(false)
       }
@@ -403,7 +397,7 @@ export default {
       // param.createUser = 1
       const { code, data } = await this.$api.inspectionRecord_update(param)
       if (code === '200' && data) {
-        this.$emit('confirm')
+        this.$emit('confirm', data)
       } else {
         loading(false)
       }
@@ -427,8 +421,6 @@ export default {
           o.badName = item
           this.badNames_data.push(o)
         })
-        // this.badNames.badDefinitionTitles
-        // this.badNames_data =
       } else {
         this.size = []
         for (let i = 1; i <= this.sampleSize; i++) {
@@ -441,13 +433,11 @@ export default {
           // this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
         }
         if (this.flag === 'add') return
-        console.log('this.selectRow', this.selectRow)
-
-        this.form = {
-          ...this.selectRow
-        }
       }
-      // badNames
+      if (this.flag === 'add') return
+      this.form = {
+        ...this.selectRow
+      }
     },
     closed() {
       this.clear()

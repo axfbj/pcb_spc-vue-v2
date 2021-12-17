@@ -1,7 +1,7 @@
 <template>
   <ki-dialog
     :visible="visible"
-    title="数据导出"
+    title="检验数据导入"
     v-bind="$attrs"
     width="80%"
     top="5vh"

@@ -339,12 +339,13 @@ export default {
     excel_import_close() {
       this.excel_import_dialog = false
     },
-    async setChart() {
+    async setChart(callback) {
       // const res4 = this.chartData // 请求
       // const res4 = chartData// 请求
       // this.getChartData()
       const res4 = await this.get_controlChartSon_data()
-      console.log('res4', res4)
+      callback && callback()
+      // console.log('res4', res4)
       if (this.chartTypeNum === 1) {
         const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
         this.myEcharts.line1 = chart[0]
@@ -430,7 +431,7 @@ export default {
         ]
         this.header_list.push(...h)
       }
-      this.header_list.push({ prop: 'createUser', label: '录入用户', width: '120' })
+      this.header_list.push({ prop: 'createUser', label: '录入用户', minWidth: '120' })
 
       // 动态表头（样本值或不良项目分类）
       const parseNum = {
@@ -481,7 +482,7 @@ export default {
       this.sampleSize = sampleSize || 0
 
       if (!['p', 'np'].includes(this.controlChartType)) {
-        // 不为p,np设置样本的动态表头
+        // p,np 不设置样本的动态表头，设置不良项目
         for (let i = 1; i <= this.sampleSize; i++) {
           const list = {}
           list.prop = `value${i}`
@@ -495,6 +496,11 @@ export default {
       this.header_list.splice(4, 0, ...arr)
     },
     async set_new_inspectionRecords_data() {
+      if (!this.form.date) {
+        this.$message.warning('需要选择一个时间范围！')
+        return
+      }
+
       await this.get_inspectionRecords_data((data) => {
         this.inspectionRecords_data = data
         this.$refs.dy_table && this.$refs.dy_table.refresh()
@@ -503,18 +509,46 @@ export default {
         })
       })
     },
+    async set_new_inspectionRecords_data2(times) {
+      if (times) {
+        this.form.date = Object.hasOwnProperty.call(times, 'thisMonthStart')
+          ? [times.thisMonthStart, times.thisMonthEnd] : null
+      }
+
+      if (!this.form.date) {
+        this.$message.warning('需要选择一个时间范围！')
+        return
+      }
+
+      await this.setChart(async() => {
+        await this.get_inspectionRecords_data((data) => {
+          this.inspectionRecords_data = data
+          this.$refs.dy_table && this.$refs.dy_table.refresh()
+        })
+      })
+
+      // await this.get_inspectionRecords_data((data) => {
+      //   this.inspectionRecords_data = data
+      //   this.$refs.dy_table && this.$refs.dy_table.refresh()
+      //   this.$nextTick(() => {
+      //     this.setChart()
+      //   })
+      // })
+    },
     async get_inspectionRecords_data(callback, flag) {
       let params = {
         controlChartType: this.chartTypeNum,
         'controlChartSonId': this.controlChartSonId || 0,
         'dataType': this.form.dataType || '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
-        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : ''
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
+        'inspectionNum': this.form.inspectionNum
       }
       if (flag === 'init') {
         params = {
           controlChartType: this.chartTypeNum,
-          'controlChartSonId': this.controlChartSonId || 0
+          'controlChartSonId': this.controlChartSonId || 0,
+          'inspectionNum': this.form.inspectionNum
         }
       }
       const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
@@ -535,8 +569,9 @@ export default {
     add_data_close() {
       this.add_data_dialog = false
     },
-    async add_data_dialog_confirm() {
-      await this.init()
+    async add_data_dialog_confirm(times) {
+      // await this.init()
+      await this.set_new_inspectionRecords_data2(times)
       this.add_data_dialog = false
     },
     handleClick() {
@@ -559,7 +594,6 @@ export default {
       }
       return {
         data: inspectionRecords.map((item, index) => {
-          // if
           const badList = {} // objectList  装不良项目的 针对p,np
           if (['p', 'np'].includes(this.controlChartType)) {
             if (item.objectList) {
@@ -689,7 +723,6 @@ export default {
         this.download_excel(data, '检验记录报表')
       }
     }
-
   }
 }
 </script>

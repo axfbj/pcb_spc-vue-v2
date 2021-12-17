@@ -13,7 +13,6 @@
   <!-- </div> -->
 </template>
 <script>
-const echarts = require('echarts/lib/echarts') // 引入柱状图组件
 // Rb：<span style="margin-right:20px">{{ vab }}</span>
 export default {
   data() {
@@ -31,7 +30,7 @@ export default {
   },
   methods: {
     add_show5(res) {
-      this.npMychart = echarts.init(this.$refs.chart1)
+      this.npMychart = this.$echarts.init(this.$refs.chart1)
       // 默认初始化（清空）
       this.Series3 = []
       this.axisX = []
@@ -81,12 +80,12 @@ export default {
             // smooth: true, // 曲线有弧度
             symbol: 'circle',
             symbolSize: 8,
-            label: {
-              normal: {
-                show: true,
-                position: 'top'
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true,
+            //     position: 'top'
+            //   }
+            // },
             markLine: {
               silent: true,
               data: [

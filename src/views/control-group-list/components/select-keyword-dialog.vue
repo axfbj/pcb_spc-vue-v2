@@ -186,7 +186,7 @@ export default {
     },
     set_checkboxData() {
       const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.formData
-      const str1 = this.keywordFlag === 'level' ? chartHierarchicalTypeStr : pointHierarchicalTypeStr
+      const str1 = this.keywordFlag === 'level' ? (chartHierarchicalTypeStr || '') : (pointHierarchicalTypeStr || '')
       const ruleArr = str1.split(',')
       ruleArr.forEach(item => {
         const arr = item.split('=')

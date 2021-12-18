@@ -106,7 +106,8 @@ export default {
     },
     set_checkboxData() {
       const { discriminationRulesStr } = this.selectRow
-      const ruleArr = discriminationRulesStr.split(',')
+      const str = discriminationRulesStr || ''
+      const ruleArr = str.split(',')
       for (let index = 0; index < 9; index++) {
         this.form[`rule${index}`] = false
       }

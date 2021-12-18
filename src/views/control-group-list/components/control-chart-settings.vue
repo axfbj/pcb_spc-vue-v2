@@ -121,7 +121,7 @@
                 设置
               </ki-button>
             </el-form-item> -->
-            <el-form :model="form" label-width="auto" :inline="true" style="margin-top: 30px;">
+            <!-- <el-form :model="form" label-width="auto" :inline="true" style="margin-top: 30px;">
               <el-form-item>
                 <div style="width: 120px; text-align: right;">上图:</div>
               </el-form-item>
@@ -150,7 +150,7 @@
               <el-form-item prop="g2lcl">
                 <el-input-number v-model="form.g2lcl" :controls="false" type="number" style="width: 120px;" :disabled="['p','np'].includes(controlChartType)" />
               </el-form-item>
-            </el-form>
+            </el-form> -->
           </fieldset>
         </el-form>
       </el-col>
@@ -242,7 +242,8 @@ export default {
         { prop: 'sampleSize', label: '样本容量' },
         { prop: 'digit', label: '小数位数' },
         { prop: 'discriminationRulesStr', label: '判异规则' },
-        { prop: 'updateUser', label: '更新用户' },
+        // { prop: 'updateUser', label: '更新用户' },
+        { prop: 'userName', label: '更新用户' },
         { prop: 'updateDate', label: '更新时间' }
       ],
       t_data: []
@@ -322,6 +323,7 @@ export default {
         status: 1, // 	状态 1显示 0隐藏
         updateDate: dateformat(new Date()),
         updateUser: 'admin',
+        userName: 'admin',
         'updateUserId': 1, // 暂时固定传1
         usl: undefined
       }
@@ -424,6 +426,8 @@ export default {
     async confirm({ loading }) {
       loading(true)
       const parmas = this.save_chart_data()
+      console.log('parmas', parmas)
+      console.log('settingFlag', this.settingFlag)
       if (this.settingFlag !== 'update') {
         parmas.controlChartId = 0
       } else {

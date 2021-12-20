@@ -94,11 +94,6 @@ export default {
       }
     }
   },
-  computed: {
-    nodeKey() {
-      return this.nodeData.id
-    }
-  },
   methods: {
     handleClose() {
       this.$refs.form.resetFields()
@@ -125,7 +120,6 @@ export default {
           } else {
             discriminationRulesStr += `,R${i}`
           }
-
           for (let j = 1; j < 4; j++) {
             if (Object.hasOwnProperty.call(this.form, `rule${i}_data${j}`)) {
               discriminationRulesStr += `-${this.form[`rule${i}_data${j}`]}`
@@ -135,39 +129,8 @@ export default {
       }
       this.$emit('confirm', discriminationRulesStr)
     },
-    async add() {
-    },
-    async update() {
-    },
     async open({ load }) {
       this.set_checkboxData()
-      // const { discriminationRulesStr } = this.selectRow
-      // console.log(discriminationRulesStr)
-      // this.flag = this.$attrs.flag
-      // const json = {
-      //   'rule0': 'rulesOne',
-      //   'rule1': 'rulesTwo',
-      //   'rule2': 'rulesThree',
-      //   'rule3': 'rulesFour',
-      //   'rule4': 'rulesFive',
-      //   'rule5': 'rulesSix',
-      //   'rule6': 'rulesSeven',
-      //   'rule7': 'rulesEight',
-      //   'rule8': 'rulesNine'
-      // }
-      // if (Object.hasOwnProperty.call(this.selectRow, 'discriminationRulesId')) {
-      // const { discriminationRulesId } = this.selectRow
-
-      // const { code, data } = await load(() => this.$api.discriminationRules_info({ discriminationRulesId }))
-      // if (code === '200' && data) {
-      //   console.log('data', data)
-      //   for (const key in json) {
-      //     if (Object.hasOwnProperty.call(json, key)) {
-      //       this.form[key] = Boolean(data[json[key]])
-      //     }
-      //   }
-      // }
-      // }
     },
     closed() {
     }

@@ -225,7 +225,7 @@ export default {
         'p': 4,
         'np': 5
       },
-
+      has_del: false,
       disabledSelectArr: [],
       updateKeys: [],
       // badGroup_dialog: false,
@@ -310,7 +310,7 @@ export default {
         g2cl: undefined,
         g2lcl: undefined,
         g2ucl: undefined,
-        id: 0,
+        // id: 0, // 新增不传
         // 'inspectionItemsId': '',
         lsl: undefined,
         // 'pointHierarchicalType': 0, //不传
@@ -368,13 +368,17 @@ export default {
         this.$message('操作取消')
         return
       }
-      if (this.select_row.id) {
+      if (Object.hasOwnProperty.call(this.select_row, 'id')) {
         const { code, data } = await this.$api.controlChartSon_delete([this.select_row.id])
         if (code === '200' && data) {
-          this.select_row = {}
           this.$message.success('删除成功！')
+          this.has_del = true
+          this.t_data.splice(this.select_row.rowNumber - 1, 1)
           this.form = JSON.parse(JSON.stringify(this.form_data))
+          this.select_row = {}
           this.$refs.dy_table.refresh()
+        } else {
+          this.$message.warning('删除失败！')
         }
       } else {
         this.t_data.splice(this.select_row.rowNumber - 1, 1)
@@ -386,7 +390,7 @@ export default {
       this.keyword_flag = flag
       this.disabledSelectArr = []
       const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.form
-      const str1 = this.keyword_flag === 'level' ? pointHierarchicalTypeStr : chartHierarchicalTypeStr
+      const str1 = this.keywordFlag === 'level' ? (chartHierarchicalTypeStr || '') : (pointHierarchicalTypeStr || '')
       const ruleArr = str1.split(',')
       ruleArr.forEach(item => {
         const arr = item.split('=')
@@ -421,41 +425,54 @@ export default {
     },
     handleClose() {
       this.$refs.form.resetFields()
-      this.$emit('handleClose')
+      this.$emit('handleClose', this.has_del)
+      // if (this.has_del) {
+      //   this.$emit('handleClose', 'refresh')
+      // } else {
+      //   this.$emit('handleClose')
+      // }
     },
     async confirm({ loading }) {
       loading(true)
-      const parmas = this.save_chart_data()
-      console.log('parmas', parmas)
-      console.log('settingFlag', this.settingFlag)
-      if (this.settingFlag !== 'update') {
+      if (this.settingFlag === 'add') {
+        const parmas = this.save_chart_data()
         parmas.controlChartId = 0
-      } else {
-        parmas.controlChartId = this.controlChartId
-        parmas.controlChartSonEntityS = parmas.controlChartSonEntityS.filter(item => !Object.hasOwnProperty.call(item, 'controlChartId'))
-      }
-      if (parmas.controlChartSonEntityS.length) {
         const { code } = await this.$api.controlChartSon_save(parmas)
         if (code === '200') {
-          const atchUpdate = await this.controlChartSon_batchUpdate()
-          if (atchUpdate === '0') {
-            this.$emit('confirm')
-          }
+          this.$emit('confirm')
         } else {
           loading(false)
         }
       } else {
-        this.controlChartSon_batchUpdate()
+        const parmas = this.save_chart_data()
+        const original = JSON.parse(JSON.stringify(parmas.controlChartSonEntityS))
+        parmas.controlChartId = this.controlChartId
+        parmas.controlChartSonEntityS = original.filter(item => !Object.hasOwnProperty.call(item, 'id'))
+        const p = original.filter(item => {
+          return Object.hasOwnProperty.call(item, 'id') && Object.hasOwnProperty.call(item, 'pointHierarchicalTypeStr')
+        })
+        if (parmas.controlChartSonEntityS.length > 0) {
+          const { code } = await this.$api.controlChartSon_save(parmas)
+          if (code === '200') {
+            this.controlChartSon_batchUpdate(loading, p)
+          } else {
+            loading(false)
+          }
+        } else {
+          this.controlChartSon_batchUpdate(loading, p)
+        }
       }
     },
-    async controlChartSon_batchUpdate() {
-      const p = this.t_data.filter(item => {
-        return Object.hasOwnProperty.call(item, 'controlChartId') && Object.hasOwnProperty.call(item, 'pointHierarchicalType')
-      })
-      if (!p.length) return '0'
+    async controlChartSon_batchUpdate(loading, p) {
+      if (p.length === 0) {
+        this.$emit('confirm')
+        return
+      }
       const { code } = await this.$api.controlChartSon_batchUpdate(p)
       if (code === '200') {
         this.$emit('confirm')
+      } else {
+        loading(false)
       }
     },
     formatNullValue(obj) {
@@ -485,9 +502,11 @@ export default {
         this.tree_path = t_data.length > 0 ? t_data[0].controlChartName : ''
         this.controlChartType = t_data.length > 0 ? t_data[0].controlChartType : ''
         this.t_data = t_data
-        this.select_row = {
-          rowNumber: t_data.find(item => item.id === id).rowNumber
-        }
+        const f = t_data.find(item => item.id === id)
+        this.select_row = f ? { rowNumber: f.rowNumber } : {}
+        // this.select_row = {
+        //   rowNumber: t_data.find(item => item.id === id).
+        // }
         this.$refs.dy_table.refresh()
       }
     },
@@ -513,15 +532,16 @@ export default {
     closed() {
       this.clear()
     },
-    request_data({ page_no, page_size, table_data }) {
-      return new Promise(resolve => {
-        return resolve(
-          {
-            data: this.t_data,
-            total: this.t_data.length
+    async request_data({ page_no, page_size, table_data }) {
+      return {
+        data: this.t_data.map((item, index) => {
+          return {
+            ...item,
+            rowNumber: index + 1
           }
-        )
-      })
+        }),
+        total: this.t_data.length
+      }
     }
   }
 }

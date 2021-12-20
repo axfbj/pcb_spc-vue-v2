@@ -28,8 +28,8 @@
           :readonly="true"
           :disabled="disabled"
           suffix-icon="el-icon-more"
-          @focus="open()"
-          @click.native="open()"
+          @focus="open"
+          @click.native="open"
         />
       </div>
 

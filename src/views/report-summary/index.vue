@@ -38,7 +38,7 @@
       :header-list="header_list"
       :request="request_data"
       :page-sizes="[999999]"
-      unique="序号"
+      :unique="unique"
     />
     <control-group-filtering
       :visible="controlGroup_filtering_dialog"
@@ -90,6 +90,7 @@ export default {
   data() {
     return {
       flag: '',
+      unique: '序号',
       export_flag: '',
       parseNum: {
         1: 'One',
@@ -123,6 +124,13 @@ export default {
     ...mapGetters(['hierarchicalTypes'])
   },
   methods: {
+    async request_data({ page_no, page_size, table_data }) {
+      console.log('this.t_data', this.t_data)
+      return {
+        data: this.t_data,
+        total: this.t_data.length
+      }
+    },
     process_capability_report_btn() {
       this.flag = 'control-group-filtering'
       this.controlGroup_filtering_dialog_btn()
@@ -186,7 +194,7 @@ export default {
           this.col_field_dialog_close()
         })
         this.form.colFieldKeys = colFieldKeys
-        console.log(this.form)
+        // console.log(this.form)
       //    form: {
       //   controlGroupKeys: [],
       //   colFieldKeys: [],
@@ -230,7 +238,7 @@ export default {
       this.filter_options_dialog = false
       this.form.filteOptions_data = filteOptions_data
       this.export_form = JSON.parse(JSON.stringify(this.form))
-      console.log(this.export_form)
+      // console.log(this.export_form)
       if (this.flag === 'control-group-filtering') {
         // console.log(this.form)
         // this.export_form = JSON.parse(JSON.stringify(this.form))

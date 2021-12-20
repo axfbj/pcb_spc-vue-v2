@@ -141,7 +141,10 @@ export default {
     },
     async opened({ loading }) {
     },
-    clear() {},
+    clear() {
+      this.checklist1 = []
+      this.checklist2 = []
+    },
     closed() {
       this.clear()
     }

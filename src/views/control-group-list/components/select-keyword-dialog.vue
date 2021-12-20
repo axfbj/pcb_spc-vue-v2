@@ -185,6 +185,7 @@ export default {
       this.form = JSON.parse(JSON.stringify(this.form_data))
     },
     set_checkboxData() {
+      // console.log('this.formData', this.formData)
       const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.formData
       const str1 = this.keywordFlag === 'level' ? (chartHierarchicalTypeStr || '') : (pointHierarchicalTypeStr || '')
       const ruleArr = str1.split(',')

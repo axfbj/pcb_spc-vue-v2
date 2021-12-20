@@ -1,4 +1,5 @@
 import { dateformat } from '@/utils/date-method'
+import { download_Blob } from '@/utils/download-files'
 export default {
   data() {
     return {
@@ -10,25 +11,11 @@ export default {
     }
   },
   methods: {
-    download_excel(data) {
-      const blob = new Blob([data])
-      const elink = document.createElement('a')
-      elink.download = `${dateformat(new Date())}.xls`
-      elink.style.display = 'none'
-      elink.href = URL.createObjectURL(blob)
-      document.body.appendChild(elink)
-      elink.click()
-      URL.revokeObjectURL(elink.href) // 释放URL 对象
-      document.body.removeChild(elink)
+    init_dyTable() {
+      this.t_data = []
+      this.header_list.splice(0, this.header_list.length)
+      this.$refs.dy_table.refresh()
     },
-
-    async request_data({ page_no, page_size, table_data }) {
-      return {
-        data: this.t_data,
-        total: this.t_data.length
-      }
-    },
-
     get_processCapabilityQueryParams(form_data) {
       const data = form_data
       const colFieldKeysObj = {}
@@ -38,7 +25,6 @@ export default {
 
       const params = {
         'excelName': `工序能力报表${dateformat(new Date())}`,
-
         'allSD': 0,
         'average': 0,
         'ca': 0,
@@ -119,6 +105,7 @@ export default {
       //   'msg': '操作成功'
       // }
       this.unique = '序号'
+      this.init_dyTable()
       if (code === '200' && data) {
         if (data.length === 0) {
           this.header_list = this.header_list_none
@@ -148,17 +135,7 @@ export default {
     async processCapabilityExcel_export() {
       const data = await this.$api.processCapabilityExcel(this.get_processCapabilityQueryParams(this.export_form))
       if (data) {
-        this.download_excel(data)
-        // window.open(data)
-        // const blob = new Blob([data])
-        // const elink = document.createElement('a')
-        // elink.download = `工序能力报表${dateformat(new Date())}.xls`
-        // elink.style.display = 'none'
-        // elink.href = URL.createObjectURL(blob)
-        // document.body.appendChild(elink)
-        // elink.click()
-        // URL.revokeObjectURL(elink.href) // 释放URL 对象
-        // document.body.removeChild(elink)
+        download_Blob({ data, fileName: `工序能力报表${dateformat(new Date())}.xls` })
       }
     },
     get_abnormalPointExcelQueryParams(form_data) {
@@ -256,10 +233,10 @@ export default {
         }),
         { prop: 'abnormalInformation', label: '失控信息' },
         { prop: 'abnormalReason', label: '失控原因' }
-
       ]
-      this.unique = 'controlChartSonId'
-      this.header_list = header_list
+      this.unique = 'serialNumber'
+      this.init_dyTable()
+      this.header_list.push(...header_list)
 
       if (code === '200' && data) {
         this.export_disabled = false
@@ -277,8 +254,7 @@ export default {
     async abnormalPointExcel_export() {
       const data = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams(this.export_form))
       if (data) {
-        // window.open(data)
-        this.download_excel(data)
+        download_Blob({ data, fileName: `失控点报表${dateformat(new Date())}.xls` })
       }
     },
     get_yieldRateReportExcelQueryParams(form_data) {
@@ -372,7 +348,9 @@ export default {
         ] }
       ]
       this.unique = 'serialNumber'
-      this.header_list = header_list
+      this.init_dyTable()
+      this.header_list.push(...header_list)
+      // this.header_list = header_list
       if (code === '200' && data) {
         this.export_disabled = false
         this.t_data = data.map((item, index) => {
@@ -388,10 +366,8 @@ export default {
     },
     async yieldRateReportExcel_export() {
       const data = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams(this.export_form))
-
       if (data) {
-        this.download_excel(data)
-        // window.open(data)
+        download_Blob({ data, fileName: `良品率报表${dateformat(new Date())}.xls` })
       }
     }
   }

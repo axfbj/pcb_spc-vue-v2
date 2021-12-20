@@ -1,3 +1,4 @@
+import { deepClone } from '@/utils'
 export default {
   props: {
     controlGroupId: {
@@ -91,9 +92,11 @@ export default {
       this.inspection_items_select = { }
       this.disabledSelectArr = []
       this.$refs.dy_table.refresh()
+
+      this.has_del = false
     },
     save_chart_data() {
-      const t_data = Array.from(this.t_data)
+      const t_data = deepClone(this.t_data)
       const params = {
         controlChartName: this.treePath,
         controlChartType: this.controlChartType,

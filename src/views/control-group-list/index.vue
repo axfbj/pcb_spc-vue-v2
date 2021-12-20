@@ -167,6 +167,7 @@
         </template>
       </container-layout>
     </el-col>
+    <!-- 控制图设置弹框 -->
     <control-chart-settings
       :control-group-id="current_tree_node_key"
       :visible="chartSetting_dialog"
@@ -174,9 +175,10 @@
       :tree-path="path"
       :setting-flag="control_chart_settings_flag"
       :select-row="select_row"
-      @handleClose="chartSetting_dialog=false"
+      @handleClose="control_chart_settings_close"
       @confirm="control_chart_settings_confirm"
     />
+    <!-- 树图添加节点 -->
     <add-group-tree-dialog
       :visible="add_group_tree_dialog"
       :flag="tree_flag"
@@ -184,7 +186,7 @@
       @handleClose="tree_dialog_close"
       @confirm="tree_confirm"
     />
-
+    <!-- 不良定义分组 -->
     <bad-group-dialog
       :select-row="select_row"
       :visible="badGroup_dialog"
@@ -200,6 +202,7 @@ import { AllowCreateSelect } from '@/components/form-item'
 import Rectangle from './components/status-graph/rectangle'
 import RoundShape from './components/status-graph/round-shape'
 import StatusFlag from './components/status-graph/status-flag'
+
 import ControlChartSettings from './components/control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
@@ -249,7 +252,7 @@ export default {
         { flag: 'last', state: '2', text: '最后点已处理' }
       ],
       item2: {},
-      header_list: [
+      header_data: [
         { prop: 'id', label: '控制图ID', width: '180' },
         { prop: 'states', label: '状态', width: '80', template: 'states' },
         { prop: 'controlChartCode', label: '编号', width: '180' },
@@ -291,21 +294,26 @@ export default {
     ...mapGetters(['hierarchicalTypes']),
     current_tree_node_key() {
       return this.current_tree_node_data.id
+    },
+    header_list() {
+      const inx = this.header_data.indexOf('$1')
+      const temp_headers = JSON.parse(JSON.stringify(this.header_data))
+      const headers = []
+      this.hierarchicalTypes.forEach(item => {
+        const o = {
+          prop: `hierarchicalTypeValue${this.parseNum[item.serialNumber]}`,
+          label: item.hierarchicalName,
+          width: '150',
+          template: 'hierarchicalType'
+        }
+        headers.push(o)
+      })
+      temp_headers.splice(inx, 1, ...headers)
+      return temp_headers
     }
   },
   created() {
-    const inx = this.header_list.indexOf('$1')
-    const headers = []
-    this.hierarchicalTypes.forEach(item => {
-      const o = {
-        prop: `hierarchicalTypeValue${this.parseNum[item.serialNumber]}`,
-        label: item.hierarchicalName,
-        width: '150',
-        template: 'hierarchicalType'
-      }
-      headers.push(o)
-    })
-    this.header_list.splice(inx, 1, ...headers)
+    Object.freeze(this.header_data)
   },
   methods: {
     badGroup_btn() {
@@ -323,7 +331,7 @@ export default {
     toDetils() {
       this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id, controlChartType: this.select_row[0].controlChartType }})
     },
-    formatter_states(row) {
+    formatter_states(row) { // 格式化控制图状态
       const { historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle } = row
       const { lastPointNotOutOfControl, lastPointNotHandle, lastPointHandle } = row
       const historicalPoint = [historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle]
@@ -366,6 +374,10 @@ export default {
     control_chart_settings_confirm() {
       this.chartSetting_dialog = false
       this.$refs.dy_table.refresh()
+    },
+    control_chart_settings_close(refresh) {
+      this.chartSetting_dialog = false
+      refresh && this.$refs.dy_table.refresh({ keep: true })
     },
     path_change(path) {
       this.path = path

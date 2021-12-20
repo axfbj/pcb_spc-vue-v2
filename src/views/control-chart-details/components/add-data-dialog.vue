@@ -36,7 +36,7 @@
           </el-col>
 
           <template v-for="item in hierarchicalTypes">
-            <el-col v-if="pointHierarchicalTypeIds.includes(item.id)" :key="item.id" :span="12">
+            <el-col v-if="pointHierarchicalType_Ids.includes(item.id)" :key="item.id" :span="12">
               <el-form-item :label="`${item.hierarchicalName}:`">
                 <allow-create-select
                   v-model="form[`hierarchicalTypeValue${parseNum[item.serialNumber]}`]"
@@ -129,10 +129,12 @@ export default {
       default: ''
     }
   },
+
   data() {
     return {
       size: [],
       badTemp: {},
+      pointHierarchicalType_Ids: [],
       badNames_data: [],
       // controlChartType: '',
       form: {},
@@ -203,14 +205,19 @@ export default {
     Object.freeze(this.form_data)
     // Object.freeze(this.rules_data)
     this.form = JSON.parse(JSON.stringify(this.form_data))
-    // this.rules = JSON.parse(JSON.stringify(this.rules_data))
+    this.rules = JSON.parse(JSON.stringify(this.rules_data))
   },
   methods: {
+    getSreach_time() {
+
+    },
     clear() {
       this.form = JSON.parse(JSON.stringify(this.form_data))
-      // this.rules = JSON.parse(JSON.stringify(this.rules_data))
+      this.rules = JSON.parse(JSON.stringify(this.rules_data))
       this.size = []
       this.badNames_data = []
+      this.pointHierarchicalType_Ids = []
+      this.$refs.form.resetFields()
     },
     async getHierarchicalType(id) {
       const { code, data } = await this.$api.keywordValue_list({
@@ -250,7 +257,7 @@ export default {
       if (['p', 'np'].includes(this.controlChartType)) {
         // form.badDefinitionMap = {}
         form.objectList = []
-        console.log(this.badNames_data)
+        // console.log(this.badNames_data)
         this.badNames_data.forEach((item, index) => {
           form.objectList[index] = {
             id: item.id,
@@ -261,7 +268,7 @@ export default {
         delete form.objectList
       }
 
-      this.pointHierarchicalTypeIds.forEach(id => {
+      this.pointHierarchicalType_Ids.forEach(id => {
         const hierarchicalItem = this.hierarchicalTypes.find(item => item.id === id)
         if (hierarchicalItem) {
           const k = `hierarchicalTypeValue${this.parseNum[hierarchicalItem.serialNumber]}`
@@ -403,10 +410,11 @@ export default {
       }
     },
     async open({ load }) {
+      this.pointHierarchicalType_Ids = this.pointHierarchicalTypeIds || []
       this.flag = this.$attrs.flag
       if (['p', 'np'].includes(this.controlChartType)) {
         if (this.controlChartType === 'np') {
-          // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
+          this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
           this.$set(this.form, 'value1', this.sampleSize)
         } else {
           // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
@@ -432,11 +440,13 @@ export default {
           this.size.push(o)
           // this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
         }
-        if (this.flag === 'add') return
       }
-      if (this.flag === 'add') return
-      this.form = {
-        ...this.selectRow
+      if (this.flag === 'add') {
+        this.$refs.form.resetFields()
+      } else {
+        this.form = {
+          ...this.selectRow
+        }
       }
     },
     closed() {

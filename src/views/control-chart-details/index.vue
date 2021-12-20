@@ -303,6 +303,7 @@ export default {
           if (this.controlChartSonId === controlChartSonId) return
           this.controlChartSonId = controlChartSonId
           this.controlChartType = this.$route.query.controlChartType
+          this.dispose_all_chart()
           this.init()
         }
       }
@@ -313,6 +314,13 @@ export default {
     this.header_list = JSON.parse(JSON.stringify(this.header_list_data))
   },
   methods: {
+    dispose_all_chart() {
+      for (const key in this.myEcharts) {
+        if (Object.hasOwnProperty.call(this.myEcharts, key)) {
+          this.myEcharts[key].dispose()
+        }
+      }
+    },
     async get_controlChartSon_data() {
       if (!this.form.date || this.form.date.length === 0) {
         return
@@ -345,7 +353,10 @@ export default {
       // this.getChartData()
       const res4 = await this.get_controlChartSon_data()
       callback && callback()
-      // console.log('res4', res4)
+      if (!res4) { // 返回undefined代表没有数据
+        this.dispose_all_chart()
+        return
+      }
       if (this.chartTypeNum === 1) {
         const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
         this.myEcharts.line1 = chart[0]
@@ -375,6 +386,7 @@ export default {
     async init() {
       this.clear()
       await this.get_inspectionRecords_data((data) => {
+        console.log('data', data)
         this.inspectionRecords_data = data
         this.get_final_header_list()
         this.$refs.dy_table && this.$refs.dy_table.refresh()
@@ -446,9 +458,9 @@ export default {
         9: 'Nine'
       }
       const { pointHierarchicalTypeIds, inspectionRecords, badDefinitionTitles, badDefinitionIds } = this.inspectionRecords_data
-      this.pointHierarchicalTypeIds = pointHierarchicalTypeIds
+      this.pointHierarchicalTypeIds = pointHierarchicalTypeIds || []
       const arr = []
-      pointHierarchicalTypeIds.forEach(id => {
+      this.pointHierarchicalTypeIds.forEach(id => {
         const hierarchicalItem = this.hierarchicalTypes.find(item => item.id === id)
         if (hierarchicalItem) {
           const list = {}
@@ -460,7 +472,7 @@ export default {
           this.dy_header_list.push(list)
         }
       })
-      if (['p', 'np'].includes(this.controlChartType) && badDefinitionTitles.length !== 0) {
+      if (['p', 'np'].includes(this.controlChartType) && badDefinitionTitles) {
         this.badNames = {
           badDefinitionTitles,
           badDefinitionIds
@@ -510,6 +522,7 @@ export default {
       })
     },
     async set_new_inspectionRecords_data2(times) {
+      console.log('times', times)
       if (times) {
         this.form.date = Object.hasOwnProperty.call(times, 'thisMonthStart')
           ? [times.thisMonthStart, times.thisMonthEnd] : null

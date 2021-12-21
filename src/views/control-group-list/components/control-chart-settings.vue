@@ -390,12 +390,13 @@ export default {
       this.keyword_flag = flag
       this.disabledSelectArr = []
       const { chartHierarchicalTypeStr, pointHierarchicalTypeStr } = this.form
-      const str1 = this.keywordFlag === 'level' ? (chartHierarchicalTypeStr || '') : (pointHierarchicalTypeStr || '')
+      const str1 = this.keyword_flag === 'level' ? (pointHierarchicalTypeStr || '') : (chartHierarchicalTypeStr || '')
       const ruleArr = str1.split(',')
       ruleArr.forEach(item => {
         const arr = item.split('=')
         if (arr[0]) this.disabledSelectArr.push(arr[0])
       })
+      console.log('disabledSelectArr', this.disabledSelectArr)
       this.select_keyword_dialog = true
     },
     keyword_dialog_close() {
@@ -403,6 +404,7 @@ export default {
       this.disabledSelectArr = []
     },
     keyword_dialog_confirm(info) {
+      console.log('info', info)
       this.select_keyword_dialog = false
       if (info) {
         for (const key in info) {
@@ -426,11 +428,6 @@ export default {
     handleClose() {
       this.$refs.form.resetFields()
       this.$emit('handleClose', this.has_del)
-      // if (this.has_del) {
-      //   this.$emit('handleClose', 'refresh')
-      // } else {
-      //   this.$emit('handleClose')
-      // }
     },
     async confirm({ loading }) {
       loading(true)
@@ -511,7 +508,6 @@ export default {
       }
     },
     opened() {
-      // this.form.hierarchicalName = this.selectRow.hierarchicalName
     },
     async select_callback(select_data) {
       if (select_data.id) {
@@ -526,7 +522,8 @@ export default {
           this.form = this.t_data[idx]
         }
       } else {
-        this.form = select_data
+        const idx = this.t_data.findIndex(item => select_data.rowNumber === item.rowNumber)
+        this.form = this.t_data[idx]
       }
     },
     closed() {

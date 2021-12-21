@@ -1,34 +1,10 @@
-// import request from '@/utils/request'
+import http from './http.js'
 
-export async function login(data) {
-  return {
-    'code': 20000,
-    'data': {
-      'token': 'admin-token'
-    }
-  }
-  // return new Promise((reject) => {
-  //   // reject({
-  //   //   'code': 20000,
-  //   //   'data': {
-  //   //     'token': 'admin-token'
-  //   //   }
-  //   // })
-
-  // })
-  // return request({
-  //   url: '/vue-element-admin/user/login',
-  //   method: 'post',
-  //   data
-  // })
+export function login(data) {
+  return http.post('/spc/user/login', data)
 }
 
-export async function getInfo(token) {
-//   return request({
-//     url: '/vue-element-admin/user/info',
-//     method: 'get',
-//     params: { token }
-//   })
+export async function getInfo(data) {
   return {
     'code': 20000,
     'data': {
@@ -40,18 +16,19 @@ export async function getInfo(token) {
       'name': 'Super Admin'
     }
   }
-  // return new Promise(() => {
-
-  // })
+  // return http.post(`/spc/user/info/${data.id}`, data, 'form')
 }
 
-export async function logout() {
-  return {
-    'code': 20000,
-    'data': 'success'
-  }
-//   return request({
-//     url: '/vue-element-admin/user/logout',
-//     method: 'post'
-//   })
+export function logout(data) {
+  return http.post('/spc/user/loginOut', data)
 }
+
+// export login(data) {
+//   return http.post('/spc/user/login', data)
+// }
+// export logout(data) {
+//   return http.post('/spc/user/loginOut', data)
+// }
+// export getInfo(data) {
+//   return http.post(`/spc/user/info/${data.id}`, data, 'form')
+// }

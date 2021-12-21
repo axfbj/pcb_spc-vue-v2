@@ -23,6 +23,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.fade-transform-enter-active, .fade-transform-leave-active {
+  transition-duration: .2s;
+}
 .app-main {
   /* 50= navbar  50  */
   min-width: 1024px;

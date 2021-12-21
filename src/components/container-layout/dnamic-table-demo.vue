@@ -74,7 +74,7 @@ export default {
   data() {
     return {
       header_list: [
-        { prop: 'doccode', label: 'doccode', width: '180' },
+        { prop: 'id', label: 'id', width: '180' },
         { prop: 'name', label: '姓名', width: '180' },
         { prop: 'address', label: '地址' }
       ],
@@ -111,6 +111,8 @@ export default {
     },
     request_data({ page_no, page_size, data }) {
       console.log('------------------', page_no, page_size)
+      page_no = Number(page_no)
+      page_size = Number(page_size)
       const total = 66
       const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
       return new Promise((resolve) => {
@@ -121,11 +123,11 @@ export default {
               name: '王小虎',
               address: '上海市普陀区金沙江路 1518 弄'
             }).map((i, index) => {
-              const doccode = (page_no - 1) * page_size + index
-              console.log(doccode)
+              const id = (page_no - 1) * page_size + index
+              console.log(id)
               return {
                 ...i,
-                doccode
+                id
               }
             }),
             total

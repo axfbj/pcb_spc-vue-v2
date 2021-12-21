@@ -10,7 +10,7 @@
     @closed="closed"
   >
     <div style="padding: 10px 40px;">
-      <el-form ref="form" :model="form" label-width="auto" :rules="rules">
+      <el-form ref="form" :model="form" label-width="100px" :rules="rules">
         <el-row :gutter="40">
           <el-col :span="12">
             <el-form-item label="抽检时间:" prop="inspectionData">
@@ -52,21 +52,20 @@
           <el-col v-for="item in size" :key="item.val" :span="12">
             <el-form-item :label="`${item.label}:`" :prop="item.val">
               <el-input-number v-model="form[item.val]" :controls="false" style="width: 100%;" />
-              <!-- <el-input v-model="form[item.val]" /> -->
             </el-form-item>
           </el-col>
 
           <el-col v-if="['p','np'].includes(controlChartType)" :span="12">
             <el-form-item label="抽检数" prop="value1">
               <el-input-number v-model="form.value1" :disabled="controlChartType === 'np'" :controls="false" style="width: 100%;" />
-              <!-- <el-input v-model="form[item.val]" /> -->
+
             </el-form-item>
           </el-col>
 
           <el-col v-for="(item,index) in badNames_data" :key="item.id" :span="12">
             <el-form-item :label="`${item.badName}:`" :prop="`badValue${index + 1}`">
               <el-input-number v-model="form[`badValue${index + 1}`]" :controls="false" style="width: 100%;" />
-              <!-- <el-input v-model="form[item.val]" /> -->
+
             </el-form-item>
           </el-col>
           <el-col :span="24">
@@ -91,7 +90,7 @@
 import { mapGetters } from 'vuex'
 import { AllowCreateSelect } from '@/components/form-item'
 export default {
-  name: 'DiscriminationRulesDialog',
+  name: 'AddInspectionRecordDialog',
   components: {
     AllowCreateSelect
   },
@@ -158,7 +157,8 @@ export default {
       },
       rules_data: {
         inspectionData: { required: true, message: '请填写检验时间', trigger: 'change' },
-        createData: { required: true, message: '请填写录入时间', trigger: 'change' }
+        createData: { required: true, message: '请填写录入时间', trigger: 'change' },
+        value1: { required: true, message: ``, trigger: 'change' }
       },
       rules: {},
 
@@ -413,17 +413,18 @@ export default {
       this.pointHierarchicalType_Ids = this.pointHierarchicalTypeIds || []
       this.flag = this.$attrs.flag
       if (['p', 'np'].includes(this.controlChartType)) {
+        this.rules[`value1`].message = '请填写抽检数'
         if (this.controlChartType === 'np') {
-          this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
           this.$set(this.form, 'value1', this.sampleSize)
+          this.rules[`value1`] = { required: true, message: ``, trigger: 'change' }
         } else {
-          // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
           this.$set(this.form, 'value1', undefined)
+          // this.rules[`value1`] = { required: true, message: `请填写抽检数`, trigger: 'change' }
         }
 
         this.badNames.badDefinitionTitles.forEach((item, index) => {
-          // this.rules[`badValue${index + 1}`] = { required: true, message: `请填写${item}`, trigger: 'change' }
           this.$set(this.form, `badValue${index + 1}`, undefined)
+          this.rules[`badValue${index + 1}`] = { required: true, message: `请填写${item}数量`, trigger: 'change' }
           const o = {}
           o.id = this.badNames.badDefinitionIds[index]
           o.badName = item
@@ -438,7 +439,7 @@ export default {
             label: `样本${i}`
           }
           this.size.push(o)
-          // this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
+          this.rules[o.val] = { required: true, message: `请填写${o.label}`, trigger: 'change' }
         }
       }
       if (this.flag === 'add') {

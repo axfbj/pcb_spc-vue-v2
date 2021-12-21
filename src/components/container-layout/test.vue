@@ -1,151 +1,38 @@
 <template>
   <el-row>
-    <container-title v-if="can_copy"><h2 style="color: red; text-align:center; width: 100%;">---点击复制按钮---</h2></container-title>
-    <container-layout style="background: #d9e8ff;">
-      <el-button-group v-for="item in icon_list" :key="item.name">
-        <template v-for="(title,text) in item">
-          <icon :key="text" :name="text" :title="title" @click.native="copy(text,title)" />
+    <el-col :span="4" style="">
+      1
+    </el-col>
+    <el-col :span="20">
+      <container-layout ref="contenter">
+        <!-- 表格 -->
+        <template v-slot:custum_content>
+          <dynamic-table
+            v-model="select"
+            :header-list="header_list"
+            :request="request_data"
+            :page-sizes="[30,60,120]"
+            fixed-height="100%"
+            @current-change="current_change"
+            @select="select_callback"
+          />
         </template>
-      </el-button-group>
-    </container-layout>
-    <container-layout v-model="select" :request="request_data" :page-sizes="[60,80,120]" @current-change="current_change" @select="select_callback">
-
-      <!-- 按钮组 -->
-      <!-- <template v-slot:btns>
-        <el-button-group>
-          <icon name="batch" title="批量" />
-          <icon name="excel" title="导入excel" />
-          <icon name="forcedel" title="强制删除" />
-
-          <icon name="upload" title="上传" />
-          <icon name="open" title="打开" />
-          <icon name="see" title="查看" />
-          <icon name="shrink" title="收缩" />
-
-          <icon name="spreadout" title="展开" />
-          <icon name="returnclose" title="返回" />
-          <icon name="approvalform" title="审批表" />
-          <icon name="calc" title="计算" />
-          <icon name="shift_group" title="分组" />
-          <icon name="addtable" title="生成表" />
-          <icon name="save" title="保存" />
-          <icon name="option" title="选项2" @click.native="copy($event)" />
-        </el-button-group>
-      </template> -->
-      <!-- 筛选表单 -->
-      <template v-slot:form>
-        <el-form-item label="单据日期:">
-          <el-col :span="11">
-            <el-date-picker v-model="form.date1" type="date" placeholder="选择日期" style="width: 100%;" />
-          </el-col>
-          <el-col class="line" :span="1">至</el-col>
-          <el-col :span="11">
-            <el-date-picker v-model="form.date1" type="date" placeholder="选择日期" style="width: 100%;" />
-          </el-col>
-        </el-form-item>
-        <el-form-item label="单据编号:">
-          <el-input v-model="form.name" style="width:150px" />
-        </el-form-item>
-        <el-form-item label="保险类别:">
-          <el-input v-model="form.name" style="width:150px" />
-        </el-form-item>
-        <el-form-item label="员工编号:">
-          <el-input v-model="form.name" style="width:150px" />
-        </el-form-item>
-
-        <el-form-item label="单据状态:">
-          <el-checkbox-group v-model="checkList">
-            <el-checkbox label="未提交" />
-            <el-checkbox label="待审批" />
-            <el-checkbox label="已审批" />
-            <el-checkbox label="已退回" />
-          </el-checkbox-group>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="dialogVisible = true">查询</el-button>
-        </el-form-item>
-      </template>
-      <!-- 表格 -->
-      <template v-slot:table>
-        <el-table-column
-          prop="doccode"
-          label="doccode"
-          width="180"
-        >
-          <template slot-scope="scope">
-            <el-link type="primary" @click="click_link">{{ scope.row.doccode }}</el-link>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="name"
-          label="姓名"
-          width="180"
-        />
-        <el-table-column
-          prop="address"
-          label="地址"
-          show-overflow-tooltip
-        />
-      </template>
-      <template v-slot:main_footer>
-        1111111111111111
-      </template>
-    </container-layout>
+      </container-layout>
+    </el-col>
   </el-row>
 
 </template>
 
 <script>
-import ContainerLayout from './index'
-import icon from '@/components/img-icon'
 
 export default {
-  name: 'Test',
-  components: {
-    ContainerLayout,
-    icon
-  },
+  name: 'DnamicTableDemo',
   data() {
     return {
-      can_copy: navigator.clipboard,
-      icon_list: [
-        { 'add': '新增' },
-        { 'edit': '编辑' },
-        { 'del': '删除' },
-        { 'submit': '提交' },
-        { 'unsubmit': '取消提交' },
-        { 'approval': '审批信息' },
-        { 'export': '导出' },
-        { 'import': '导入' },
-        { 'rolad': '刷新' },
-        { 'first': '首单' },
-        { 'up': '上单' },
-        { 'last': '末单' },
-        { 'sure': '确定' },
-        { 'clear': '取消' },
-        { 'search': '查询' },
-        { 'select': '选项' },
-        { 'approv': '审核' },
-        { 'unapprov': '反审核' },
-        { 'returns': '退回' },
-        { 'batch': '批量' },
-        { 'excel': '导入excel' },
-        { 'forcedel': '强制删除' },
-        { 'upload': '上传' },
-        { 'open': '打开' },
-        { 'see': '查看' },
-        { 'shrink': '收缩' },
-        { 'spreadout': '展开' },
-        { 'returnclose': '返回' },
-        { 'approvalform': '审批表' },
-        { 'calc': '计算' },
-        { 'shift_group': '分组' },
-        { 'generation_table': '生成表' },
-        { 'save': '保存' },
-        { 'option': '选项2' },
-        { 'lock': '锁定' },
-        { 'lock_key': '解锁' },
-        { 'calc2': '计算2' }
+      header_list: [
+        { prop: 'id', label: 'id', width: '180' },
+        { prop: 'name', label: '姓名', width: '180' },
+        { prop: 'address', label: '地址' }
       ],
       form: {
         name: '',
@@ -158,12 +45,13 @@ export default {
         desc: ''
       },
       checkList: ['选中且禁用', '复选框 A'],
+      select2: [],
+      select: {}
       // select: [{
-      //   doccode: 1
+      //   id: 1
       // }, {
-      //   doccode: 22
+      //   id: 22
       // }]
-      select: { doccode: 30 }
     }
   },
 
@@ -175,30 +63,153 @@ export default {
       this.$message.success('按钮已到剪贴板')
     },
     current_change(val) {
+      console.log('current_change')
       console.log(val)
     },
     request_data({ page_no, page_size, data }) {
       console.log('------------------', page_no, page_size)
-      const total = 166
+      page_no = Number(page_no)
+      page_size = Number(page_size)
+      const total = 66
       const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
+      console.log(list_num)
+      const d = {
+        'data': [
+          {
+            'id': '1',
+            'pid': '0',
+            'title': '统计过程控制',
+            'href': '',
+            'openType': '',
+            'type': 0,
+            'powerCode': '',
+            'children': [
+              {
+                'id': '2',
+                'pid': '1',
+                'title': '控制组列表',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              },
+              {
+                'id': '3',
+                'pid': '1',
+                'title': '层次信息定义',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              },
+              {
+                'id': '4',
+                'pid': '1',
+                'title': '检测项目定义',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              },
+              {
+                'id': '5',
+                'pid': '1',
+                'title': '不良项目定义',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              },
+              {
+                'id': '6',
+                'pid': '1',
+                'title': '失控点处理',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              },
+              {
+                'id': '7',
+                'pid': '1',
+                'title': '报表汇总',
+                'href': '',
+                'openType': '',
+                'type': 1,
+                'powerCode': ''
+              }
+            ]
+          },
+          {
+            'id': '8',
+            'pid': '0',
+            'title': '系统管理',
+            'href': '',
+            'openType': '',
+            'type': 0,
+            'powerCode': '',
+            'children': [
+              {
+                'id': '9',
+                'pid': '8',
+                'title': '用户管理',
+                'href': '',
+                'openType': '',
+                'type': 0,
+                'powerCode': ''
+              },
+              {
+                'id': '10',
+                'pid': '8',
+                'title': '权限管理',
+                'href': '',
+                'openType': '',
+                'type': 0,
+                'powerCode': ''
+              },
+              {
+                'id': '11',
+                'pid': '8',
+                'title': '角色管理',
+                'href': '',
+                'openType': '',
+                'type': 0,
+                'powerCode': ''
+              }
+            ]
+          },
+          {
+            'id': '298',
+            'pid': '0',
+            'title': '',
+            'href': '',
+            'openType': '',
+            'type': 0,
+            'powerCode': ''
+          }
+        ],
+        'code': '200',
+        'msg': '操作成功'
+      }
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve({
-            data: Array(list_num).fill({
-              date: '2016-05-02',
-              name: '王小虎',
-              address: '上海市普陀区金沙江路 1518 弄'
-            }).map((i, index) => {
-              const doccode = (page_no - 1) * page_size + index
-              console.log(doccode)
-              return {
-                ...i,
-                doccode
-              }
-            }),
-            total
+            data: d.data,
+            // data: Array(list_num).fill({
+            //   date: '2016-05-02',
+            //   name: '王小虎',
+            //   address: '上海市普陀区金沙江路 1518 弄'
+            // }).map((i, index) => {
+            //   const id = (page_no - 1) * page_size + index
+            //   console.log(id)
+            //   return {
+            //     ...i,
+            //     id
+            //   }
+            // }),
+            total: d.data.length
           })
-        }, 1000)
+        }, 10)
       })
     },
     select_callback(data) {

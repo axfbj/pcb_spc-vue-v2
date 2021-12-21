@@ -117,11 +117,12 @@ export default {
       this.vLCLr = res.vLCLr.toFixed(2)
       this.vab = res.Series11[0].y.toFixed(2)
       res.LineSeries3.forEach((i) => {
-        if (i.exceptionInformation) {
-          this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark, '异常信息': i.exceptionInformation })
-        } else {
-          this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark })
-        }
+        // if (i.exceptionInformation) {
+        this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark || '', inspectionRecordId: i.inspectionRecordId })
+        //   this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark || '', '异常信息': i.exceptionInformation })
+        // } else {
+        //   this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark || '' })
+        // }
         // const aaa = i.tdate.split(' ')[0]
         this.axisX.push(i.x)
         this.xbar.push(i.y)
@@ -133,51 +134,59 @@ export default {
         }
       })
       // 加入异常点
-      if (res.Series8.R0) {
-        res.Series8.R0.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R1) {
-        res.Series8.R1.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R2) {
-        res.Series8.R2.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R3) {
-        res.Series8.R3.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R4) {
-        res.Series8.R4.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R5) {
-        res.Series8.R5.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R6) {
-        res.Series8.R6.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R7) {
-        res.Series8.R7.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R8) {
-        res.Series8.R8.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
+      res.Series8.forEach(item => {
+        // console.log('i.', i)
+        this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: item.x, yAxis: item.y })
+        // 浮框内信息，确认有是个异常点，并添加上异常信息
+        const has_exceptionInformation_point = this.LineSeries3.find(i => item.inspectionRecordId === i.inspectionRecordId)
+        has_exceptionInformation_point['异常信息'] = item.exceptionInformation
+        // this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark || '', '异常信息': i.exceptionInformation })
+      })
+      // if (res.Series8.R0) {
+      //   res.Series8.R0.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R1) {
+      //   res.Series8.R1.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R2) {
+      //   res.Series8.R2.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R3) {
+      //   res.Series8.R3.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R4) {
+      //   res.Series8.R4.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R5) {
+      //   res.Series8.R5.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R6) {
+      //   res.Series8.R6.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R7) {
+      //   res.Series8.R7.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R8) {
+      //   res.Series8.R8.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
       // Series9
       if (res.Series9.length > 0) {
         res.Series9.forEach((i) => {
@@ -247,10 +256,17 @@ export default {
           // }
         },
         yAxis: {
-          max: this.max + 3,
-          min: this.min - 3,
+          max: this.max * 1.2,
+          min: this.min * 0.8,
           type: 'value',
-          splitLine: { show: false }
+          splitLine: { show: false },
+          axisLine: { show: true },
+          axisLabel: {
+            color: '#797979',
+            fontSize: 13,
+            showMinLabel: false, // 不显示最小刻度线值
+            showMaxLabel: false // 不显示最大刻度线值
+          }
         },
         series: [
           {
@@ -267,12 +283,12 @@ export default {
             // smooth: true, // 曲线有弧度
             symbol: 'circle',
             symbolSize: 8,
-            label: {
-              normal: {
-                show: true,
-                position: 'top'
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true,
+            //     position: 'top'
+            //   }
+            // },
             markLine: {
               silent: true,
               data: [
@@ -334,11 +350,11 @@ export default {
             itemStyle: {
               color: '#084081'
             },
-            label: {
-              normal: {
-                show: true
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true
+            //   }
+            // },
             markLine: {
               silent: true,
               data: [
@@ -381,11 +397,11 @@ export default {
               color: '#FF0000' // 这儿设置安全基线颜色
               // type: 'solid'
             },
-            label: {
-              normal: {
-                show: true
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true
+            //   }
+            // },
             markPoint: {
               symbol: 'circle',
               symbolSize: 12,
@@ -427,10 +443,18 @@ export default {
           // }
         },
         yAxis: {
-          min: this.vLCLr,
-          max: this.max1 + 3,
+          axisLine: { show: true },
+          min: this.vLCLr * 0.8,
+          // max: this.max1 + 3,
+          max: this.max1 * 1.2,
           type: 'value',
-          splitLine: { show: false }
+          splitLine: { show: false },
+          axisLabel: {
+            color: '#797979',
+            fontSize: 13,
+            showMinLabel: false, // 不显示最小刻度线值
+            showMaxLabel: false // 不显示最大刻度线值
+          }
         },
         series: [
           {
@@ -446,12 +470,12 @@ export default {
             // smooth: true, // 曲线有弧度
             symbol: 'circle',
             symbolSize: 8,
-            label: {
-              normal: {
-                show: true,
-                position: 'top'
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true,
+            //     position: 'top'
+            //   }
+            // },
             markLine: {
               silent: true,
               data: [
@@ -510,11 +534,11 @@ export default {
               color: '#FF0000' // 这儿设置安全基线颜色
               // type: 'solid'
             },
-            label: {
-              normal: {
-                show: true
-              }
-            },
+            // label: {
+            //   normal: {
+            //     show: true
+            //   }
+            // },
 
             markPoint: {
               symbol: 'circle',

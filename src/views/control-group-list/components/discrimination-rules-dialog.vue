@@ -33,10 +33,10 @@
           <el-checkbox v-model="form.rule6">R6：连续<el-input v-model="form.rule6_data1" class="rule-input" />点中有<el-input v-model="form.rule6_data2" class="rule-input" />点落在中心线同侧{{ form.rule6_data3 }}倍标准差以外</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
+          <el-checkbox v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧的{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />落在规格线以外</el-checkbox>
+          <el-checkbox v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule8_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
       </el-form>
     </div>
@@ -90,7 +90,8 @@ export default {
         rule6_data3: 1, //
         rule7_data1: 15,
         rule7_data2: 1,
-        rule8_data1: 8
+        rule8_data1: 8,
+        rule8_data2: 1
       }
     }
   },

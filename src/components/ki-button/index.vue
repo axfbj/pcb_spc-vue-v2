@@ -26,10 +26,6 @@ export default {
     size: {
       type: String,
       default: 'mini'
-    },
-    autoLoading: {
-      type: Boolean,
-      default: false
     }
   },
   data() {
@@ -38,14 +34,15 @@ export default {
     }
   },
   methods: {
+    set_loadingStatus(status) {
+      this.loadingStatus = status
+    },
     handleClick() {
       if (this.autoLoading) {
         this.loadingStatus = true
       }
       // console.log('this.$listeners', this.$listeners)
-      this.$emit('click', () => {
-        this.loadingStatus = false
-      })
+      this.$emit('click', this.set_loadingStatus)
     }
   }
 }

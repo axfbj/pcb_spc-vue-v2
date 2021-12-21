@@ -213,7 +213,7 @@ import xbarmr from './components/xbarmr'
 import pchart from './components/pchart'
 import npchart from './components/npchart'
 
-import chartData from './mixins/data'
+// import chartData from './mixins/data'
 // import Xbars_data from './mixins/Xbars_data'
 // import p_data from './mixins/p_data'
 // import XMR_data from './mixins/XMR_data'
@@ -235,6 +235,7 @@ export default {
   data() {
     return {
       arr: [],
+      chartData: [],
       add_dialog_flag: '',
       controlChartSonId: '',
       controlChartType: '',
@@ -298,13 +299,13 @@ export default {
   watch: {
     '$route.query.controlChartSonId': {
       immediate: true,
-      handler(controlChartSonId) {
+      async handler(controlChartSonId) {
         if (controlChartSonId) {
           if (this.controlChartSonId === controlChartSonId) return
           this.controlChartSonId = controlChartSonId
           this.controlChartType = this.$route.query.controlChartType
           this.dispose_all_chart()
-          this.init()
+          this.set_data('init')
         }
       }
     }
@@ -317,9 +318,33 @@ export default {
     dispose_all_chart() {
       for (const key in this.myEcharts) {
         if (Object.hasOwnProperty.call(this.myEcharts, key)) {
-          this.myEcharts[key].dispose()
+          !this.myEcharts[key].isDisposed() && this.myEcharts[key].dispose()
         }
       }
+    },
+    async set_data(flag) {
+      if (flag === 'init') {
+        const { code, data } = await this.get_inspectionRecordDate(this.controlChartSonId)
+        if (code === '200' && data) {
+          this.form.dataType = '1'
+          this.form.date = [data.thisMonthStart, data.thisMonthEnd]
+        } else {
+          this.clear()
+          return
+        }
+        this.clear()
+      }
+      const res = await this.get_controlChartSon_data()
+      await this.get_inspectionRecords_data((data) => {
+        this.inspectionRecords_data = data
+        if (this.dy_header_list.length <= 2) {
+          this.get_final_header_list()
+        }
+        this.$refs.dy_table && this.$refs.dy_table.refresh()
+        this.$nextTick(() => {
+          this.setChart(res)
+        })
+      })
     },
     async get_controlChartSon_data() {
       if (!this.form.date || this.form.date.length === 0) {
@@ -335,7 +360,22 @@ export default {
       }
       const { code, data } = await this.$api.controlChartSon_data(param)
       if (code === '200' && data) {
+        this.chartData = data
         return { data }
+      }
+    },
+    async get_inspectionRecords_data(callback, flag) {
+      const params = {
+        controlChartType: this.chartTypeNum,
+        'controlChartSonId': this.controlChartSonId || 0,
+        'dataType': this.form.dataType || '',
+        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
+        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
+        'inspectionNum': this.form.inspectionNum
+      }
+      const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
+      if (code === '200' && data) {
+        if (callback) callback(data) // 添加和首次进入完成检验数据之后,需要重新设置时间
       }
     },
     excel_import_dialog_btn() {
@@ -347,12 +387,12 @@ export default {
     excel_import_close() {
       this.excel_import_dialog = false
     },
-    async setChart(callback) {
+    async setChart(res) {
       // const res4 = this.chartData // 请求
       // const res4 = chartData// 请求
       // this.getChartData()
-      const res4 = await this.get_controlChartSon_data()
-      callback && callback()
+      const res4 = res
+      // callback && callback()
       if (!res4) { // 返回undefined代表没有数据
         this.dispose_all_chart()
         return
@@ -380,20 +420,13 @@ export default {
       }
       this.chart_resize()
     },
-    async query() {
-      await this.set_new_inspectionRecords_data()
-    },
-    async init() {
-      this.clear()
-      await this.get_inspectionRecords_data((data) => {
-        console.log('data', data)
-        this.inspectionRecords_data = data
-        this.get_final_header_list()
-        this.$refs.dy_table && this.$refs.dy_table.refresh()
-        this.$nextTick(() => {
-          this.setChart()
-        })
-      }, 'init')
+    async query(loading) {
+      if (!this.form.date) {
+        this.$message.warning('需要选择一个时间段！')
+      }
+      loading(true)
+      await this.set_data()
+      loading(false)
     },
     clear() {
       this.inspectionRecords_data = {}
@@ -404,6 +437,8 @@ export default {
         { prop: 'inspectionData', label: '抽检时间', width: '180' },
         { prop: 'createData', label: '录入时间', width: '180' }
       ]
+      this.chartData = []
+      this.dispose_all_chart()
       this.$refs.dy_table && this.$refs.dy_table.refresh()
     },
     del_btn(open) {
@@ -420,7 +455,7 @@ export default {
       if (code === '200' && data) {
         this.select_row = {}
         this.$message.success('删除成功！')
-        await this.init()
+        this.set_data()
       }
     },
     get_final_header_list() {
@@ -507,71 +542,6 @@ export default {
 
       this.header_list.splice(4, 0, ...arr)
     },
-    async set_new_inspectionRecords_data() {
-      if (!this.form.date) {
-        this.$message.warning('需要选择一个时间范围！')
-        return
-      }
-
-      await this.get_inspectionRecords_data((data) => {
-        this.inspectionRecords_data = data
-        this.$refs.dy_table && this.$refs.dy_table.refresh()
-        this.$nextTick(() => {
-          this.setChart()
-        })
-      })
-    },
-    async set_new_inspectionRecords_data2(times) {
-      console.log('times', times)
-      if (times) {
-        this.form.date = Object.hasOwnProperty.call(times, 'thisMonthStart')
-          ? [times.thisMonthStart, times.thisMonthEnd] : null
-      }
-
-      if (!this.form.date) {
-        this.$message.warning('需要选择一个时间范围！')
-        return
-      }
-
-      await this.setChart(async() => {
-        await this.get_inspectionRecords_data((data) => {
-          this.inspectionRecords_data = data
-          this.$refs.dy_table && this.$refs.dy_table.refresh()
-        })
-      })
-
-      // await this.get_inspectionRecords_data((data) => {
-      //   this.inspectionRecords_data = data
-      //   this.$refs.dy_table && this.$refs.dy_table.refresh()
-      //   this.$nextTick(() => {
-      //     this.setChart()
-      //   })
-      // })
-    },
-    async get_inspectionRecords_data(callback, flag) {
-      let params = {
-        controlChartType: this.chartTypeNum,
-        'controlChartSonId': this.controlChartSonId || 0,
-        'dataType': this.form.dataType || '',
-        'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
-        'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
-        'inspectionNum': this.form.inspectionNum
-      }
-      if (flag === 'init') {
-        params = {
-          controlChartType: this.chartTypeNum,
-          'controlChartSonId': this.controlChartSonId || 0,
-          'inspectionNum': this.form.inspectionNum
-        }
-      }
-      const { code, data } = await this.$api.inspectionRecord_queryByControlChartSonId(params)
-      if (code === '200' && data) {
-        if (callback) callback(data) // 添加和首次进入完成检验数据之后,需要重新设置时间
-        if (flag === 'init') {
-          this.form.date = !data.thisMonthStart ? null : [data.thisMonthStart, data.thisMonthEnd]
-        }
-      }
-    },
     add_data_dialog_btn(flag) {
       if (flag !== 'add') {
         if (!this.$refs.dy_table.one_row_select()) return
@@ -584,14 +554,15 @@ export default {
     },
     async add_data_dialog_confirm(times) {
       // await this.init()
-      await this.set_new_inspectionRecords_data2(times)
+      // await this.set_new_inspectionRecords_data2(times)
+      await this.set_data('init')
       this.add_data_dialog = false
     },
     handleClick() {
       if (this.chartTypeNum !== 1) return // 目前只有 X-bars能切换 tabs
       this.$nextTick(() => {
         if (this.activeName === 'bar') {
-          this.myEcharts.bar1 = this.$refs['normal'].add_show1(chartData.data)
+          this.myEcharts.bar1 = this.$refs['normal'].add_show1(this.chartData)
         }
         this.chart_resize()
       })
@@ -729,12 +700,16 @@ export default {
         'dataType': this.form.dataType || '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
         'thisMonthEnd': this.form.date ? (this.form.date[1] || '') : '',
-        'excelName': `检验记录报表${dateformat(new Date())}`
+        'excelName': `检验记录报表${dateformat(new Date())}`,
+        'inspectionNum': this.form.inspectionNum
       }
       const data = await this.$api.inspectionRecordExcel(params)
       if (data) {
         this.download_excel(data, '检验记录报表')
       }
+    },
+    async get_inspectionRecordDate(controlChartSonId) {
+      return await this.$api.inspectionRecord_queryInspectionRecordDate({ id: controlChartSonId })
     }
   }
 }

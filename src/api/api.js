@@ -8,7 +8,8 @@ import controlChartSon from './control-chart-son'
 import discriminationRules from './discrimination-rules'
 import inspectionRecord from './inspection-record'
 import controlChartAbnorma from './control-chart-abnorma'
-import ReportSummary from './report-summary'
+import reportSummary from './report-summary'
+import menuManagement from './menu-management'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -26,5 +27,6 @@ export default {
   ...discriminationRules,
   ...inspectionRecord,
   ...controlChartAbnorma,
-  ...ReportSummary
+  ...reportSummary,
+  ...menuManagement
 }

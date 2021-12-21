@@ -11,11 +11,6 @@ export default {
     }
   },
   methods: {
-    init_dyTable() {
-      this.t_data = []
-      this.header_list.splice(0, this.header_list.length)
-      this.$refs.dy_table.refresh()
-    },
     get_processCapabilityQueryParams(form_data) {
       const data = form_data
       const colFieldKeysObj = {}
@@ -70,7 +65,6 @@ export default {
       }
       return params
     },
-
     async processCapabilityExcelQuery_preview() {
       const { code, data } = await this.$api.processCapabilityExcelQuery(this.get_processCapabilityQueryParams(this.form))
       // const { code, data } = {
@@ -105,27 +99,29 @@ export default {
       //   'msg': '操作成功'
       // }
       this.unique = '序号'
-      this.init_dyTable()
       if (code === '200' && data) {
         if (data.length === 0) {
           this.header_list = this.header_list_none
           this.t_data = []
         } else {
-          this.header_list.splice(0, this.header_list.length)
-          for (const key in data[0]) {
-            if (Object.hasOwnProperty.call(data[0], key)) {
-              const head = { prop: key, label: key }
-              if (key === '控制组名称') {
-                head.width = '180'
+          // this.header_list.splice(0, this.header_list.length)
+          this.header_list = []
+          this.$nextTick(() => {
+            for (const key in data[0]) {
+              if (Object.hasOwnProperty.call(data[0], key)) {
+                const head = { prop: key, label: key }
+                if (key === '控制组名称') {
+                  head.width = '180'
+                }
+                if (key === '检测项目') {
+                  head.width = '140'
+                }
+                this.header_list.push(head)
               }
-              if (key === '检测项目') {
-                head.width = '180'
-              }
-              this.header_list.push(head)
             }
-          }
+            this.t_data = data
+          })
           this.export_disabled = false
-          this.t_data = data
         }
         this.$refs.dy_table.refresh()
       } else {
@@ -225,9 +221,9 @@ export default {
       // }
       const header_list = [
         { prop: 'serialNumber', label: '序号' },
-        { prop: 'controlChartName', label: '控制组名称' },
-        { prop: 'controlChartCode', label: '控制组编号' },
-        { prop: 'inspectionName', label: '检测项目' },
+        { prop: 'controlChartName', label: '控制组名称', minWidth: '180' },
+        { prop: 'controlChartCode', label: '控制组编号', minWidth: '140' },
+        { prop: 'inspectionName', label: '检测项目', minWidth: '180' },
         ... this.hierarchicalTypes.map((item) => {
           return { prop: `hierarchicalTypeValue${this.parseNum[item.serialNumber]}`, label: item.hierarchicalName }
         }),
@@ -235,21 +231,22 @@ export default {
         { prop: 'abnormalReason', label: '失控原因' }
       ]
       this.unique = 'serialNumber'
-      this.init_dyTable()
-      this.header_list.push(...header_list)
-
-      if (code === '200' && data) {
-        this.export_disabled = false
-        this.t_data = data.map((item, index) => {
-          return {
-            ...item,
-            serialNumber: index + 1
-          }
-        })
-        this.$refs.dy_table.refresh()
-      } else {
-        this.export_disabled = true
-      }
+      this.header_list = []
+      this.$nextTick(() => {
+        this.header_list.push(...header_list)
+        if (code === '200' && data) {
+          this.export_disabled = false
+          this.t_data = data.map((item, index) => {
+            return {
+              ...item,
+              serialNumber: index + 1
+            }
+          })
+          this.$refs.dy_table.refresh()
+        } else {
+          this.export_disabled = true
+        }
+      })
     },
     async abnormalPointExcel_export() {
       const data = await this.$api.abnormalPointExcel(this.get_abnormalPointExcelQueryParams(this.export_form))
@@ -348,21 +345,22 @@ export default {
         ] }
       ]
       this.unique = 'serialNumber'
-      this.init_dyTable()
-      this.header_list.push(...header_list)
-      // this.header_list = header_list
-      if (code === '200' && data) {
-        this.export_disabled = false
-        this.t_data = data.map((item, index) => {
-          return {
-            ...item,
-            serialNumber: index + 1
-          }
-        })
-        this.$refs.dy_table.refresh()
-      } else {
-        this.export_disabled = true
-      }
+      this.header_list = []
+      this.$nextTick(() => {
+        this.header_list.push(...header_list)
+        if (code === '200' && data) {
+          this.export_disabled = false
+          this.t_data = data.map((item, index) => {
+            return {
+              ...item,
+              serialNumber: index + 1
+            }
+          })
+          this.$refs.dy_table.refresh()
+        } else {
+          this.export_disabled = true
+        }
+      })
     },
     async yieldRateReportExcel_export() {
       const data = await this.$api.yieldRateReportExcel(this.get_yieldRateReportExcelQueryParams(this.export_form))

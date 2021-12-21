@@ -91,6 +91,28 @@ export const constantRoutes = [
       //   meta: { title: '首页', icon: 'dashboard', affix: true }
       // }
     ]
+  },
+  {
+    path: '/components',
+    component: Layout,
+    redirect: '/components/my-table',
+    name: '组件库',
+    meta: { title: '组件库', icon: 'example' },
+    hidden: !Vue.config.devtools,
+    children: [
+      {
+        path: 'dnamic-table-demo',
+        name: 'dnamicTableDemo',
+        component: () => import('@/components/container-layout/dnamic-table-demo'),
+        meta: { title: '动态表格', icon: 'example' }
+      },
+      {
+        path: 'Test',
+        name: 'Test',
+        component: () => import('@/components/container-layout/test'),
+        meta: { title: '布局1', icon: 'example' }
+      }
+    ]
   }
   // {
   //   path: '/documentation',
@@ -174,6 +196,15 @@ export const asyncRoutes = [
         name: 'RolePermission',
         meta: {
           title: '角色权限',
+          roles: ['admin']
+        }
+      },
+      {
+        path: 'menu-management',
+        component: () => import('@/views/menu-management/index'),
+        name: 'MenuManagement',
+        meta: {
+          title: '菜单管理',
           roles: ['admin']
         }
       }

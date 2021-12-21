@@ -8,6 +8,7 @@
     <el-table
       ref="table"
       v-loading="loading"
+      :tree-props="treeProps"
       :data="data"
       :max-height="!!fixedHeight && typeof(fixedHeight) === 'number' ? fixedHeight : 'none'"
       :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : undefined) : table_height"
@@ -101,6 +102,10 @@ export default {
   },
   mixins: [table_select],
   props: {
+    treeProps: {
+      type: Object,
+      default: () => ({ children: 'children', hasChildren: 'hasChildren' })
+    },
     autoInit: {
       type: Boolean,
       default: true

@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 
 // const TokenKey = 'Admin-Token'
-const TokenKey = 'satoken'
+const TokenKey = 'spc-token'
 
 export function getToken() {
   return Cookies.get(TokenKey)

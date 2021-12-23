@@ -5,16 +5,17 @@
     :props="props"
     :node-key="nodeKey"
     :default-expand-all="defaultExpandAll"
-    :default-expanded-keys="expandedList"
     :current-node-key="currentNodeKey"
     :highlight-current="true"
     :expand-on-click-node="false"
+    v-bind="$attrs"
     @node-click="handleNodeClick"
     @node-expand="nodeExpand"
     @node-collapse="nodeCollapse"
   >
     <slot />
   </el-tree>
+  <!-- :default-expanded-keys="expandedList" -->
 </template>
 
 <script>

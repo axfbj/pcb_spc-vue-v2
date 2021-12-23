@@ -1,6 +1,7 @@
 // import axios from 'axios'
 import request from './request'
 import helper from './helper'
+// import { getToken } from '@/utils/auth'
 // const qs = require('querystring')
 
 // console.log( process.env.NODE_ENV)

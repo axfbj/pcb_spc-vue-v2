@@ -1,5 +1,17 @@
 <template>
-  <el-table-column v-if="!list.children" :prop="list.prop" :label="list.label" :width="list.width" :fixed="list.fixed" :show-overflow-tooltip="list.tooltip" :sortable="!!list.sortable ? ((list.sortType || sortType)==='client' ? true: 'custom'):false" :align="list.align" :min-width="list.minWidth" :max-width="list.maxWidth">
+  <el-table-column
+    v-if="!list.children"
+    :type="list.type"
+    :prop="list.prop"
+    :label="list.label"
+    :width="list.width"
+    :fixed="list.fixed"
+    :show-overflow-tooltip="list.tooltip"
+    :sortable="!!list.sortable ? ((list.sortType || sortType)==='client' ? true: 'custom'):false"
+    :align="list.align"
+    :min-width="list.minWidth"
+    :max-width="list.maxWidth"
+  >
 
     <template slot="header" slot-scope="scope">
 
@@ -22,7 +34,7 @@
   </el-table-column>
 
   <!-- 类型3：多级表头,含有类型1,2 -->
-  <el-table-column v-else :label="list.label" :align="list.align">
+  <el-table-column v-else :label="list.label" :align="list.align" :type="list.type">
 
     <template slot="header" slot-scope="scope">
       <slot name="header-template" :scope="scope" :list="list" :label="scope.column.label">

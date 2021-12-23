@@ -444,6 +444,9 @@ export default {
       }
       if (this.flag === 'add') {
         this.$refs.form.resetFields()
+        if (this.controlChartType === 'np') {
+          this.form.value1 = this.sampleSize
+        }
       } else {
         this.form = {
           ...this.selectRow

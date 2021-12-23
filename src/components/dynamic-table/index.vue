@@ -8,6 +8,7 @@
     <el-table
       ref="table"
       v-loading="loading"
+      v-bind="$attrs"
       :tree-props="treeProps"
       :data="data"
       :max-height="!!fixedHeight && typeof(fixedHeight) === 'number' ? fixedHeight : 'none'"
@@ -20,7 +21,6 @@
       :show-summary="showSummary"
       :cell-class-name="cell_class_name"
       border
-
       fit
       @row-click="click"
       @select="select"

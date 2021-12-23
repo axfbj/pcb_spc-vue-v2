@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import http from './http.js'
 
 export function getRoutes() {
   return request({
@@ -7,32 +8,29 @@ export function getRoutes() {
   })
 }
 
-export function getRoles() {
-  return request({
-    url: '/vue-element-admin/roles',
-    method: 'get'
-  })
+export function getRoles(data) {
+  return http.post('/spc/role/list', data)
+}
+
+export function getRoleInfo(data) {
+  return http.post(`/spc/role/info/${data.id}`, data, 'form')
 }
 
 export function addRole(data) {
-  return request({
-    url: '/vue-element-admin/role',
-    method: 'post',
-    data
-  })
+  return http.post('/spc/role/save', data)
 }
-
-export function updateRole(id, data) {
-  return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'put',
-    data
-  })
+export function updateRole(data) {
+  return http.post('/spc/role/update', data)
 }
-
-export function deleteRole(id) {
-  return request({
-    url: `/vue-element-admin/role/${id}`,
-    method: 'delete'
-  })
+export function deleteRole(data) {
+  return http.post('/spc/role/delete', data)
+}
+export function getRolePower(data) {
+  return http.post(`/spc/role/getRolePower/${data.roleId}`, data, 'form')
+}
+export function saveRolePower(data) {
+  return http.put('/spc/role/saveRolePower', data)
+}
+export function saveRoleControlGroupPower(data) {
+  return http.put('/spc/role/saveRoleControlGroupPower', data)
 }

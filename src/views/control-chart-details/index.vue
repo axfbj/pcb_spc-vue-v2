@@ -328,10 +328,10 @@ export default {
         if (code === '200' && data) {
           this.form.dataType = '1'
           this.form.date = [data.thisMonthStart, data.thisMonthEnd]
-        } else {
-          this.clear()
-          return
         }
+        // else {
+        //   this.clear()
+        // }
         this.clear()
       }
       const res = await this.get_controlChartSon_data()

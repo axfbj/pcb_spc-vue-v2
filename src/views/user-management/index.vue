@@ -53,16 +53,20 @@
                   style="display: inline-block; width: 12px; height: 14px; font-size: 12px;"
                 />
               </template>
-              <template v-else-if="data.list.template === 'enable'">
+              <template v-else-if="data.list.template === 'userStatus'">
                 {{ data.cellValue ? '是' : '否' }}
               </template>
-              <template v-else-if="data.list.template === 'roleType'">
-                {{ data.row.roleType === 1 ? '菜单角色' : '数据角色' }}
+              <template v-else-if="data.list.template === 'sex'">
+                {{ data.row.sex === 1 ? '男' : '女' }}
+              </template>
+              <template v-else-if="data.list.template === 'isAdmin'">
+                {{ data.row.isAdmin === 1 ? '是' : '否' }}
               </template>
               <template v-else-if="data.list.template === 'operate'">
                 <div class="operate-box">
-                  <el-link type="warning" @click="update_role_btn(data.scope)">修改</el-link>
-                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">分配权限</el-link>
+                  <el-link type="primary" @click="update_role_btn(data.scope)">修改</el-link>
+                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">重置密码</el-link>
+                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">修改密码</el-link>
                 </div>
               </template>
               <!-- <el-link v-else-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
@@ -96,9 +100,8 @@
 <script>
 import AddRoleDialog from './components/add-role-dialog'
 import AssignPermissionsDialog from './components/assign-permissions-dialog'
-// import MenuTree from './components/menu-tree'
-// import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
-import { getRoles, deleteRole } from '@/api/role'
+import { userList, userDelete } from '@/api/user'
+
 export default {
   name: 'Role',
   components: {
@@ -112,12 +115,13 @@ export default {
       assign_permissions_dialog: false,
       dialog_flag: '',
       header_list: [
-        { prop: 'roleCode', label: '角色标识' },
-        { prop: 'roleName', label: '角色名称' },
-        { prop: 'roleType', label: '角色类型', template: 'roleType' },
-        { prop: 'details', label: '描述' },
-        { prop: 'enable', label: '是否可用', template: 'enable' },
-        { prop: 'createTime', label: '创建时间' },
+        { prop: 'userCode', label: '账号' },
+        { prop: 'userName', label: '用户名' },
+        { prop: 'sex', label: '性别', template: 'sex' },
+        { prop: 'mobilePhone', label: '电话' },
+        { prop: 'email', label: '邮箱' },
+        { prop: 'isAdmin', label: '管理员', template: 'isAdmin' },
+        { prop: 'userStatus', label: '启用', template: 'userStatus' },
         { prop: 'operate', label: '操作', template: 'operate', align: 'center' }
       ],
       form: {
@@ -176,7 +180,7 @@ export default {
       }
 
       const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
-      const { code, data } = await deleteRole(ids)
+      const { code, data } = await userDelete(ids)
       if (code === '200' && data) {
         this.select_row = []
         this.$message.success('删除成功！')
@@ -194,7 +198,7 @@ export default {
       return states[row[col.property]] || ''
     },
     async request_data({ page_no, page_size, table_data }) {
-      const { code, data } = await getRoles({
+      const { code, data } = await userList({
         page: page_no,
         limit: page_size
       })

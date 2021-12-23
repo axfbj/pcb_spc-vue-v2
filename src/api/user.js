@@ -22,13 +22,21 @@ export async function getInfo(data) {
 export function logout(data) {
   return http.post('/spc/user/loginOut', data)
 }
-
-// export login(data) {
-//   return http.post('/spc/user/login', data)
-// }
-// export logout(data) {
-//   return http.post('/spc/user/loginOut', data)
-// }
-// export getInfo(data) {
-//   return http.post(`/spc/user/info/${data.id}`, data, 'form')
-// }
+export function userList(data) {
+  return http.post('/spc/user/list', data)
+}
+export function userInfo(data) {
+  return http.post(`/spc/user/info/${data.id}`, data, 'form')
+}
+export function resetPwd(data) {
+  return http.put(`/spc/user/resetPwd/${data.userId}`, data, 'form')
+}
+export function updatePwd(data) {
+  return http.put(`/spc/user/updatePwd/${data.userId}`, data, 'form')
+}
+export function user_add_or_update(data) {
+  return http.post('/spc/user', data)
+}
+export function userDelete(data) {
+  return http.post('/spc/user/delete', data)
+}

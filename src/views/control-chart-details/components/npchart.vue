@@ -10,7 +10,6 @@
       </div>
     </el-col>
   </el-row>
-  <!-- </div> -->
 </template>
 <script>
 // Rb：<span style="margin-right:20px">{{ vab }}</span>
@@ -100,7 +99,7 @@ export default {
                   yAxis: this.lable93,
                   lineStyle: {
                     color: 'green' // 这儿设置安全基线颜色
-                    // type: 'solid'
+                    // type: 'solid'/
                   }
                 }
               ]

@@ -1,10 +1,35 @@
 <template>
   <el-row>
-    <el-col :span="4" style="">
-      1
+
+    <el-col :span="4" style="border-right: 1px solid #ccc;">
+      <container-layout ref="left_tree">
+        <template v-slot:btns>
+          <el-row>
+            <el-col :span="8" style="text-align: left; font-size: 14px;">
+              控制组列表
+            </el-col>
+          </el-row>
+        </template>
+        <template v-slot:custum_content>
+          <control-group-tree
+            ref="tree"
+            @node-click="node_click"
+            @render-after="render_after"
+            @path-change="path_change"
+          />
+        </template>
+      </container-layout>
     </el-col>
+
     <el-col :span="20">
       <container-layout ref="contenter">
+        <template v-slot:btns>
+          <el-row>
+            <el-col :span="8" style="text-align: left; font-size: 14px;">
+              {{ path || '' }}
+            </el-col>
+          </el-row>
+        </template>
         <!-- 表格 -->
         <template v-slot:custum_content>
           <dynamic-table
@@ -24,9 +49,12 @@
 </template>
 
 <script>
-
+import ControlGroupTree from './components/control-group-tree'
 export default {
   name: 'DnamicTableDemo',
+  components: {
+    ControlGroupTree
+  },
   data() {
     return {
       header_list: [
@@ -46,7 +74,9 @@ export default {
       },
       checkList: ['选中且禁用', '复选框 A'],
       select2: [],
-      select: {}
+      select: {},
+      current_tree_node_data: {},
+      path: ''
       // select: [{
       //   id: 1
       // }, {
@@ -56,11 +86,16 @@ export default {
   },
 
   methods: {
-    async copy(name, title) {
-      if (!this.can_copy) return
-
-      await this.can_copy.writeText(`<icon name="${name}" title="${title}" />`)
-      this.$message.success('按钮已到剪贴板')
+    node_click(data, node) {
+      this.current_tree_node_data = data
+      // this.$refs.dy_table.refresh()
+    },
+    render_after(currentData) {
+      this.current_tree_node_data = currentData
+      // this.$refs.dy_table.refresh({ keep: true })
+    },
+    path_change(path) {
+      this.path = path
     },
     current_change(val) {
       console.log('current_change')
@@ -72,142 +107,23 @@ export default {
       page_size = Number(page_size)
       const total = 66
       const list_num = page_no * page_size < total ? page_size : page_size - (page_no * page_size - total)
-      console.log(list_num)
-      const d = {
-        'data': [
-          {
-            'id': '1',
-            'pid': '0',
-            'title': '统计过程控制',
-            'href': '',
-            'openType': '',
-            'type': 0,
-            'powerCode': '',
-            'children': [
-              {
-                'id': '2',
-                'pid': '1',
-                'title': '控制组列表',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              },
-              {
-                'id': '3',
-                'pid': '1',
-                'title': '层次信息定义',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              },
-              {
-                'id': '4',
-                'pid': '1',
-                'title': '检测项目定义',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              },
-              {
-                'id': '5',
-                'pid': '1',
-                'title': '不良项目定义',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              },
-              {
-                'id': '6',
-                'pid': '1',
-                'title': '失控点处理',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              },
-              {
-                'id': '7',
-                'pid': '1',
-                'title': '报表汇总',
-                'href': '',
-                'openType': '',
-                'type': 1,
-                'powerCode': ''
-              }
-            ]
-          },
-          {
-            'id': '8',
-            'pid': '0',
-            'title': '系统管理',
-            'href': '',
-            'openType': '',
-            'type': 0,
-            'powerCode': '',
-            'children': [
-              {
-                'id': '9',
-                'pid': '8',
-                'title': '用户管理',
-                'href': '',
-                'openType': '',
-                'type': 0,
-                'powerCode': ''
-              },
-              {
-                'id': '10',
-                'pid': '8',
-                'title': '权限管理',
-                'href': '',
-                'openType': '',
-                'type': 0,
-                'powerCode': ''
-              },
-              {
-                'id': '11',
-                'pid': '8',
-                'title': '角色管理',
-                'href': '',
-                'openType': '',
-                'type': 0,
-                'powerCode': ''
-              }
-            ]
-          },
-          {
-            'id': '298',
-            'pid': '0',
-            'title': '',
-            'href': '',
-            'openType': '',
-            'type': 0,
-            'powerCode': ''
-          }
-        ],
-        'code': '200',
-        'msg': '操作成功'
-      }
       return new Promise((resolve) => {
         setTimeout(() => {
           resolve({
-            data: d.data,
-            // data: Array(list_num).fill({
-            //   date: '2016-05-02',
-            //   name: '王小虎',
-            //   address: '上海市普陀区金沙江路 1518 弄'
-            // }).map((i, index) => {
-            //   const id = (page_no - 1) * page_size + index
-            //   console.log(id)
-            //   return {
-            //     ...i,
-            //     id
-            //   }
-            // }),
-            total: d.data.length
+
+            data: Array(list_num).fill({
+              date: '2016-05-02',
+              name: '王小虎',
+              address: '上海市普陀区金沙江路 1518 弄'
+            }).map((i, index) => {
+              const id = (page_no - 1) * page_size + index
+              console.log(id)
+              return {
+                ...i,
+                id
+              }
+            })
+
           })
         }, 10)
       })

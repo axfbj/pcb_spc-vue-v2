@@ -207,6 +207,15 @@ export const asyncRoutes = [
           title: '菜单管理',
           roles: ['admin']
         }
+      },
+      {
+        path: 'user-management',
+        component: () => import('@/views/user-management/index'),
+        name: 'UserManagement',
+        meta: {
+          title: '用户管理',
+          roles: ['admin']
+        }
       }
     ]
   },

@@ -65,7 +65,6 @@
                 <div class="operate-box">
                   <el-link type="primary" @click="update_user_btn(data.scope)">修改</el-link>
                   <el-link type="primary" @click="reset_pwd(data.scope)">重置密码</el-link>
-                  <!-- <el-link type="primary" @click="assign_permissions_btn(data.scope)">修改密码</el-link> -->
                 </div>
               </template>
               <!-- <el-link v-else-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
@@ -114,12 +113,12 @@ export default {
       assign_permissions_dialog: false,
       dialog_flag: '',
       header_list: [
-        { prop: 'userCode', label: '账号' },
-        { prop: 'userName', label: '用户名' },
+        { prop: 'userCode', label: '编号' },
+        { prop: 'userName', label: '账号' },
         { prop: 'sex', label: '性别', template: 'sex' },
         { prop: 'mobilePhone', label: '电话' },
         { prop: 'email', label: '邮箱' },
-        { prop: 'isAdmin', label: '管理员', template: 'isAdmin' },
+        // { prop: 'isAdmin', label: '管理员', template: 'isAdmin' },
         { prop: 'userStatus', label: '启用', template: 'userStatus' },
         { prop: 'operate', label: '操作', template: 'operate', align: 'center' }
       ],
@@ -145,10 +144,6 @@ export default {
       this.send_data = row
       this.update_user_dialog = true
     },
-    // assign_permissions_btn({ row }) {
-    //   this.send_data = row
-    //   this.assign_permissions_dialog = true
-    // },
     reset_pwd({ row }) {
       this.$confirm('确定重置密吗, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -202,6 +197,7 @@ export default {
         this.$refs.dy_table.refresh()
       }
     },
+
     formatType(row, col) {
       const states = {
         0: '',

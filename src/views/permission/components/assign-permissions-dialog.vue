@@ -18,16 +18,19 @@
             show-checkbox
             node-key="id"
             :props="defaultProps1"
+            default-expand-all
             :default-checked-keys="menu_default_checked_keys"
           />
         </el-tab-pane>
         <el-tab-pane v-if="roleType === 2" label="控制组权限" name="controlGroup">
           <el-tree
             ref="chekbox_tree2"
+            default-expand-all
             :data="controlGroup_tree_data"
             show-checkbox
             node-key="id"
             :props="defaultProps2"
+            :default-checked-keys="controlGroup_default_checked_keys"
           />
         </el-tab-pane>
       </el-tabs>
@@ -37,7 +40,7 @@
 
 <script>
 // import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
-import { saveRolePower, saveRoleControlGroupPower, getRolePower } from '@/api/role'
+// import { saveRolePower, saveRoleControlGroupPower } from '@/api/role'
 export default {
   name: 'AssignPermissionsDialog',
   props: {
@@ -65,6 +68,7 @@ export default {
       menu_tree_data: [],
       controlGroup_tree_data: [],
       menu_default_checked_keys: [],
+      controlGroup_default_checked_keys: [],
       defaultProps1: {
         label: 'title',
         children: 'children'
@@ -84,14 +88,14 @@ export default {
     },
     save_rolePower() {
       const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
-      return saveRolePower({
+      return this.$api.saveRolePower({
         powerIds: menu_tree_checked.toString(),
         roleId: this.sendData.id
       })
     },
     save_roleControlGroupPower() {
       const controlGroup_tree_checked = this.$refs.chekbox_tree2.getCheckedKeys()
-      return saveRoleControlGroupPower({
+      return this.$api.saveRoleControlGroupPower({
         groupIds: controlGroup_tree_checked.toString(),
         roleId: this.sendData.id
       })
@@ -113,32 +117,65 @@ export default {
       // this.handleClose()
     },
     handleClick() {},
-    async set_menu_tree() {
-      const { code, data } = await this.$api.menu_tree()
+    // async set_menu_tree() {
+    //   const { code, data } = await this.$api.menu_tree()
+    //   if (code === '200' && data) {
+    //     this.menu_tree_data = data
+    //   }
+    // },
+    // async set_controlGroup_tree() {
+    //   const { code, data } = await this.$api.controlGroup_tree()
+    //   if (code === '200' && data) {
+    //     this.controlGroup_tree_data = data
+    //   }
+    // },
+    getNode(node) {
+      const result = []
+      let _getNode = function(node) {
+        const tmp = JSON.parse(JSON.stringify(node))
+        delete tmp.children
+        result.push(tmp) // 移除拍平数组的子元素,只保留节点相干元素
+        const child = node.children
+        if (child !== undefined && child.length > 0) {
+          child.forEach(ele => {
+            // arguments.callee(ele)
+            this.getNode(ele)
+          })
+        }
+      }
+      _getNode(node)
+      _getNode = null
+      return result
+    },
+    async getRolePower() {
+      const { code, data } = await this.$api.getRolePower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.menu_tree_data = data
+        const result = this.getNode(data)
+        this.menu_default_checked_keys = result.map(item => {
+          if (item.isCheck) return item.id
+        })
       }
     },
-    async set_controlGroup_tree() {
-      const { code, data } = await this.$api.controlGroup_tree()
+    async getRoleControlGroupPower() {
+      const { code, data } = await this.$api.getRoleControlGroupPower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.controlGroup_tree_data = data
+        const result = this.getNode(data)
+        this.controlGroup_default_checked_keys = result.map(item => {
+          if (item.isCheck) return item.id
+        })
       }
     },
     async open({ loading }) {
       this.roleType = this.sendData.roleType
       loading(true)
       // await this.set_menu_tree()
+      await this.getRolePower()
       if (this.roleType === 2) {
-        await this.set_controlGroup_tree()
+        await this.getRoleControlGroupPower()
       }
-      // console.log('this.sendData', this.sendData)
-      const { code, data } = await getRolePower({ roleId: this.sendData.id })
-      if (code === '200' && data) {
-        this.menu_tree_data = data
-        this.menu_default_checked_keys = data.map(item => item.id)
-        // console.log(this.menu_default_checked_keys)
-      }
+
       loading(false)
     },
     async opened({ loading }) {

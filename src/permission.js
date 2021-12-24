@@ -19,7 +19,7 @@ router.beforeEach(async(to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-
+  // alert(hasToken)
   if (hasToken) {
     // console.log(1111)
     // this.$store.dispatch('hierarchicalTypesDefinition/changeHtypes', this)
@@ -35,20 +35,18 @@ router.beforeEach(async(to, from, next) => {
         // console.log(333)
         next()
       } else {
-        // console.log(444)
         try {
-          await store.dispatch('hierarchicalTypesDefinition/changeHtypes')
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-          // alert(1)
           const { roles } = await store.dispatch('user/getInfo')
 
           // generate accessible routes map based on roles
+
           const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
 
+          await store.dispatch('hierarchicalTypesDefinition/changeHtypes')
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
-
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true })

@@ -29,11 +29,14 @@
             v-model="pids"
             :options="menuTree"
             :show-all-levels="false"
-            :props="{value:'id',label: 'title'}"
+            :props="{value:'id',label: 'title',checkStrictly: true}"
             style="width: 100%;"
             clearable
             @change="cas_change"
           />
+        </el-form-item>
+        <el-form-item prop="title" label="名称:">
+          <el-input v-model="form.title" />
         </el-form-item>
         <el-form-item prop="icon" label="小图标:">
 
@@ -56,8 +59,11 @@
         <el-form-item prop="href" label="链接:">
           <el-input v-model="form.href" />
         </el-form-item>
+        <el-form-item prop="powerCode" label="权限标识:">
+          <el-input v-model="form.powerCode" />
+        </el-form-item>
         <el-form-item prop="type" label="类型:">
-          <el-select v-model="form.type" placeholder="菜单类型:" clearable>
+          <el-select v-model="form.type" placeholder="" clearable style="width: 100%;">
             <el-option
               v-for="item in options"
               :key="item.value"
@@ -74,12 +80,12 @@
         </el-form-item> -->
         <el-form-item label="是否启用:">
           <el-radio-group v-model="form.enable">
-            <el-radio :label="1">是</el-radio>
-            <el-radio :label="0">否</el-radio>
+            <el-radio :label="true">是</el-radio>
+            <el-radio :label="false">否</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item prop="remark" label="备注:">
-          <el-input v-model="form.remark" />
+          <el-input v-model="form.remark" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
     </div>
@@ -98,6 +104,10 @@ export default {
       type: [Object, Array],
       default: () => ({})
     },
+    sendRow: {
+      type: [Object, Array],
+      default: () => ({})
+    },
     menuTree: {
       type: [Object, Array],
       default: () => ([])
@@ -106,21 +116,21 @@ export default {
   data() {
     return {
       flag: '',
-      pids: ['1', '2'],
-      form: {
+      form: {},
+      form_data: {
         // 'checkArr': '',
-        'createTime': '',
+        // 'createTime': '',
         // 状态(0:禁用,1:启用)
-        'enable': 1,
+        'enable': true,
         'href': '',
         // 'id': 0,
         'openType': '', // 链接打开方式
-        'pid': 0, // 父级ID
-        // 'powerCode': '', // 权限标识
+        'pid': '0', // 父级ID
+        'powerCode': '', // 权限标识
         'remark': '', // 备注
         'sort': 0, // 排序码
         'title': '', // 标题
-        'type': 1, // 类型 1:目录、2：菜单、3接口、4数据
+        'type': '', // 类型 1:目录、2：菜单、3接口、4数据
         'icon': '' // 小图标类名
       },
       rules: {
@@ -139,71 +149,75 @@ export default {
       }, {
         value: 4,
         label: '数据'
-      }]
+      }],
+      // pids: ['1','2'],
+      pids: [],
+      send_row: {}
     }
   },
+  created() {
+    Object.freeze(this.form_data)
+    this.form = JSON.parse(JSON.stringify(this.form_data))
+  },
   methods: {
+    clear() {
+      this.send_row = {}
+      this.pids = []
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+      this.$refs.form.resetFields()
+    },
     cas_change(val) {
       this.form.pid = val[val - 1]
     },
     handleClose() {
       this.$emit('handleClose')
-      this.$refs.form.resetFields()
+      this.clear()
     },
     async confirm({ loading }) {
       this.$refs.form.validate(valid => {
         if (!valid) return
         loading(true)
-        if (this.flag === 'add') {
-        //   this.add()
+        if (this.flag === 'add' || this.flag === 'add-clear') {
+          this.add(loading)
         } else {
-        //   this.update()
+          this.update(loading)
         }
       })
     },
-    async add() {
-      const res = await this.$api.menu_save({
-        badCode: this.form.badCode,
-        badName: this.form.badName,
-        badDescription: this.form.badDescription
+    async add(loading) {
+      const { code, data } = await this.$api.menu_save({
+        ...this.form,
+        enable: Number(this.form.enable)
       })
-      if (res.code === '200') {
+      if (code === '200' && data) {
         this.$emit('confirm')
+      } else {
+        loading(false)
       }
-      this.handleClose()
     },
-    async update() {
-      const res = await this.$api.menu_update({
-        // 'checkArr': '', 不知道是什么
-        'createTime': '',
-        'enable': true,
-        'href': '',
-        'id': 0,
-        'openType': '',
-        'pid': 0,
-        'powerCode': '',
-        'remark': '',
-        'sort': 0,
-        'title': '',
-        'type': 0
+    async update(loading) {
+      const { code, data } = await this.$api.menu_update({
+        ...this.form,
+        enable: Number(this.form.enable)
+        // // 'checkArr': '', 不知道是什么
+        // 'createTime': '',
+        // 'enable': true,
+        // 'href': '',
+        // 'id': 0,
+        // 'openType': '',
+        // 'pid': 0,
+        // 'powerCode': '',
+        // 'remark': '',
+        // 'sort': 0,
+        // 'title': '',
+        // 'type': ''
       })
-      if (res.code === '200') {
+      if (code === '200' && data) {
         this.$emit('confirm')
+      } else {
+        loading(false)
       }
-      this.handleClose()
     },
-    // getTreeIds() {
-    // //   const currentNode = this.selectRow.id
-    //   const arr = [this.selectRow.id]
-    //   const getName = (key) => {
-    //     if (key === '0') return arr.reverse()
-    //     const node = this.getNode(key)
-    //     arr.push(node.data.groupName)
-    //     return getName(node.data.parentId)
-    //   }
-    //   const path = `/${getName(parentId)}`
-    //   return path
-    // },
     getParentIds(id, data) {
       // 深度遍历查找
       function dfs(data, id, parents) {
@@ -228,29 +242,29 @@ export default {
     },
     async open({ loading }) {
       this.flag = this.$attrs.flag
-      if (this.flag !== 'add') {
-        loading(true)
-        const { code, data } = await this.$api.menu_info({ id: this.selectRow.id })
-        if (code === '200' && data) {
-        //   this.form = {
-        //     badCode: data.badCode,
-        //     badName: data.badName,
-        //     badDescription: data.badDescription
-        //   }
-        }
-        loading(false)
-      } else {
-        const ids = this.getParentIds(this.selectRow.id, this.menuTree)
-        if (ids[0]) {
-          ids.push(this.selectRow.id)
+      if (this.flag === 'add') {
+        this.send_row = this.sendRow
+        const ids = this.getParentIds(this.send_row.id, this.menuTree)
+        ids.push(this.send_row.id)
+        if (ids.length > 0) {
           this.pids = ids
-          this.form.pid = this.pids[this.pids.length - 1]
-        } else {
-          this.pids = []
-          this.form.pid = '0'
         }
+        this.form.pid = this.pids.length > 0 ? this.pids[this.pids.length - 1] : '0'
+      } else if (this.flag === 'update') {
+        this.send_row = this.sendRow
+        const ids = this.getParentIds(this.send_row.id, this.menuTree)
+        if (ids.length > 0) {
+          this.pids = ids
+        }
+        this.form = {
+          ...this.send_row,
+          pid: this.pids.length > 0 ? this.pids[this.pids.length - 1] : '0',
+          type: this.send_row.type || ''
+        }
+      } else {
+        this.clear()
+        this.form.pid = '0'
       }
-    //   this.$refs['ipt'].focus()
     },
     async opened({ loading }) {
 

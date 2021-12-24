@@ -20,10 +20,10 @@
           <el-input ref="ipt" v-model="form.userCode" />
         </el-form-item>
         <el-form-item prop="userName" label="用户名:">
-          <el-input v-model="form.userName" />
+          <el-input v-model="form.userName" autocomplete="off" />
         </el-form-item>
         <el-form-item v-if="flag === 'add'" prop="loginPassword" label="密码:">
-          <el-input v-model.trim="form.loginPassword" autocomplete="off" type="password" />
+          <el-input v-model.trim="form.loginPassword" autocomplete="off" auto-complete="new-password" type="password" />
         </el-form-item>
         <el-form-item prop="email" label="邮箱:">
           <el-input v-model="form.email" />
@@ -45,7 +45,7 @@
         </el-form-item>
 
         <el-form-item prop="roleIds" label="角色:">
-          <el-select v-model="form.roleIds" placeholder="请选择角色">
+          <el-select v-model="form.roleIds" placeholder="请选择角色" multiple style="width: 100%;">
             <el-option
               v-for="item in options"
               :key="item.id"
@@ -95,9 +95,9 @@ export default {
         'mobilePhone': '',
         'userStatus': 1,
         // 'id': 0,
-        'isAdmin': 0,
-        'roleIds': '',
-        'roleName': '',
+        // 'isAdmin': 0,
+        'roleIds': [],
+        'roleName': [],
         'sex': 1
 
       },
@@ -151,12 +151,26 @@ export default {
         }
       })
     },
+    get_roleName(roleIds) {
+      const roleNames = []
+      roleIds.map(id => {
+        const f = this.options.find(item => {
+          return id === item.id
+        })
+        if (f) {
+          roleNames.push(f.roleName)
+        }
+      })
+      return roleNames.toString()
+    },
     async add(loading) {
       if (Object.hasOwnProperty.call(this.form, 'id')) {
         delete this.form.id
       }
       const { code, data } = await this.$api.user_add_or_update({
-        ...this.form
+        ...this.form,
+        roleIds: this.form.roleIds.toString(),
+        roleName: this.get_roleName(this.form.roleIds)
       })
       if (code === '200' && data) {
         this.$emit('confirm')
@@ -169,7 +183,9 @@ export default {
         delete this.form.loginPassword
       }
       const { code, data } = await this.$api.user_add_or_update({
-        ...this.form
+        ...this.form,
+        roleIds: this.form.roleIds.toString(),
+        roleName: this.get_roleName(this.form.roleIds)
       })
       if (code === '200' && data) {
         this.$emit('confirm')
@@ -193,7 +209,9 @@ export default {
         const { code, data } = await this.$api.userInfo({ id: this.sendData.id })
         if (code === '200' && data) {
           this.form = {
-            ...data
+            ...data,
+            roleIds: data.roleIds ? data.roleIds.split(',') : '',
+            roleName: data.roleName ? data.roleName.split(',') : ''
           }
         }
         loading(false)

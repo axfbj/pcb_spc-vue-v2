@@ -12,9 +12,9 @@ export default {
   menu_update(data) {
     return http.post('/spc/menu/update', data)
   },
-  menu_info(data) {
-    return http.post(`/spc/menu/info/${data.id}`, data, 'form')
-  },
+  // menu_info(data) {
+  //   return http.post(`/spc/menu/info/${data.id}`, data, 'form')
+  // },
   menu_delete(data) {
     return http.post('/spc/menu/delete', data)
   }

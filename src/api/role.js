@@ -28,11 +28,14 @@ export function deleteRole(data) {
 export function getRolePower(data) {
   return http.post(`/spc/role/getRolePower/${data.roleId}`, data, 'form')
 }
+export function getRoleControlGroupPower(data) {
+  return http.post(`/spc/role/getRoleControlGroupPower/${data.roleId}`, data, 'form')
+}
 export function saveRolePower(data) {
-  return http.put('/spc/role/saveRolePower', data)
+  return http.post('/spc/role/saveRolePower', data)
 }
 export function saveRoleControlGroupPower(data) {
-  return http.put('/spc/role/saveRoleControlGroupPower', data)
+  return http.post('/spc/role/saveRoleControlGroupPower', data)
 }
 
 const role = {
@@ -42,6 +45,7 @@ const role = {
   updateRole,
   deleteRole,
   getRolePower,
+  getRoleControlGroupPower,
   saveRolePower,
   saveRoleControlGroupPower
 }

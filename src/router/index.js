@@ -191,20 +191,20 @@ export const asyncRoutes = [
         }
       },
       {
+        path: '/permission/menu-management',
+        component: () => import('@/views/menu-management/index'),
+        name: 'MenuManagement',
+        meta: {
+          title: '菜单管理',
+          roles: ['admin']
+        }
+      },
+      {
         path: 'role',
         component: () => import('@/views/permission/role'),
         name: 'RolePermission',
         meta: {
           title: '角色权限',
-          roles: ['admin']
-        }
-      },
-      {
-        path: 'menu-management',
-        component: () => import('@/views/menu-management/index'),
-        name: 'MenuManagement',
-        meta: {
-          title: '菜单管理',
           roles: ['admin']
         }
       },

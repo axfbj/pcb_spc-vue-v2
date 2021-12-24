@@ -9,13 +9,13 @@
     :highlight-current="true"
     :expand-on-click-node="false"
     v-bind="$attrs"
+    :default-expanded-keys="expandedList"
     @node-click="handleNodeClick"
     @node-expand="nodeExpand"
     @node-collapse="nodeCollapse"
   >
     <slot />
   </el-tree>
-  <!-- :default-expanded-keys="expandedList" -->
 </template>
 
 <script>

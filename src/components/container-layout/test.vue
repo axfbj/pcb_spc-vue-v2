@@ -11,12 +11,12 @@
           </el-row>
         </template>
         <template v-slot:custum_content>
-          <control-group-tree
+          <!-- <control-group-tree
             ref="tree"
             @node-click="node_click"
             @render-after="render_after"
             @path-change="path_change"
-          />
+          /> -->
         </template>
       </container-layout>
     </el-col>
@@ -49,11 +49,11 @@
 </template>
 
 <script>
-import ControlGroupTree from './components/control-group-tree'
+// import ControlGroupTree from './components/control-group-tree'
 export default {
   name: 'DnamicTableDemo',
   components: {
-    ControlGroupTree
+    // ControlGroupTree
   },
   data() {
     return {

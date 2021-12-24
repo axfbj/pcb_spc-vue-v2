@@ -38,6 +38,7 @@
           <el-row>
             <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span>
             <span style="float: right;">
+              <!-- v-permission="[1111]" -->
               <ki-button
                 type="primary"
                 @click="badGroup_btn"

@@ -21,14 +21,12 @@ router.beforeEach(async(to, from, next) => {
   const hasToken = getToken()
   // alert(hasToken)
   if (hasToken) {
-    // console.log(1111)
     // this.$store.dispatch('hierarchicalTypesDefinition/changeHtypes', this)
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
       next({ path: '/' })
       NProgress.done() // hack: https://github.com/PanJiaChen/vue-element-admin/pull/2939
     } else {
-      // console.log(222)
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {

@@ -20,6 +20,14 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+/** 全局注册*/
+import permission from '@/directive/permission/index.js' // 权限判断指令
+Vue.directive('permission', {
+  /**
+   * 当被绑定元素插入到DOM时 */
+  ...permission
+})
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

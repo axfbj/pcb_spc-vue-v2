@@ -200,8 +200,8 @@ export const asyncRoutes = [
         }
       },
       {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
+        path: 'role-permission',
+        component: () => import('@/views/role-permission/index'),
         name: 'RolePermission',
         meta: {
           title: '角色权限',

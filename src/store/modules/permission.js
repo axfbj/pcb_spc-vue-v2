@@ -1,4 +1,17 @@
-import { asyncRoutes, constantRoutes } from '@/router'
+// import { asyncRoutes, constantRoutes } from '@/router'
+import { constantRoutes } from '@/router'
+import menu from '@/api/menu-management'
+import Layout from '@/layout'
+const { menu_tree } = menu
+
+function pare_route_name(package_url) {
+  if (!package_url) return ''
+  // console.log('package_url', package_url)
+  const strArr = package_url.split('-')
+  let name_key = ''
+  strArr.forEach(i => { name_key += i.replace(i[0], i[0].toUpperCase()) })
+  return name_key
+}
 
 /**
  * Use meta.role to determine if the current user has permission
@@ -34,30 +47,80 @@ export function filterAsyncRoutes(routes, roles) {
   return res
 }
 
+export function filterAsyncRoutes2(routes, powerCodes, roles) {
+  const res = []
+  const roleCodes = powerCodes
+  routes.forEach(route => {
+    // console.log('route', route)
+    // const tmp = { ...route }
+    if (route.type === 2) {
+      roleCodes.push(route.powerCode)
+      console.log(roleCodes)
+    }
+    if (route.type === 1) {
+      const strArr = route.href.split('/')
+      const tmp = {
+        path: route.href,
+        name: pare_route_name(strArr[strArr.length - 1]),
+        meta: { title: route.title, icon: route.icon },
+        hidden: !route.enable,
+        // component: () => import(`@/views/${strArr[strArr.length - 1]}/index`),
+        component: (resolve) => require([`@/views/${strArr[strArr.length - 1]}/index`], resolve),
+        children: route.children
+      }
+      if (route.pid === '0') {
+        tmp.component = Layout
+      }
+      if (hasPermission(roles, tmp)) {
+        if (tmp.children) {
+          tmp.children = filterAsyncRoutes2(tmp.children, roleCodes, roles).accessedRoutes
+        }
+        res.push(tmp)
+      }
+    }
+  })
+
+  // return res
+  return {
+    accessedRoutes: res,
+    powerCodes
+  }
+}
+
 const state = {
   routes: [],
-  addRoutes: []
+  addRoutes: [],
+  powerCodes: []
 }
 
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes)
+  },
+  SET_POWERCODES: (state, powerCodes) => {
+    state.powerCodes = powerCodes
   }
 }
 
 const actions = {
-  generateRoutes({ commit }, roles) {
-    return new Promise(resolve => {
-      let accessedRoutes
-      if (roles.includes('admin')) {
-        accessedRoutes = asyncRoutes || []
-      } else {
-        accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
-      }
-      commit('SET_ROUTES', accessedRoutes)
-      resolve(accessedRoutes)
-    })
+  async generateRoutes({ commit }, roles) {
+    const { code, data } = await menu_tree()
+    if (code !== '200' || !data) { return [] }
+    const { accessedRoutes, powerCodes } = filterAsyncRoutes2(data, [], roles)
+    commit('SET_ROUTES', accessedRoutes)
+    commit('SET_POWERCODES', powerCodes)
+    return accessedRoutes
+    // return new Promise(resolve => {
+    //   let accessedRoutes
+    //   if (roles.includes('admin')) {
+    //     accessedRoutes = asyncRoutes || []
+    //   } else {
+    //     accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
+    //   }
+    //   commit('SET_ROUTES', accessedRoutes)
+    //   resolve(accessedRoutes)
+    // })
   }
 }
 

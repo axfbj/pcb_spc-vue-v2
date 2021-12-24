@@ -85,10 +85,15 @@ export default {
         reader.onload = e => {
           const data = e.target.result
           const workbook = XLSX.read(data, { type: 'array' })
+          // const workbook = XLSX.read(data, {
+          //   type: 'binary',
+          //   cellDates: true
+          // })
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
           const header = this.getHeaderRow(worksheet)
           const results = XLSX.utils.sheet_to_json(worksheet)
+          // const results = XLSX.utils.sheet_to_json(worksheet, { raw: false })
           this.generateData({ header, results })
           this.loading = false
           resolve()

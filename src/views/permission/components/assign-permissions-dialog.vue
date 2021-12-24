@@ -105,11 +105,6 @@ export default {
       Promise.all(res).then(res => {
         console.log('res', res)
       })
-      // if (this.flag === 'add') {
-      //   this.add(loading)
-      // } else {
-      //   this.update(loading)
-      // }
     },
     async add(loading) {
 

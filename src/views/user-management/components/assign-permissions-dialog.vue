@@ -77,10 +77,12 @@ export default {
   },
   methods: {
     handleClose() {
+      this.clear()
       this.$emit('handleClose')
     },
     clear() {
-      this.this.menu_default_checked_keys = []
+      this.roleType = ''
+      this.menu_default_checked_keys = []
     },
     save_rolePower() {
       const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
@@ -103,7 +105,7 @@ export default {
         res.push(this.save_roleControlGroupPower())
       }
       Promise.all(res).then(res => {
-        console.log('res', res)
+        this.$message.success('权限分配成功')
       })
       // if (this.flag === 'add') {
       //   this.add(loading)
@@ -115,7 +117,7 @@ export default {
 
     },
     async update(loading) {
-      // this.handleClose()
+
     },
     handleClick() {},
     async set_menu_tree() {
@@ -137,7 +139,6 @@ export default {
       if (this.roleType === 2) {
         await this.set_controlGroup_tree()
       }
-      // console.log('this.sendData', this.sendData)
       const { code, data } = await getRolePower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.menu_tree_data = data

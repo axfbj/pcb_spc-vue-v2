@@ -10,6 +10,9 @@ import inspectionRecord from './inspection-record'
 import controlChartAbnorma from './control-chart-abnorma'
 import reportSummary from './report-summary'
 import menuManagement from './menu-management'
+
+import user from './user'
+import role from './role'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -17,6 +20,9 @@ export default {
   // getUserInfo(data, token) {
   //   return http.get('/getUserInfo', data, token)
   // },
+
+  ...role,
+  ...user,
   ...hierarchicalType,
   ...keywordValue,
   ...inspectionItems,

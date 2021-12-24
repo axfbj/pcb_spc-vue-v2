@@ -38,7 +38,6 @@
           <dynamic-table
             ref="dy_table"
             v-model="select_row"
-            default-expand-all
             :header-list="header_list"
             :request="request_data"
             :page-sizes="[30,60,120]"
@@ -64,9 +63,9 @@
               </template>
               <template v-else-if="data.list.template === 'operate'">
                 <div class="operate-box">
-                  <el-link type="primary" @click="update_role_btn(data.scope)">修改</el-link>
-                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">重置密码</el-link>
-                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">修改密码</el-link>
+                  <el-link type="primary" @click="update_user_btn(data.scope)">修改</el-link>
+                  <el-link type="primary" @click="reset_pwd(data.scope)">重置密码</el-link>
+                  <!-- <el-link type="primary" @click="assign_permissions_btn(data.scope)">修改密码</el-link> -->
                 </div>
               </template>
               <!-- <el-link v-else-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
@@ -77,8 +76,8 @@
       </container-layout>
     </el-col>
 
-    <add-role-dialog
-      :visible="update_role_dialog"
+    <add-user-dialog
+      :visible="update_user_dialog"
       :select-row="select_row"
       :send-data="send_data"
       :flag="dialog_flag"
@@ -98,20 +97,20 @@
 </template>
 
 <script>
-import AddRoleDialog from './components/add-role-dialog'
+import AddUserDialog from './components/add-user-dialog'
 import AssignPermissionsDialog from './components/assign-permissions-dialog'
-import { userList, userDelete } from '@/api/user'
+// import { userList, userDelete, resetPwd } from '@/api/user'
 
 export default {
   name: 'Role',
   components: {
     // MenuTree
-    AddRoleDialog,
+    AddUserDialog,
     AssignPermissionsDialog
   },
   data() {
     return {
-      update_role_dialog: false,
+      update_user_dialog: false,
       assign_permissions_dialog: false,
       dialog_flag: '',
       header_list: [
@@ -141,29 +140,45 @@ export default {
   },
 
   methods: {
-    update_role_btn({ row, column }) {
-      // this.dialog_flag = 'update'
-      // console.log(row)
+    update_user_btn({ row }) {
+      this.dialog_flag = 'update'
       this.send_data = row
-      this.update_role_dialog = true
+      this.update_user_dialog = true
     },
-    assign_permissions_btn({ row, column }) {
-      this.send_data = row
-      this.assign_permissions_dialog = true
+    // assign_permissions_btn({ row }) {
+    //   this.send_data = row
+    //   this.assign_permissions_dialog = true
+    // },
+    reset_pwd({ row }) {
+      this.$confirm('确定重置密吗, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const { code, data } = this.$api.reset_pwd({ userId: row.id })
+        if (code === '200' && data) {
+          this.$message.success('密码重置成功!')
+        }
+      }).catch(() => {
+      })
     },
     del_btn(open) {
       if (!this.$refs.dy_table.one_row_select()) return
       open()
     },
+    getRolesOptions() {
+
+    },
     menu_setting_dialog_btn() {
       this.dialog_flag = 'add'
-      this.update_role_dialog = true
+      this.update_user_dialog = true
     },
     dialog_close() {
-      this.update_role_dialog = false
+      this.update_user_dialog = false
     },
     dialog_confirm() {
-      this.update_role_dialog = false
+      this.$refs.dy_table.refresh()
+      this.update_user_dialog = false
     },
     permissions_dialog_close() {
       this.assign_permissions_dialog = false
@@ -180,7 +195,7 @@ export default {
       }
 
       const ids = Array.isArray(this.select_row) ? this.select_row.map(item => item.id) : [this.select_row.id]
-      const { code, data } = await userDelete(ids)
+      const { code, data } = await this.$api.userDelete(ids)
       if (code === '200' && data) {
         this.select_row = []
         this.$message.success('删除成功！')
@@ -198,7 +213,7 @@ export default {
       return states[row[col.property]] || ''
     },
     async request_data({ page_no, page_size, table_data }) {
-      const { code, data } = await userList({
+      const { code, data } = await this.$api.userList({
         page: page_no,
         limit: page_size
       })
@@ -210,7 +225,6 @@ export default {
       }
     },
     select_callback(data) {
-      // console.log('select_callback：  ', JSON.stringify(data))
     },
     click_link(data) {
       console.log(data)

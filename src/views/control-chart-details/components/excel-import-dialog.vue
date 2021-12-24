@@ -61,6 +61,7 @@ export default {
       return false
     },
     handleSuccess({ results, header }) {
+      console.log('results', results)
       this.tableData = results
       this.tableHeader = header
     },

@@ -661,6 +661,9 @@ export default {
       var wb = XLSX.utils.book_new()
       // json转sheet
       var ws = XLSX.utils.json_to_sheet(table, { header: header, skipHeader: true })
+      // console.log('ws', ws)
+      // ws.A1.t = 'd'
+      // ws.B1.t = 'd'
       // 设置列宽
       // console.log('header', header)
       const colWidthArr = []

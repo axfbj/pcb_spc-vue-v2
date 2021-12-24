@@ -34,3 +34,16 @@ export function saveRolePower(data) {
 export function saveRoleControlGroupPower(data) {
   return http.put('/spc/role/saveRoleControlGroupPower', data)
 }
+
+const role = {
+  getRoles,
+  getRoleInfo,
+  addRole,
+  updateRole,
+  deleteRole,
+  getRolePower,
+  saveRolePower,
+  saveRoleControlGroupPower
+}
+
+export default role

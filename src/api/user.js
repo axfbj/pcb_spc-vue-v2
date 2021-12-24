@@ -40,3 +40,14 @@ export function user_add_or_update(data) {
 export function userDelete(data) {
   return http.post('/spc/user/delete', data)
 }
+
+const user = {
+  userList,
+  userInfo,
+  resetPwd,
+  updatePwd,
+  user_add_or_update,
+  userDelete
+}
+
+export default user

@@ -49,7 +49,7 @@ export default {
         hierarchicalName: ''
       },
       rules: {
-        hierarchicalName: [{ required: true, message: '类型名称不能为空', trigger: 'change' }]
+        // hierarchicalName: [{ required: true, message: '类型名称不能为空', trigger: 'change' }]
         // badName: [{ required: true, message: '不良名称不能为空', trigger: 'change' }]
       }
     }

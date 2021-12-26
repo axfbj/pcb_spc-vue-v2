@@ -5,8 +5,9 @@ const state = {
 
 const mutations = {
   CHANGE_HTYPES: (state, list) => {
-    // eslint-disable-next-line no-prototype-builtins
-    state.hierarchicalTypes = list
+    state.hierarchicalTypes = list.filter(item => {
+      return item.hierarchicalName !== '' && item.hierarchicalName !== null && item.hierarchicalName !== undefined
+    })
   }
 }
 

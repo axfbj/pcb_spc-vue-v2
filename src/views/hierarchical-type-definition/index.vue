@@ -49,7 +49,16 @@
           :one-page-show-pagination="false"
           @current-change="current_change"
           @select="select_callback"
-        />
+        >
+          <template v-slot:cell-template="data">
+            <template v-if="data.list.template === 'enable'">
+              <el-tag v-if="data.cellValue">是</el-tag>
+              <el-tag v-if="!data.cellValue" type="warning">否</el-tag>
+            </template>
+            <template v-else>{{ data.cellValue }}</template>
+          </template>
+
+        </dynamic-table>
       </template>
     </container-layout>
 
@@ -84,7 +93,8 @@ export default {
       item2: {},
       header_list: [
         { prop: 'id', label: '层次类型ID', width: '150' },
-        { prop: 'hierarchicalName', label: '类型名称', width: '260' }
+        { prop: 'hierarchicalName', label: '类型名称', width: '260' },
+        { prop: 'enable', label: '是否可用', width: '100', template: 'enable', align: 'center' }
       ],
       select_row: {},
       tableData: []
@@ -160,7 +170,12 @@ export default {
       })
       if (code === '200' && data) {
         return {
-          data: data.list,
+          data: data.list.map(item => {
+            return {
+              ...item,
+              enable: !!item.hierarchicalName
+            }
+          }),
           total: data.totalCount
         }
       }

@@ -190,8 +190,13 @@
     />
 
     <excel-import-dialog
+      :control-chart-son-id="controlChartSonId"
+      :bad-names="badNames"
+      :dy-header-list="dy_header_list"
       :select-row="select_row"
+      :control-chart-type="controlChartType"
       :visible="excel_import_dialog"
+      :point-hierarchical-type-ids="pointHierarchicalTypeIds"
       @handleClose="excel_import_close"
       @confirm="excel_import_confirm"
     />
@@ -220,7 +225,7 @@ import npchart from './components/npchart'
 import { dateformat } from '@/utils/date-method'
 
 export default {
-  name: 'ControlChartDetails',
+  // name: 'ControlChartDetails',
   components: {
     AddDataDialog,
     ExcelImportDialog,
@@ -521,6 +526,7 @@ export default {
           list.prop = `badValue${index + 1}`
           list.label = item
           list.width = '180'
+          list.t = 'n'
           arr.push(list)
           this.dy_header_list.push(list)
         })
@@ -535,6 +541,7 @@ export default {
           list.prop = `value${i}`
           list.label = `样本${i}`
           list.width = '120'
+          list.t = 'n'
           arr.push(list)
           this.dy_header_list.push(list)
         }

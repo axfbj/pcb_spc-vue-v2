@@ -130,7 +130,6 @@ export default {
         resource: '',
         desc: ''
       },
-      checkList: ['选中且禁用', '复选框 A'],
       select_row: [],
       send_data: []
     }
@@ -160,6 +159,7 @@ export default {
     },
     dialog_confirm() {
       this.update_role_dialog = false
+      this.$refs.dy_table.refresh()
     },
     permissions_dialog_close() {
       this.assign_permissions_dialog = false
@@ -183,16 +183,16 @@ export default {
         this.$refs.dy_table.refresh()
       }
     },
-    formatType(row, col) {
-      const states = {
-        0: '',
-        1: '目录',
-        2: '菜单',
-        3: '接口',
-        4: '数据'
-      }
-      return states[row[col.property]] || ''
-    },
+    // formatType(row, col) {
+    //   const states = {
+    //     0: '',
+    //     1: '目录',
+    //     2: '菜单',
+    //     3: '接口',
+    //     4: '数据'
+    //   }
+    //   return states[row[col.property]] || ''
+    // },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await getRoles({
         page: page_no,

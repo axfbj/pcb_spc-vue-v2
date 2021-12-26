@@ -9,9 +9,10 @@
             </el-col>
             <el-col :span="16" style="text-align: right;">
               <el-button-group>
-                <ki-button type="primary" icon="el-icon-plus" @click="tree_add" />
-                <ki-button type="warning" icon="el-icon-edit" @click="tree_edit" />
+                <ki-button v-permission="['control.group.save']" type="primary" icon="el-icon-plus" @click="tree_add" />
+                <ki-button v-permission="['control.group.update']" type="warning" icon="el-icon-edit" @click="tree_edit" />
                 <ki-message-box
+                  v-permission="['control.group.delete']"
                   :next="tree_del_next"
                   style="float: left;"
                   @click="tree_del"
@@ -40,15 +41,18 @@
             <span style="float: right;">
               <!-- v-permission="[1111]" -->
               <ki-button
+                v-permission="['badDefinition.list']"
                 type="primary"
                 @click="badGroup_btn"
               >不良分组</ki-button>
               <ki-button
+                v-permission="['control.save','control.update','control.delete']"
                 type="primary"
                 @click="check_setting_dialog"
               >控制图设置</ki-button>
-              <ki-button type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
+              <ki-button v-permission="['control.save']" type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
               <ki-message-box
+                v-permission="['control.delete']"
                 :next="del"
                 @click="del_btn"
               >

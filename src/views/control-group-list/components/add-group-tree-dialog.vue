@@ -114,10 +114,17 @@ export default {
       })
     },
     async add() {
-      const { code, data } = await this.$api.controlGroup_save({
-        parentId: this.level === '0' ? this.nodeData.id : this.nodeData.parentId,
+      const params = {
         ...this.form
-      })
+      }
+
+      if (Object.hasOwnProperty.call(this.nodeData, 'id')) {
+        //  parentId: this.level === '0' ? this.nodeData.id : this.nodeData.parentId,
+        params.parentId = this.level === '0' ? this.nodeData.id : this.nodeData.parentId
+      } else {
+        params.parentId = '0'
+      }
+      const { code, data } = await this.$api.controlGroup_save(params)
       if (code === '200' && data) {
         this.$emit('confirm')
       }

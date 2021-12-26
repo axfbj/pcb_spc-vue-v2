@@ -42,7 +42,7 @@ export default {
   },
   async created() {
     this.refresh((data) => {
-      if (data && data[0].id) {
+      if (data && data.length > 0) {
         this.defaultExpandedKeys.push(data[0].id)
         this.$refs.tree.setCurrentKey(data[0].id)
         this.current_tree_node = data[0]

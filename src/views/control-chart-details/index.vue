@@ -658,12 +658,23 @@ export default {
       // })
       const header = Object.keys(columnList)
       // 创建book
+      // console.log('dateformat(new Date())', dateformat(new Date(), 'YYYY/MM/DD HH:mm:ss'))
+      // const row = {}
+      // for (const key in columnList) {
+      //   if (Object.hasOwnProperty.call(columnList, key)) {
+      //     row[key] = ''
+      //     if (key === 'A' || key === 'B') {
+      //       row[key] = dateformat(new Date(), 'YYYY/MM/DD HH:mm:ss')
+      //     }
+      //   }
+      // }
+      // table.push(row)
+      console.log(table)
       var wb = XLSX.utils.book_new()
+
       // json转sheet
       var ws = XLSX.utils.json_to_sheet(table, { header: header, skipHeader: true })
-      // console.log('ws', ws)
-      // ws.A1.t = 'd'
-      // ws.B1.t = 'd'
+      console.log('ws', ws)
       // 设置列宽
       // console.log('header', header)
       const colWidthArr = []
@@ -671,6 +682,8 @@ export default {
         colWidthArr.push({ width: 15 })
       })
       ws['!cols'] = colWidthArr
+      // console.log('ws', ws)
+      // console.log('wb', wb)
       // ws['!cols'] = [
       //   { width: 15 },
       //   { width: 15 },
@@ -678,6 +691,7 @@ export default {
       //   { width: 15 },
       //   { width: 15 }
       // ]
+      // columnList
       var timestamp = (new Date()).getTime()
       // sheet写入book
       XLSX.utils.book_append_sheet(wb, ws, 'file')

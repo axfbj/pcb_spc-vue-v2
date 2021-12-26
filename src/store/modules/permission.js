@@ -55,7 +55,7 @@ export function filterAsyncRoutes2(routes, powerCodes, roles) {
     // const tmp = { ...route }
     if (route.type === 2) {
       roleCodes.push(route.powerCode)
-      console.log(roleCodes)
+      // console.log(roleCodes)
     }
     if (route.type === 1) {
       const strArr = route.href.split('/')
@@ -108,6 +108,7 @@ const actions = {
     const { code, data } = await menu_tree()
     if (code !== '200' || !data) { return [] }
     const { accessedRoutes, powerCodes } = filterAsyncRoutes2(data, [], roles)
+    accessedRoutes.push({ path: '*', redirect: '/404', hidden: true })
     commit('SET_ROUTES', accessedRoutes)
     commit('SET_POWERCODES', powerCodes)
     return accessedRoutes

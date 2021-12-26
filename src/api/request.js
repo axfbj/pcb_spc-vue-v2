@@ -53,6 +53,26 @@ service.interceptors.response.use(
         return res
       }
       if (res.code !== '200') {
+        if (res.code === '100000') {
+          Message({
+            message: '会话超时',
+            type: 'error',
+            duration: 5 * 1000
+          })
+          store.dispatch('user/resetToken').then(() => {
+            setTimeout(() => {
+              location.reload()
+            }, 1000)
+          })
+          // MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+          //   confirmButtonText: 'Re-Login',
+          //   cancelButtonText: 'Cancel',
+          //   type: 'warning'
+          // }).then(() => {
+
+          // })
+          return
+        }
         Message({
           message: res.msg,
           type: 'error',

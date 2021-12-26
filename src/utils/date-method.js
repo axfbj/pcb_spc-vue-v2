@@ -1,6 +1,6 @@
 import moment from 'moment'
 
-export function dateformat(date, formatStr = 'YYYY-MM-DD hh:mm:ss') {
+export function dateformat(date, formatStr = 'YYYY-MM-DD HH:mm:ss') {
   return moment(date).format(formatStr)
 }
 

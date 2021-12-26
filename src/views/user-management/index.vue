@@ -149,8 +149,8 @@ export default {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
-        const { code, data } = this.$api.reset_pwd({ userId: row.id })
+      }).then(async() => {
+        const { code, data } = await this.$api.resetPwd({ userId: row.id })
         if (code === '200' && data) {
           this.$message.success('密码重置成功!')
         }

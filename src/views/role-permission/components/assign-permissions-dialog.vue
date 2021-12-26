@@ -12,15 +12,18 @@
     <div style="padding: 10px 20px;">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="菜单权限" name="menu">
-          <el-tree
-            ref="chekbox_tree1"
-            :data="menu_tree_data"
-            show-checkbox
-            node-key="id"
-            :props="defaultProps1"
-            default-expand-all
-            :default-checked-keys="menu_default_checked_keys"
-          />
+          <div style="max-height: 50vh;overflow: auto">
+            <el-tree
+              ref="chekbox_tree1"
+              :data="menu_tree_data"
+              show-checkbox
+              node-key="id"
+              :props="defaultProps1"
+              check-strictly
+              default-expand-all
+              :default-checked-keys="menu_default_checked_keys"
+            />
+          </div>
         </el-tab-pane>
         <el-tab-pane v-if="roleType === 2" label="控制组权限" name="controlGroup">
           <el-tree
@@ -30,6 +33,7 @@
             show-checkbox
             node-key="id"
             :props="defaultProps2"
+            check-strictly
             :default-checked-keys="controlGroup_default_checked_keys"
           />
         </el-tab-pane>
@@ -81,10 +85,13 @@ export default {
   },
   methods: {
     handleClose() {
+      this.clear()
       this.$emit('handleClose')
     },
     clear() {
-      this.this.menu_default_checked_keys = []
+      this.activeName = 'menu'
+      this.menu_default_checked_keys = []
+      this.controlGroup_default_checked_keys = []
     },
     save_rolePower() {
       const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
@@ -107,7 +114,11 @@ export default {
         res.push(this.save_roleControlGroupPower())
       }
       Promise.all(res).then(res => {
-        console.log('res', res)
+        const b = res.every(item => item.code === '200' && item.data)
+        if (b) {
+          this.$message.success('操作成功')
+          this.$emit('confirm')
+        }
       })
     },
     async add(loading) {
@@ -129,29 +140,44 @@ export default {
     //     this.controlGroup_tree_data = data
     //   }
     // },
-    getNode(node) {
-      const result = []
-      let _getNode = function(node) {
-        const tmp = JSON.parse(JSON.stringify(node))
-        delete tmp.children
-        result.push(tmp) // 移除拍平数组的子元素,只保留节点相干元素
-        const child = node.children
-        if (child !== undefined && child.length > 0) {
-          child.forEach(ele => {
-            // arguments.callee(ele)
-            this.getNode(ele)
-          })
-        }
+    /**
+ *
+ * @param {Array} arrs 树形数据
+ * @param {string} childs 树形数据子数据的属性名,常用'children'
+ * @param {Array} attrArr 需要提取的公共属性数组(默认是除了childs的全部属性)
+ * @returns
+ */
+    extractTree(arrs, childs, attrArr) {
+      let attrList = []
+      if (!Array.isArray(arrs) && !arrs.length) return []
+      if (typeof childs !== 'string') return []
+      if (!Array.isArray(attrArr) || Array.isArray(attrArr) && !attrArr.length) {
+        attrList = Object.keys(arrs[0])
+        attrList.splice(attrList.indexOf(childs), 1)
+      } else {
+        attrList = attrArr
       }
-      _getNode(node)
-      _getNode = null
-      return result
+      const list = []
+      const getObj = (arr) => {
+        arr.forEach(function(row) {
+          const obj = {}
+          attrList.forEach(item => {
+            obj[item] = row[item]
+          })
+          list.push(obj)
+          if (row[childs]) {
+            getObj(row[childs])
+          }
+        })
+        return list
+      }
+      return getObj(arrs)
     },
     async getRolePower() {
       const { code, data } = await this.$api.getRolePower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.menu_tree_data = data
-        const result = this.getNode(data)
+        const result = this.extractTree(data, 'children', ['id', 'isCheck'])
         this.menu_default_checked_keys = result.map(item => {
           if (item.isCheck) return item.id
         })
@@ -161,7 +187,7 @@ export default {
       const { code, data } = await this.$api.getRoleControlGroupPower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.controlGroup_tree_data = data
-        const result = this.getNode(data)
+        const result = this.extractTree(data, 'children', ['id', 'isCheck'])
         this.controlGroup_default_checked_keys = result.map(item => {
           if (item.isCheck) return item.id
         })

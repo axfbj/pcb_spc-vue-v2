@@ -182,9 +182,9 @@ export default {
             saveAsImage: { show: true }
           }
         },
-        legend: {
-          data: ['蒸发量', '平均温度']
-        },
+        // legend: {
+        //   data: ['蒸发量', '平均温度']
+        // },
         xAxis: [
           {
             interval: 1,

@@ -6,6 +6,7 @@ import router, { resetRouter } from '@/router'
 const state = {
   token: getToken(),
   currentUser: {},
+  userId: '',
   name: '',
   avatar: '',
   introduction: '',
@@ -22,6 +23,9 @@ const mutations = {
   // },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
+  },
+  SET_USERID: (state, userId) => {
+    state.userId = userId
   },
   SET_NAME: (state, name) => {
     state.name = name
@@ -64,6 +68,7 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
         const d = {
+          userId: data.id,
           roles: data.roleIds.split(','),
           roleCodes: data.roleCodes.split(','),
           name: data.userName || '',
@@ -74,12 +79,13 @@ const actions = {
         if (d.roles.includes('1') || d.roleCodes.includes('admin')) {
           d.roles.push('admin')
         }
-        const { roles, name, avatar, introduction } = d
+        const { userId, roles, name, avatar, introduction } = d
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
           // reject('getInfo: roles must be a non-null array!')
           reject('此账户没有分配角色')
         }
+        commit('SET_USERID', userId)
         commit('SET_ROLES', roles)
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)

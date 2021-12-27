@@ -3,9 +3,9 @@
     :visible.sync="visible"
     :title="f_title"
     :width="width"
-    :before-close="handleClose"
     :top="top"
     append-to-body
+    :before-close="handleClose"
     @open="open"
     @opened="opened"
     @closed="closed"

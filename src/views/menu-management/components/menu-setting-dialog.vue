@@ -8,6 +8,7 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
+    @closed="closed"
     @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 20px;">
@@ -171,7 +172,6 @@ export default {
     },
     handleClose() {
       this.$emit('handleClose')
-      this.clear()
     },
     async confirm({ loading }) {
       this.$refs.form.validate(valid => {
@@ -265,6 +265,9 @@ export default {
         this.clear()
         this.form.pid = '0'
       }
+    },
+    closed() {
+      this.clear()
     },
     async opened({ loading }) {
 

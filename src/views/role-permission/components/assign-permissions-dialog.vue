@@ -19,23 +19,25 @@
               show-checkbox
               node-key="id"
               :props="defaultProps1"
-              check-strictly
               default-expand-all
-              :default-checked-keys="menu_default_checked_keys"
             />
+            <!-- :default-checked-keys="menu_default_checked_keys" -->
+            <!--      check-strictly -->
           </div>
         </el-tab-pane>
         <el-tab-pane v-if="roleType === 2" label="控制组权限" name="controlGroup">
-          <el-tree
-            ref="chekbox_tree2"
-            default-expand-all
-            :data="controlGroup_tree_data"
-            show-checkbox
-            node-key="id"
-            :props="defaultProps2"
-            check-strictly
-            :default-checked-keys="controlGroup_default_checked_keys"
-          />
+          <div style="max-height: 50vh;overflow: auto">
+            <el-tree
+              ref="chekbox_tree2"
+              default-expand-all
+              :data="controlGroup_tree_data"
+              show-checkbox
+              node-key="id"
+              :props="defaultProps2"
+            />
+            <!-- :default-checked-keys="controlGroup_default_checked_keys" -->
+            <!-- check-strictly -->
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -94,14 +96,21 @@ export default {
       this.controlGroup_default_checked_keys = []
     },
     save_rolePower() {
-      const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
+      // const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
+      // const menu_tree_checked2 = this.$refs.chekbox_tree1.getHalfCheckedKeys()
+      const tree1 = this.$refs.chekbox_tree1
+      const menu_tree_checked = [...tree1.getCheckedKeys(), ...tree1.getHalfCheckedKeys()]
+      // console.log(menu_tree_checked)
+
       return this.$api.saveRolePower({
         powerIds: menu_tree_checked.toString(),
         roleId: this.sendData.id
       })
     },
     save_roleControlGroupPower() {
-      const controlGroup_tree_checked = this.$refs.chekbox_tree2.getCheckedKeys()
+      const tree2 = this.$refs.chekbox_tree2
+      // const controlGroup_tree_checked = this.$refs.chekbox_tree2.getCheckedKeys()
+      const controlGroup_tree_checked = [...tree2.getCheckedKeys(), ...tree2.getHalfCheckedKeys()]
       return this.$api.saveRoleControlGroupPower({
         groupIds: controlGroup_tree_checked.toString(),
         roleId: this.sendData.id
@@ -178,8 +187,17 @@ export default {
       if (code === '200' && data) {
         this.menu_tree_data = data
         const result = this.extractTree(data, 'children', ['id', 'isCheck'])
-        this.menu_default_checked_keys = result.map(item => {
-          if (item.isCheck) return item.id
+        this.menu_default_checked_keys = []
+        result.forEach(item => {
+          if (item.isCheck) {
+            this.menu_default_checked_keys.push(item.id)
+          }
+        })
+        const tree1 = this.$refs.chekbox_tree1
+        this.$nextTick(() => {
+          this.menu_default_checked_keys.forEach(key => {
+            tree1.setChecked(key, true, false)
+          })
         })
       }
     },
@@ -188,8 +206,20 @@ export default {
       if (code === '200' && data) {
         this.controlGroup_tree_data = data
         const result = this.extractTree(data, 'children', ['id', 'isCheck'])
-        this.controlGroup_default_checked_keys = result.map(item => {
-          if (item.isCheck) return item.id
+        this.controlGroup_default_checked_keys = []
+        const controlGroup_default_checked_keys2 = []
+        result.forEach(item => {
+          if (item.isCheck) {
+            this.controlGroup_default_checked_keys.push(item.id)
+          } else {
+            controlGroup_default_checked_keys2.push(item.id)
+          }
+        })
+        const tree2 = this.$refs.chekbox_tree2
+        this.$nextTick(() => {
+          this.controlGroup_default_checked_keys.forEach(key => {
+            tree2.setChecked(key, true, false)
+          })
         })
       }
     },

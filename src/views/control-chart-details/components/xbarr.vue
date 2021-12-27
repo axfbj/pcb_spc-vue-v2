@@ -67,7 +67,8 @@ export default {
 
   },
   methods: {
-    add_show(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+    // add_show(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+    add_show(res, controlGroupId, date) {
       this.myChart = this.$echarts.init(this.$refs.chart)
       this.myChart1 = this.$echarts.init(this.$refs.chart1)
 
@@ -228,6 +229,29 @@ export default {
         },
         tooltip: {
           trigger: 'axis',
+          position: function(point, params, dom, rect, size) {
+            // 其中point为当前鼠标的位置，size中有两个属性：viewSize和contentSize，分别为外层div和tooltip提示框的大小
+            var x = point[0] //
+            var y = point[1]
+            var posX = 0 // x坐标位置
+            // var posY = 0 // y坐标位置
+
+            var boxWidth = size.contentSize[0]
+            // var boxHeight = size.contentSize[1]
+
+            var viewWidth = size.viewSize[0]
+            // var viewHeight = size.viewSize[1]
+
+            if ((viewWidth - x) < boxWidth) {
+              posX = x - boxWidth
+              return [posX - 15, y + 10]
+            } else {
+              return [x + 15, y + 10]
+            }
+
+            // return [posX, posY]
+          },
+          // position: ['50%', '50%'],
           formatter: function(tt) {
             if (tt[0].data.异常信息) {
               return '数值：' + tt[0].data.value + '</br>' +
@@ -555,7 +579,9 @@ export default {
 
       this.myChart.on('click', (res) => {
         if (res.name === '异常点') {
-          this.$router.push({ path: '/exception-handling', query: { mes_logintime_k: thisMonthStart, mes_logintime_j: MonthEnd, productCode: productCode, productTypeCode: productTypeCode, inspectionCode }})
+          // this.$router.push({ path: '/statistical-process-control/exception-handling', query: { mes_logintime_k: thisMonthStart, mes_logintime_j: MonthEnd, productCode: productCode, productTypeCode: productTypeCode, inspectionCode }})
+          // this.$router.push({ path: '/statistical-process-control/exception-handling', params: { controlGroupId, thisMonthStart: date[0], thisMonthEnd: date[1] }})
+          this.$router.push({ name: 'ExceptionHandling', params: { controlGroupId, thisMonthStart: date[0], thisMonthEnd: date[1] }})
         }
       })
 

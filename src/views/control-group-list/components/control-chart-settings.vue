@@ -171,6 +171,7 @@
     <discrimination-rules-dialog
       :select-row="select_row"
       :visible="discrimination_rules_dialog"
+      :control-chart-type="controlChartType"
       @handleClose="rules_dialog_close"
       @confirm="rules_confirm"
     />
@@ -191,6 +192,7 @@ import DiscriminationRulesDialog from './discrimination-rules-dialog'
 import SelectKeywordDialog from './select-keyword-dialog'
 import ControlChartSettingsData from './mixins/control-chart-settings-data'
 import { dateformat } from '@/utils/date-method'
+import { mapGetters } from 'vuex'
 export default {
   name: 'ControlChartSettings',
   components: {
@@ -268,6 +270,9 @@ export default {
   //     //   'np': 5
   //     // },
   // },
+  computed: {
+    ...mapGetters(['hierarchicalTypes', 'userId'])
+  },
   created() {
   },
   methods: {
@@ -322,9 +327,10 @@ export default {
         sl: undefined,
         status: 1, // 	状态 1显示 0隐藏
         updateDate: dateformat(new Date()),
-        updateUser: 'admin',
-        userName: 'admin',
-        'updateUserId': 1, // 暂时固定传1
+        // updateUser: 'admin',
+        // userName: 'admin',
+        // 'updateUserId': 1, // 暂时固定传1
+        'updateUserId': this.userId, // 暂时固定传1
         usl: undefined
       }
       if (['Xbar-R', 'Xbar-s'].includes(this.controlChartType)) {

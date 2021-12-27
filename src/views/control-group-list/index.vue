@@ -41,7 +41,7 @@
             <span style="float: right;">
               <!-- v-permission="[1111]" -->
               <ki-button
-                v-permission="['badDefinition.list']"
+                v-permission="['badDefinitionGroup.update']"
                 type="primary"
                 @click="badGroup_btn"
               >不良分组</ki-button>
@@ -334,7 +334,10 @@ export default {
       this.badGroup_dialog = false
     },
     toDetils() {
-      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: { controlChartSonId: this.select_row[0].id, controlChartType: this.select_row[0].controlChartType }})
+      this.$router.push({ path: '/statistical-process-control/control-chart-details', query: {
+        controlChartSonId: this.select_row[0].id,
+        controlChartType: this.select_row[0].controlChartType,
+        controlGroupId: this.current_tree_node_key }})
     },
     formatter_states(row) { // 格式化控制图状态
       const { historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle } = row

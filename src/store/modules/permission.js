@@ -71,6 +71,13 @@ export function filterAsyncRoutes2(routes, powerCodes, roles) {
       if (route.pid === '0') {
         tmp.component = Layout
       }
+      if (tmp.name === 'ControlChartDetails') {
+        tmp.hidden = true
+        tmp.meta.activeMenu = '/statistical-process-control/control-group-list'
+      }
+      if (tmp.name === 'ControlGroupList') {
+        tmp.meta.affix = true
+      }
       if (hasPermission(roles, tmp)) {
         if (tmp.children) {
           tmp.children = filterAsyncRoutes2(tmp.children, roleCodes, roles).accessedRoutes

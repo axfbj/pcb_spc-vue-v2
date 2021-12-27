@@ -11,7 +11,7 @@
   >
     <div style="padding: 10px 40px;">
       <el-form ref="form" :model="form">
-        <el-form-item>
+        <el-form-item v-if="!['p','np'].includes(controlChartType)">
           <el-checkbox v-model="form.rule0" class="fixed-select">R0：落在规格线外</el-checkbox>
         </el-form-item>
         <el-form-item>
@@ -27,16 +27,16 @@
           <el-checkbox v-model="form.rule4">R4：连续<el-input v-model="form.rule4_data1" class="rule-input" />交替上下跳动</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule5">R5：连续<el-input v-model="form.rule5_data1" class="rule-input" />点中有<el-input v-model="form.rule5_data2" class="rule-input" />点落在中心线同侧{{ form.rule5_data3 }}倍标准差以外</el-checkbox>
+          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule5">R5：连续<el-input v-model="form.rule5_data1" class="rule-input" />点中有<el-input v-model="form.rule5_data2" class="rule-input" />点落在中心线同侧{{ form.rule5_data3 }}倍标准差以外</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule6">R6：连续<el-input v-model="form.rule6_data1" class="rule-input" />点中有<el-input v-model="form.rule6_data2" class="rule-input" />点落在中心线同侧{{ form.rule6_data3 }}倍标准差以外</el-checkbox>
+          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule6">R6：连续<el-input v-model="form.rule6_data1" class="rule-input" />点中有<el-input v-model="form.rule6_data2" class="rule-input" />点落在中心线同侧{{ form.rule6_data3 }}倍标准差以外</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧的{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
+          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧的{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule8_data2 }}倍标准差以内</el-checkbox>
+          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule8_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
       </el-form>
     </div>
@@ -54,6 +54,10 @@ export default {
     selectRow: {
       type: [Object, Array],
       default: () => ({})
+    },
+    controlChartType: {
+      type: String,
+      default: ''
     }
   },
   data() {

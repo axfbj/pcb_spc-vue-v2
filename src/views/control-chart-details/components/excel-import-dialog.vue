@@ -83,7 +83,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['hierarchicalTypes']),
+    ...mapGetters(['hierarchicalTypes', 'userId']),
     getChartNum() {
       return this.parseChartType[this.controlChartType] || ''
     }
@@ -96,7 +96,6 @@ export default {
     },
     handleClose() {
       this.$emit('handleClose')
-      this.clear()
     },
     import_verification() {
       // const rowKeys = this.dyHeaderList.map(item => item.prop)
@@ -149,7 +148,7 @@ export default {
           nubmer_value_keys.push(item.label)
         }
       })
-      console.log('nubmer_value_keys', nubmer_value_keys)
+      // console.log('nubmer_value_keys', nubmer_value_keys)
       // console.log('rowKeys', rowLabels)
       // console.log('header', header)
 
@@ -243,7 +242,7 @@ export default {
       const param = this.getSaveParams()
       const { code, data } = await this.$api.inspectionRecord_save(param)
       if (code === '200' && data) {
-        this.$emit('confirm', data)
+        this.$emit('confirm')
       } else {
         loading(false)
       }
@@ -262,6 +261,7 @@ export default {
       }
     },
     closed() {
+      this.clear()
     },
     getSaveParams() {
       const h_type = {
@@ -306,7 +306,7 @@ export default {
         } else {
           delete inspectionRecord.objectList
         }
-        inspectionRecord.createUser = 1
+        inspectionRecord.createUser = this.userId
         inspectionRecordList.push(inspectionRecord)
       })
       // console.log('inspectionRecordList', inspectionRecordList)

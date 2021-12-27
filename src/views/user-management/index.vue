@@ -113,8 +113,8 @@ export default {
       assign_permissions_dialog: false,
       dialog_flag: '',
       header_list: [
-        { prop: 'userCode', label: '编号' },
-        { prop: 'userName', label: '账号' },
+        { prop: 'userCode', label: '用户账号' },
+        { prop: 'userName', label: '用户名' },
         { prop: 'sex', label: '性别', template: 'sex' },
         { prop: 'mobilePhone', label: '电话' },
         { prop: 'email', label: '邮箱' },

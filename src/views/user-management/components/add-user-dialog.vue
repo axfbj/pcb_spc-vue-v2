@@ -8,6 +8,7 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
+    @closed="closed"
   >
     <div style="padding: 10px 20px;">
       <el-form
@@ -138,7 +139,6 @@ export default {
     },
     handleClose() {
       this.$emit('handleClose')
-      this.clear()
     },
     async confirm({ loading }) {
       this.$refs.form.validate(valid => {
@@ -219,8 +219,11 @@ export default {
       this.$refs['ipt'].focus()
     },
     async opened({ loading }) {
-
+    },
+    closed() {
+      this.clear()
     }
+
   }
 }
 </script>

@@ -39,7 +39,6 @@
       :request="request_data"
       :page-sizes="[20,60,100]"
       fixed-height="40vh"
-      @current-change="current_change"
       @select="select_callback"
     />
     <cu-dialog
@@ -117,10 +116,6 @@ export default {
     refresh(params) {
       this.$refs.dy_table.refresh(params)
     },
-    current_change(val) {
-      console.log('current_change')
-      console.log(val)
-    },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await this.$api.keywordValue_list({
         page: page_no,
@@ -136,7 +131,7 @@ export default {
       }
     },
     select_callback(data) {
-      console.log('select_callback：  ', JSON.stringify(data))
+      // console.log('select_callback：  ', JSON.stringify(data))
     },
     click_link(data) {
       console.log(data)

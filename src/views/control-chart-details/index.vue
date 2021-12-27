@@ -168,7 +168,7 @@
             <template v-if="data.list.template === 'states'">
               <span v-if="data.cellValue === 0" style="color: green;">正常</span>
               <span v-if="data.cellValue === 1" style="color: red;">失控</span>
-              <span v-if="data.cellValue === 2" style="color: pink;">已处理</span>
+              <span v-if="data.cellValue === 2" style="color: #9932CC;">已处理</span>
             </template>
             <template v-else>{{ data.cellValue }}</template>
           </template>
@@ -386,7 +386,8 @@ export default {
     excel_import_dialog_btn() {
       this.excel_import_dialog = true
     },
-    excel_import_confirm() {
+    async excel_import_confirm() {
+      await this.set_data('init')
       this.excel_import_dialog = false
     },
     excel_import_close() {
@@ -403,7 +404,10 @@ export default {
         return
       }
       if (this.chartTypeNum === 1) {
-        const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
+        // const chart = this.$refs['xbarr'].add_show(res4.data, this.thisMonthStart, this.thisMonthEnd, this.inspectionCode, this.productTypeCode, this.productCode)
+        const chart = this.$refs['xbarr'].add_show(res4.data,
+          this.$route.query.controlGroupId,
+          this.form.date)
         this.myEcharts.line1 = chart[0]
         this.myEcharts.line2 = chart[1]
         if (this.activeName === 'bar') {
@@ -411,7 +415,9 @@ export default {
         }
       } else if (this.chartTypeNum === 2) {
         // const res4 = Xbars_data
-        this.myEcharts.xbars = this.$refs['xbars'].add_show2(res4.data)
+        this.myEcharts.xbars = this.$refs['xbars'].add_show2(res4.data,
+          this.$route.query.controlGroupId,
+          this.form.date)
         // this.arr.Cpk = res4.data.vCPK
       } else if (this.chartTypeNum === 3) {
         // const res4 = XMR_data
@@ -460,7 +466,7 @@ export default {
       if (code === '200' && data) {
         this.select_row = {}
         this.$message.success('删除成功！')
-        this.set_data()
+        await this.set_data()
       }
     },
     get_final_header_list() {

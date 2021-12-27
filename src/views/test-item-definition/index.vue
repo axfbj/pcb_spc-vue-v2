@@ -142,7 +142,7 @@ export default {
       }
     },
     select_callback(data) {
-      console.log('select_callback：  ', JSON.stringify(data))
+      // console.log('select_callback：  ', JSON.stringify(data))
     },
     query() {
       this.$refs.dy_table.refresh()

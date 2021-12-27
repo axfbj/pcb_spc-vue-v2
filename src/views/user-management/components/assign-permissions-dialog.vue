@@ -8,6 +8,7 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
+    @closed="closed"
   >
     <div style="padding: 10px 20px;">
       <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -77,7 +78,6 @@ export default {
   },
   methods: {
     handleClose() {
-      this.clear()
       this.$emit('handleClose')
     },
     clear() {
@@ -148,7 +148,9 @@ export default {
       loading(false)
     },
     async opened({ loading }) {
-
+    },
+    closed() {
+      this.clear()
     }
   }
 }

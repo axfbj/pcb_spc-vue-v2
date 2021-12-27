@@ -26,6 +26,7 @@
         <template v-slot:custum_content>
           <control-group-tree
             ref="tree"
+
             @node-click="node_click"
             @render-after="render_after"
             @path-change="path_change"
@@ -107,8 +108,8 @@
       </container-layout>
     </el-col>
 
-    <bad-item-dialog
-      :visible="bad_item_dialog"
+    <exception-handling-dialog
+      :visible="exception_handling_dialog"
       :select-row="select_row"
       :flag="dialog_flag"
       @handleClose="dialog_close"
@@ -118,13 +119,13 @@
 </template>
 
 <script>
-import badItemDialog from './components/bad-item-dialog'
-import ControlGroupTree from '../control-group-list/components/control-group-tree'
+import ExceptionHandlingDialog from './components/exception-handling-dialog'
+import ControlGroupTree from './components/control-group-tree'
 import { getMothStartAndEnd } from '@/utils/date-method'
 export default {
   name: 'ExceptionHandling',
   components: {
-    badItemDialog,
+    ExceptionHandlingDialog,
     ControlGroupTree
   },
   data() {
@@ -132,7 +133,7 @@ export default {
       path: '',
       current_tree_node_data: {},
       dialog_flag: 'add',
-      bad_item_dialog: false,
+      exception_handling_dialog: false,
       item2: {},
       header_list: [
         { prop: 'id', label: 'ID', width: '180' },
@@ -146,6 +147,7 @@ export default {
       form: {
         inspectionName: '',
         date: getMothStartAndEnd(),
+        // date: [],
         checkList: []
       },
       select_row: {}
@@ -156,7 +158,30 @@ export default {
       return this.current_tree_node_data.id
     }
   },
-
+  watch: {
+    '$route.params.thisMonthStart': {
+      immediate: true,
+      handler(date0) {
+        if (date0) {
+          this.$set(this.form.date, 0, date0)
+        }
+      }
+    },
+    '$route.params.thisMonthEnd': {
+      immediate: true,
+      handler(date1) {
+        if (date1) {
+          this.$set(this.form.date, 1, date1)
+        }
+      }
+    }
+  },
+  activated() {
+    if (this.$route.params.thisMonthStart && this.$route.params.thisMonthEnd) {
+      this.form.date[0] = this.$route.params.thisMonthStart
+      this.form.date[1] = this.$route.params.thisMonthEnd
+    }
+  },
   methods: {
     query() {
       if (!this.form.date) {
@@ -174,20 +199,21 @@ export default {
     },
     render_after(currentData) {
       this.current_tree_node_data = currentData
+      console.log(this.form.date)
       this.$refs.dy_table.refresh({ keep: true })
     },
     // add() {
     //   this.dialog_flag = 'add'
-    //   this.bad_item_dialog = true
+    //   this.exception_handling_dialog = true
     // },
     exception_handling_btn() {
       if (!this.$refs.dy_table.one_row_select()) return
-      this.bad_item_dialog = true
+      this.exception_handling_dialog = true
     },
     // edit() {
     //   if (!this.$refs.dy_table.one_row_select()) return
     //   this.dialog_flag = 'edit'
-    //   this.bad_item_dialog = true
+    //   this.exception_handling_dialog = true
     // },
     // del_btn(open) {
     //   if (!this.$refs.dy_table.one_row_select()) return
@@ -212,10 +238,11 @@ export default {
       this.$refs.dy_table.refresh()
     },
     dialog_close() {
-      this.bad_item_dialog = false
+      this.exception_handling_dialog = false
     },
     async request_data({ page_no, page_size, table_data }) {
-      const { code, data } = await this.$api.controlChartAbnorma_list({
+      console.log(this.form.date)
+      const p = {
         page: page_no,
         limit: page_size,
         // order: 'asc',
@@ -242,16 +269,18 @@ export default {
         // 'thisMonthStart': '2021-11-30 11:59:57',
         // 'sidx': 'id',
         // 'order': 'desc'
-      })
+      }
+      const { code, data } = await this.$api.controlChartAbnorma_list(p)
+
       if (code === '200' && data) {
         return {
           data: data.list,
-          total: data.totalPage
+          total: data.totalCount
         }
       }
     },
     select_callback(data) {
-      console.log('select_callback：  ', JSON.stringify(data))
+      // console.log('select_callback：  ', JSON.stringify(data))
     }
   }
 }

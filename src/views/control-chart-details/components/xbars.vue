@@ -39,7 +39,8 @@ export default {
 
   },
   methods: {
-    add_show2(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+    // add_show2(res, thisMonthStart, MonthEnd, inspectionCode, productTypeCode, productCode) {
+    add_show2(res, controlGroupId, date) {
       this.myChart = echarts.init(this.$refs.chart)
       // 默认初始化（清空）
       this.axisX = []
@@ -79,51 +80,60 @@ export default {
           this.min = i.y
         }
       })
-      if (res.Series8.R0) {
-        res.Series8.R0.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R1) {
-        res.Series8.R1.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R2) {
-        res.Series8.R2.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R3) {
-        res.Series8.R3.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R4) {
-        res.Series8.R4.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R5) {
-        res.Series8.R5.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R6) {
-        res.Series8.R6.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R7) {
-        res.Series8.R7.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
-      if (res.Series8.R8) {
-        res.Series8.R8.forEach((i) => {
-          this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
-        })
-      }
+      // 加入异常点
+      res.Series8.forEach(item => {
+        // console.log('i.', i)
+        this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: item.x, yAxis: item.y })
+        // 浮框内信息，确认有是个异常点，并添加上异常信息
+        const has_exceptionInformation_point = this.LineSeries3.find(i => item.inspectionRecordId === i.inspectionRecordId)
+        has_exceptionInformation_point['异常信息'] = item.exceptionInformation
+        // this.LineSeries3.push({ 'value': i.y, '日期': i.tdate, '备注': i.remark || '', '异常信息': i.exceptionInformation })
+      })
+      // if (res.Series8.R0) {
+      //   res.Series8.R0.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R1) {
+      //   res.Series8.R1.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R2) {
+      //   res.Series8.R2.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R3) {
+      //   res.Series8.R3.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R4) {
+      //   res.Series8.R4.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R5) {
+      //   res.Series8.R5.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R6) {
+      //   res.Series8.R6.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R7) {
+      //   res.Series8.R7.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
+      // if (res.Series8.R8) {
+      //   res.Series8.R8.forEach((i) => {
+      //     this.series8.push({ itemStyle: { color: '#FF0000' }, name: '异常点', xAxis: i.x, yAxis: i.y })
+      //   })
+      // }
       this.myChart.setOption({
         legend: {
           data: [
@@ -146,8 +156,8 @@ export default {
           data: this.axisX
         },
         yAxis: {
-          max: this.max + 3,
-          min: this.min - 3,
+          max: this.max * 1.2,
+          min: this.min * 1.2,
           type: 'value',
           splitLine: { show: false }
         },
@@ -294,6 +304,14 @@ export default {
             }
           }]
       })
+      this.myChart.on('click', (res) => {
+        if (res.name === '异常点') {
+          // this.$router.push({ path: '/statistical-process-control/exception-handling', query: { mes_logintime_k: thisMonthStart, mes_logintime_j: MonthEnd, productCode: productCode, productTypeCode: productTypeCode, inspectionCode }})
+          // this.$router.push({ path: '/statistical-process-control/exception-handling', params: { controlGroupId, thisMonthStart: date[0], thisMonthEnd: date[1] }})
+          this.$router.push({ name: 'ExceptionHandling', params: { controlGroupId, thisMonthStart: date[0], thisMonthEnd: date[1] }})
+        }
+      })
+
       return this.myChart
       // this.myChart.on('click', (res) => {
       //   if (res.name === '异常点') {

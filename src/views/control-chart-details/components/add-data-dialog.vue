@@ -196,7 +196,14 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['hierarchicalTypes']),
+    ...mapGetters([
+      'hierarchicalTypes',
+      'userId'
+      // 'name',
+      // 'sidebar',
+      // 'avatar',
+      // 'device'
+    ]),
     getChartNum() {
       return this.parseChartType[this.controlChartType] || ''
     }
@@ -277,7 +284,7 @@ export default {
         // console.log(hierarchicalItem)
       })
 
-      form.createUser = 1
+      form.createUser = this.userId
       // if (this.flag === 'add') {
       //   const { inspectionRecords } = this.inspectionRecords_data
       //   if (inspectionRecords[0].controlChartSonId === null) {
@@ -297,7 +304,7 @@ export default {
             controlChartSonId: this.controlChartSonId,
             // createData: '',
             // inspectionData: this.form,
-            'createUser': 1,
+            'createUser': this.userId,
             'hierarchicalTypeValueEight': '',
             'hierarchicalTypeValueFive': '',
             'hierarchicalTypeValueFour': '',

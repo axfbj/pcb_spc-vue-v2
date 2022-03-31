@@ -24,7 +24,9 @@
             show-checkbox
             node-key="id"
             :props="defaultProps"
+            check-strictly
           />
+          <!-- check-strictly -->
         </el-col>
         <el-col :span="6" style="text-align: center;">
           <ki-button @click="checkAll">全选</ki-button>
@@ -40,16 +42,12 @@
       <ki-button style="float: left;" @click="handleClose">取 消</ki-button>
       <!-- <ki-button type="warning" @click="prev">上一步</ki-button> -->
       <ki-button type="warning" @click="next">下一步</ki-button>
-      <!-- <ki-button
-        style="margin-left: 60px;"
-        type="primary"
-        @click="confirm"
-      >确 定</ki-button> -->
     </template>
   </ki-dialog>
 </template>
 
 <script>
+import { extractTree } from '@/utils/tree-method'
 export default {
   name: 'ControlGroupFiltering',
   props: {
@@ -144,8 +142,8 @@ export default {
       // })
     },
     checkAll() {
-      // this.flag = true
-      this.$refs.chekbox_tree.setCheckedNodes(this.tree_data)
+      const allKeys = extractTree(this.tree_data, 'children', ['id']).map(item => item.id)
+      this.$refs.chekbox_tree.setCheckedKeys(allKeys)
     },
     // 全选
     batchSelect(nodes, refs, flag, seleteds) {
@@ -163,9 +161,13 @@ export default {
     },
     // 反选
     inverse() {
-      const res = this.$refs.chekbox_tree
-      const nodes = res.getCheckedNodes(true, true)
-      this.batchSelect(this.tree_data, res, true, nodes)
+      const tree = this.$refs.chekbox_tree
+      const allKeys = extractTree(this.tree_data, 'children', ['id']).map(item => item.id)
+      const selectedKeys = tree.getCheckedKeys()
+      const newSelectKeys = allKeys.filter(key => !selectedKeys.includes(key))
+      this.$refs.chekbox_tree.setCheckedKeys(newSelectKeys)
+      // const nodes = res.getCheckedNodes(true, true)
+      // this.batchSelect(this.tree_data, res, true, nodes)
     },
     async add() {
 

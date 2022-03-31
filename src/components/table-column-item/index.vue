@@ -44,16 +44,17 @@
 
     <template v-for="item in list.children">
       <!-- 递归渲染 -->
-      <table-column-item :key="item.prop" :list="item">
-        <template slot="header-template" slot-scope="scope">
-          <slot name="header-template" v-bind="scope" />
-        </template>
+      <template>
+        <table-column-item :key="item.prop" :list="item">
+          <template slot="header-template" slot-scope="scope">
+            <slot name="header-template" v-bind="scope" />
+          </template>
 
-        <template slot="cell-template" slot-scope="scope">
-          <slot name="cell-template" v-bind="scope" />
-        </template>
-      </table-column-item>
-
+          <template slot="cell-template" slot-scope="scope">
+            <slot name="cell-template" v-bind="scope" />
+          </template>
+        </table-column-item>
+      </template>
     </template>
 
   </el-table-column>

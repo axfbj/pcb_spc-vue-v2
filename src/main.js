@@ -40,12 +40,23 @@ Vue.directive('permission', {
 //   const { mockXHR } = require('../mock')
 //   mockXHR()
 // }
+
+// --------更改组件默认属性-----------
+Element.TableColumn.props.showOverflowTooltip = {
+  type: Boolean,
+  default: true
+}
+
 Element.Dialog.props.closeOnClickModal.default = false
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'mini'// set element-ui default size
   // locale: enLang // 如果使用中文，无需设置，请删除
 })
+
+// 引入 loadsh
+// import _ from 'lodash'
+// Vue.prototype._ = _
 
 import api from './api/api.js'
 // 定义全局变量

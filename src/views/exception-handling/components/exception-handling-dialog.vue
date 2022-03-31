@@ -3,21 +3,22 @@
     :visible="visible"
     title="异常处理"
     width="40%"
+    :button-text="['处 理','取 消']"
+    :default-footer="flag !== 'details'"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
     @opened="opened"
     @close="close"
-    @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 60px;">
       <el-form
         ref="form"
         :model="form"
         :rules="rules"
-        label-width="auto"
+        label-width="120px"
       >
-        <el-row class="desc-list mini-space">
+        <el-row v-show="show_details" class="desc-list mini-space">
           <el-col :span="12">
             <el-form-item label="检测项目:">
               {{ form.inspectionName }}
@@ -49,39 +50,52 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="当前值:">
+            <!-- <el-form-item label="当前值:">
               {{ form.currentValue }}
-            </el-form-item>
+            </el-form-item> -->
           </el-col>
-          <el-col :span="24">
+          <!-- <el-col :span="24">
             <el-form-item label="异常信息:">
               {{ form.abnormalInformation }}
             </el-form-item>
-          </el-col>
+          </el-col> -->
 
         </el-row>
         <el-row class="desc-list">
           <el-col :span="24">
-            <el-form-item label="失控原因:">
-              <el-input ref="ipt" v-model="form.abnormalReason" type="textarea" :rows="4" />
+            <el-form-item label="失控原因:" prop="abnormalReason">
+              <el-input ref="ipt" v-model.trim="form.abnormalReason" type="textarea" :rows="4" :readonly="flag === 'details'" />
             </el-form-item>
           </el-col>
           <el-col :span="24">
-            <el-form-item label="处理措施:">
-              <el-input v-model="form.handleProgramme" type="textarea" :rows="4" />
+            <el-form-item label="处理措施:" prop="handleProgramme">
+              <el-input v-model.trim="form.handleProgramme" type="textarea" :rows="4" :readonly="flag === 'details'" />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-row class="desc-list">
+        <el-row v-show="show_details" class="desc-list">
           <el-col :span="12">
             <el-form-item label="处理人:">
-              admin
+              {{ form.handler }}
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="处理时间:">
-              {{ form.happenDate }}
+              {{ form.processingDate }}
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row v-show="show_details" class="desc-list">
+          <el-col :span="12">
+            <el-form-item label="审核人:">
+              {{ form.auditor }}
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="审核时间:">
+              {{ form.auditDate }}
             </el-form-item>
           </el-col>
         </el-row>
@@ -92,8 +106,9 @@
 </template>
 
 <script>
+// import { mapGetters } from 'vuex'
 export default {
-  name: 'BadItemDialog',
+  name: 'ExceptionHandlingDialog',
   props: {
     visible: {
       type: Boolean,
@@ -102,10 +117,16 @@ export default {
     selectRow: {
       type: [Object, Array],
       default: () => ({})
+    },
+    sendRow: {
+      type: [Object, Array],
+      default: () => ({})
     }
   },
+
   data() {
     return {
+      flag: '',
       form: {},
       form_data: {
         inspectionName: '',
@@ -130,13 +151,24 @@ export default {
         'processingDate': '',
         'seqNo': 0,
         'sl': 0,
-        'usl': 0
+        'usl': 0,
+        'auditor': ''
       },
       rules: {
-        // badCode: [{ required: true, message: '不良代码不能为空', trigger: 'change' }],
-        // badName: [{ required: true, message: '不良名称不能为空', trigger: 'change' }]
+        'abnormalReason': [
+          { required: true, message: '请输入失控原因', trigger: 'change' }
+        ],
+        'handleProgramme': [
+          { required: true, message: '请输入处理措施', trigger: 'change' }
+        ]
       }
     }
+  },
+  computed: {
+    show_details() {
+      return this.selectRow.length === 1 || this.flag === 'details'
+    }
+    // ...mapGetters(['name'])
   },
   created() {
     Object.freeze(this.form_data)
@@ -144,11 +176,12 @@ export default {
   },
   methods: {
     clear() {
+      this.flag = ''
       this.form = JSON.parse(JSON.stringify(this.form_data))
+      this.$refs.form.resetFields()
     },
     handleClose() {
       this.$emit('handleClose')
-      this.$refs.form.resetFields()
     },
     async confirm({ loading }) {
       this.$refs.form.validate(valid => {
@@ -157,71 +190,44 @@ export default {
         this.update(loading)
       })
     },
-    // async add() {
-    //   const res = await this.$api.badDefinition_save({
-    //     badCode: this.form.badCode,
-    //     badName: this.form.badName,
-    //     badDescription: this.form.badDescription
-    //   })
-    //   if (res.code === '200') {
-    //     this.$emit('confirm')
-    //   }
-    //   this.handleClose()
-    // },
     async update(loading) {
-      const res = await this.$api.controlChartAbnorma_update({
-        ...this.form,
-        abnormalStatus: '1'
+      const p = {
+        ids: [],
+        abnormalReason: this.form.abnormalReason,
+        handleProgramme: this.form.handleProgramme
+      }
+      this.selectRow.forEach(row => {
+        p.ids.push(...row.abnormalIdList)
       })
+      const res = await this.$api.abnormalHandleByInspectionRecordId(p)
       if (res.code === '200') {
         this.$emit('confirm')
       } else {
         loading(false)
       }
-      this.handleClose()
     },
-    async open({ loading }) {
-      // this.flag = this.$attrs.flag
-
-      loading(true)
-      const { code, data } = await this.$api.controlChartAbnorma_info({ id: this.selectRow.id })
+    async getDetils() {
+      const row = this.flag === 'details' ? this.sendRow : this.selectRow[0]
+      const { code, data } = await this.$api.abnormalByInspectionRecordId({ inspectionRecordId: row.inspectionRecordId })
       if (code === '200' && data) {
-        // console.log(data)
-        for (const key in data) {
-          if (Object.hasOwnProperty.call(data, key)) {
-            this.form[key] = data[key] || ''
+        for (const key in data[0]) {
+          if (Object.hasOwnProperty.call(data[0], key)) {
+            this.form[key] = data[0][key] || ''
           }
         }
-        this.form.inspectionName = this.selectRow.inspectionName
-        // this.form = {
-        //   'abnormalCode': '',
-        //   'abnormalInformation': '',
-        //   'abnormalReason': '',
-        //   'abnormalStatus': 0,
-        //   'controlChartSonId': 0,
-        //   'currentValue': 0,
-        //   'exceptionLevel': '',
-        //   'g1cl': 0,
-        //   'g1lcl': 0,
-        //   'g1ucl': 0,
-        //   'g2cl': 0,
-        //   'g2lcl': 0,
-        //   'g2ucl': 0,
-        //   'handleProgramme': '',
-        //   'handleResult': '',
-        //   'handlerId': 0,
-        //   'happenDate': '',
-        //   'id': 0,
-        //   'lsl': 0,
-        //   'processingDate': '',
-        //   'seqNo': 0,
-        //   'sl': 0,
-        //   'usl': 0
-        // }
+        this.form.inspectionName = row.inspectionName
       }
-      loading(false)
-
-      this.$refs['ipt'].focus()
+    },
+    async open({ loading }) {
+      this.flag = this.$attrs.flag
+      if (this.selectRow.length === 1 || this.flag === 'details') {
+        loading(true)
+        await this.getDetils()
+        loading(false)
+      }
+      if (this.flag !== 'details') {
+        this.$refs['ipt'].focus()
+      }
     },
     async opened({ loading }) {
 

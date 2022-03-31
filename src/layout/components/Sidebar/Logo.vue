@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      title: '思方MES系统',
+      title: 'SPC统计过程管理系统',
       // logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
       logo: '@/assets/sifang1.png'
     }

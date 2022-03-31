@@ -3,9 +3,10 @@
     <container-layout ref="contenter">
       <template v-slot:btns>
         <div style="text-align: right;">
-          <ki-button type="primary" @click="add">添加</ki-button>
-          <ki-button type="warning" @click="edit">修改</ki-button>
+          <ki-button v-permission="['inspectionItems.save']" type="primary" @click="add">添加</ki-button>
+          <ki-button v-permission="['inspectionItems.update']" type="warning" @click="edit">修改</ki-button>
           <ki-message-box
+            v-permission="['inspectionItems.delete']"
             :next="del"
             @click="del_btn"
           >
@@ -137,7 +138,7 @@ export default {
       if (code === '200' && data) {
         return {
           data: data.list,
-          total: data.totalPage
+          total: data.totalCount
         }
       }
     },

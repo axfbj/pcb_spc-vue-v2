@@ -18,6 +18,9 @@ export default {
   badDefinitionGroup_info(data) {
     return http.post(`/spc/badDefinitionGroup/info/${data.id}`, data, 'form')
   },
+  badDefinitionGroup_infos(data) {
+    return http.post(`/spc/badDefinitionGroup/info/${data.id}`)
+  },
   badDefinitionGroup_saveOrUpdateBatch(data) {
     return http.post(`/spc/badDefinitionGroup/saveOrUpdateBatch`, data)
   }

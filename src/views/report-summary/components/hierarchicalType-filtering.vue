@@ -33,7 +33,7 @@
           <ki-button @click="inverse">反选</ki-button>
         </el-col>
         <br>
-        <el-col :span="24" style="padding-top: 10px;">
+        <el-col v-if="$attrs.flag!=='abnormalPoint'" :span="24" style="padding-top: 10px;">
           <el-checkbox v-model="cpkHighlight">
             当CPK小于 <el-input-number v-model="cpkHighlightValue" :controls="false" style="width: 60px;" /> 时高亮显示当前单元格
           </el-checkbox>
@@ -134,6 +134,8 @@ export default {
     async opened({ loading }) {
     },
     clear() {
+      this.cpkHighligh = false
+      this.cpkHighlightValue = 0
       this.checklist = []
     },
     closed() {

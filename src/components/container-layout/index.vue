@@ -255,11 +255,13 @@ export default {
         left: 0;
         width: 100%;
         z-index: 100;
-        background-color: #dcdcdc;
+        // background-color: #dcdcdc;
+        background-color: #bdbcbc;
         height: 100%;
         transition: background-color 0.3s;
         &:hover {
-          background-color: #bdbcbc;
+          // background-color: #bdbcbc;
+          background-color: #878383;
           cursor: n-resize !important;
         }
       }
@@ -271,7 +273,8 @@ export default {
   position: relative;
   .koimy-main-header {
     .el-form-item {
-      margin: 10px 5px 2px 5px;
+      // margin: 10px 5px 2px 5px;
+      margin: 8px 5px 5px 5px;
     }
   }
   .koimy-main-footer {

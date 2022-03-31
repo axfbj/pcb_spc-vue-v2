@@ -55,6 +55,9 @@ export function filterAsyncRoutes2(routes, powerCodes, roles) {
     // const tmp = { ...route }
     if (route.type === 2) {
       roleCodes.push(route.powerCode)
+      if (route.children) {
+        filterAsyncRoutes2(route.children, roleCodes, roles).accessedRoutes
+      }
       // console.log(roleCodes)
     }
     if (route.type === 1) {
@@ -71,12 +74,13 @@ export function filterAsyncRoutes2(routes, powerCodes, roles) {
       if (route.pid === '0') {
         tmp.component = Layout
       }
+      // 控制图 隐藏  active高亮指向 控制组列表
       if (tmp.name === 'ControlChartDetails') {
         tmp.hidden = true
         tmp.meta.activeMenu = '/statistical-process-control/control-group-list'
       }
       if (tmp.name === 'ControlGroupList') {
-        tmp.meta.affix = true
+        tmp.meta.affix = true // 控制组列表 固定
       }
       if (hasPermission(roles, tmp)) {
         if (tmp.children) {
@@ -114,6 +118,17 @@ const actions = {
   async generateRoutes({ commit }, roles) {
     const { code, data } = await menu_tree()
     if (code !== '200' || !data) { return [] }
+    // console.log(data)
+    const permission_menu = data.find(menu => menu.id === '1')
+    if (permission_menu) {
+      if (permission_menu.children.length === 1 && permission_menu.children[0].id === '2') {
+        const child = permission_menu.children[0]
+        if (child.children.length === 1 && child.children[0].id === '5') {
+          permission_menu.enable = false
+        }
+      }
+    }
+
     const { accessedRoutes, powerCodes } = filterAsyncRoutes2(data, [], roles)
     accessedRoutes.push({ path: '*', redirect: '/404', hidden: true })
     commit('SET_ROUTES', accessedRoutes)

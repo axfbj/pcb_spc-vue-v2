@@ -12,6 +12,9 @@ export default {
   controlChartSon_info(data) {
     return http.post(`/spc/control/chart/son/info/${data.id}`, data, 'form')
   },
+  controlChartSon_infos(data) {
+    return http.post(`/spc/control/chart/son/infos`, data)
+  },
   controlChartSon_generateCode(data) {
     return http.post('/spc/control/chart/son/proGenerateControlChartCode', data)
   },

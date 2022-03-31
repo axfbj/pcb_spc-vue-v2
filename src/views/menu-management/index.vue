@@ -23,6 +23,7 @@
         <!-- <ki-message-box
                 :next="del"
                 @click="del_btn"
+                v-permission="['menu.delete']"
               >
                 <ki-button
                   type="danger"
@@ -63,7 +64,7 @@
               <template v-else-if="data.list.template === 'operate'">
                 <div class="operate-box">
                   <!-- <el-link type="primary" @click="add_menu_son_btn(data.scope)">添加</el-link> -->
-                  <el-link type="primary" @click="update_menu_son_btn(data.scope)">修改</el-link>
+                  <el-link v-permission="['menu.update']" type="primary" @click="update_menu_son_btn(data.scope)">修改</el-link>
                 </div>
               </template>
               <template v-else>{{ data.cellValue }}</template>

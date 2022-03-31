@@ -28,6 +28,10 @@ export default {
     controlChartSonId: {
       type: String,
       default: '0'
+    },
+    controlGroupId: {
+      type: String,
+      default: ''
     }
   },
   data() {
@@ -47,23 +51,20 @@ export default {
     }
   },
   watch: {
-    '$route.params.controlGroupId': {
-      immediate: true,
-      handler(controlGroupId) {
-        this.init()
-      }
+    controlGroupId(val) {
+      // alert(1)
+      if (val) this.init()
     }
-  },
-  async created() {
-    // this.init()
+    // currentKey(currentKey) {
+    //   this.$emit('tree-key-change', currentKey)
+    // }
   },
   methods: {
     init() {
       this.refresh((data) => {
-        // alert(this.$route.params.controlGroupId)
         if (data && data.length > 0) {
-          if (this.$route.params.controlGroupId) {
-            const controlGroupId = this.$route.params.controlGroupId
+          if (this.controlGroupId) {
+            const controlGroupId = this.controlGroupId
             if (!this.$refs.tree.getNode(controlGroupId)) {
               this.defaultExpandedKeys.push(data[0].id)
               this.$refs.tree.setCurrentKey(data[0].id)

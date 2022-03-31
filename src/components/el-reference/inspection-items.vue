@@ -120,7 +120,7 @@ export default {
       if (code === '200' && data) {
         return {
           data: data.list,
-          total: data.totalPage
+          total: data.totalCount
         }
       }
     },

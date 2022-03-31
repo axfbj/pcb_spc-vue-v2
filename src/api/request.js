@@ -10,7 +10,7 @@ const service = axios.create({
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   baseURL: process.env.VUE_APP_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 30000 // request timeout
 })
 
 // request interceptor
@@ -48,20 +48,25 @@ service.interceptors.response.use(
    */
   response => {
     if (response.status === 200) {
-      const res = response.data
+      let res = {}
+      if (Object.hasOwnProperty.call(response, 'data')) {
+        res = response.data
+      }
+
       if (res instanceof Blob) {
         return res
       }
       if (res.code !== '200') {
         if (res.code === '100000') {
           Message({
-            message: '会话超时',
+            message: '会话超时,请重新登录!',
             type: 'error',
-            duration: 5 * 1000
+            duration: 2 * 1000
           })
           store.dispatch('user/resetToken').then(() => {
             setTimeout(() => {
-              location.reload()
+              location.href = location.pathname
+              // location.reload('/login') // 这个会保留重定向路径
             }, 1000)
           })
           // MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {

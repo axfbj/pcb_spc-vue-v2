@@ -4,6 +4,7 @@
     title="分配权限"
     width="26%"
     :flag="$attrs.flag"
+    :permission="['role.update.power','role.update.control.group.power']"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
@@ -14,12 +15,14 @@
         <el-tab-pane label="菜单权限" name="menu">
           <div style="max-height: 50vh;overflow: auto">
             <el-tree
-              ref="chekbox_tree1"
+              v-if="powerCodes.includes('role.power')"
+              ref="checkbox_tree1"
               :data="menu_tree_data"
               show-checkbox
               node-key="id"
               :props="defaultProps1"
               default-expand-all
+              check-strictly
             />
             <!-- :default-checked-keys="menu_default_checked_keys" -->
             <!--      check-strictly -->
@@ -28,15 +31,18 @@
         <el-tab-pane v-if="roleType === 2" label="控制组权限" name="controlGroup">
           <div style="max-height: 50vh;overflow: auto">
             <el-tree
-              ref="chekbox_tree2"
+              v-if="powerCodes.includes('role.control.group.power')"
+              ref="checkbox_tree2"
+              v-permission="['role.control.group.power']"
               default-expand-all
               :data="controlGroup_tree_data"
               show-checkbox
               node-key="id"
               :props="defaultProps2"
+              check-strictly
+              @check="group_check_change"
             />
-            <!-- :default-checked-keys="controlGroup_default_checked_keys" -->
-            <!-- check-strictly -->
+            <div v-else style="text-align:center;color: #E6A23C;"><span>无查看权限</span></div>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -47,6 +53,8 @@
 <script>
 // import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
 // import { saveRolePower, saveRoleControlGroupPower } from '@/api/role'
+import { mapGetters } from 'vuex'
+import _ from 'lodash'
 export default {
   name: 'AssignPermissionsDialog',
   props: {
@@ -85,7 +93,51 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['powerCodes'])
+  },
   methods: {
+    getTreePath(currentNode) {
+      const tree = this.$refs.checkbox_tree2
+      // const currentNode = this.getCurrentNode()
+      const arr = [currentNode.groupName]
+      const arr2 = [currentNode.id]
+      const getName = (key) => {
+        if (key === '0') return arr.reverse().join('/')
+        const node = tree.getNode(key)
+        arr.push(node.data.groupName)
+        return getName(node.data.parentId)
+      }
+      const getId = (key) => {
+        if (key === '0') return arr2.reverse().join('/')
+        const node = tree.getNode(key)
+        arr2.push(node.data.id)
+        return getId(node.data.parentId)
+      }
+      // console.log('getId', getId(currentNode.parentId))
+      const path = `${getId(currentNode.parentId)}`
+      const pathStr = `/${getName(currentNode.parentId)}`
+      return { pathStr, path }
+    },
+
+    group_check_change(data, data2) {
+      const clickNodeKey = data.id
+      const { checkedKeys } = data2
+      const isChecked = checkedKeys.includes(clickNodeKey)
+      const tree = this.$refs.checkbox_tree2
+
+      const { path } = this.getTreePath(data)
+      const parentIdArr = path.split('/')
+      parentIdArr.pop()
+      if (isChecked) { // 选中
+        const newCheckedKeys = _.uniq([...checkedKeys, ...parentIdArr])
+        tree.setCheckedKeys(newCheckedKeys)
+      } else { // 没选中
+        const result = this.extractTree([data], 'children', ['id']).map(item => item.id)
+        const newCheckedKeys = checkedKeys.filter(key => !result.includes(key))
+        tree.setCheckedKeys(newCheckedKeys)
+      }
+    },
     handleClose() {
       this.clear()
       this.$emit('handleClose')
@@ -96,20 +148,16 @@ export default {
       this.controlGroup_default_checked_keys = []
     },
     save_rolePower() {
-      // const menu_tree_checked = this.$refs.chekbox_tree1.getCheckedKeys()
-      // const menu_tree_checked2 = this.$refs.chekbox_tree1.getHalfCheckedKeys()
-      const tree1 = this.$refs.chekbox_tree1
+      const tree1 = this.$refs.checkbox_tree1
       const menu_tree_checked = [...tree1.getCheckedKeys(), ...tree1.getHalfCheckedKeys()]
-      // console.log(menu_tree_checked)
-
       return this.$api.saveRolePower({
         powerIds: menu_tree_checked.toString(),
         roleId: this.sendData.id
       })
     },
     save_roleControlGroupPower() {
-      const tree2 = this.$refs.chekbox_tree2
-      // const controlGroup_tree_checked = this.$refs.chekbox_tree2.getCheckedKeys()
+      const tree2 = this.$refs.checkbox_tree2
+      // const controlGroup_tree_checked = this.$refs.checkbox_tree2.getCheckedKeys()
       const controlGroup_tree_checked = [...tree2.getCheckedKeys(), ...tree2.getHalfCheckedKeys()]
       return this.$api.saveRoleControlGroupPower({
         groupIds: controlGroup_tree_checked.toString(),
@@ -119,7 +167,7 @@ export default {
     async confirm({ loading }) {
       const res = []
       res.push(this.save_rolePower())
-      if (this.roleType === 2) {
+      if (this.roleType === 2 && this.$refs.checkbox_tree2) {
         res.push(this.save_roleControlGroupPower())
       }
       Promise.all(res).then(res => {
@@ -137,18 +185,6 @@ export default {
       // this.handleClose()
     },
     handleClick() {},
-    // async set_menu_tree() {
-    //   const { code, data } = await this.$api.menu_tree()
-    //   if (code === '200' && data) {
-    //     this.menu_tree_data = data
-    //   }
-    // },
-    // async set_controlGroup_tree() {
-    //   const { code, data } = await this.$api.controlGroup_tree()
-    //   if (code === '200' && data) {
-    //     this.controlGroup_tree_data = data
-    //   }
-    // },
     /**
  *
  * @param {Array} arrs 树形数据
@@ -186,14 +222,14 @@ export default {
       const { code, data } = await this.$api.getRolePower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.menu_tree_data = data
-        const result = this.extractTree(data, 'children', ['id', 'isCheck'])
+        const result = this.extractTree(data, 'children', ['id', 'isChecked'])
         this.menu_default_checked_keys = []
         result.forEach(item => {
-          if (item.isCheck) {
+          if (item.isChecked) {
             this.menu_default_checked_keys.push(item.id)
           }
         })
-        const tree1 = this.$refs.chekbox_tree1
+        const tree1 = this.$refs.checkbox_tree1
         this.$nextTick(() => {
           this.menu_default_checked_keys.forEach(key => {
             tree1.setChecked(key, true, false)
@@ -205,17 +241,14 @@ export default {
       const { code, data } = await this.$api.getRoleControlGroupPower({ roleId: this.sendData.id })
       if (code === '200' && data) {
         this.controlGroup_tree_data = data
-        const result = this.extractTree(data, 'children', ['id', 'isCheck'])
+        const result = this.extractTree(data, 'children', ['id', 'isChecked'])
         this.controlGroup_default_checked_keys = []
-        const controlGroup_default_checked_keys2 = []
         result.forEach(item => {
-          if (item.isCheck) {
+          if (item.isChecked) {
             this.controlGroup_default_checked_keys.push(item.id)
-          } else {
-            controlGroup_default_checked_keys2.push(item.id)
           }
         })
-        const tree2 = this.$refs.chekbox_tree2
+        const tree2 = this.$refs.checkbox_tree2
         this.$nextTick(() => {
           this.controlGroup_default_checked_keys.forEach(key => {
             tree2.setChecked(key, true, false)
@@ -226,9 +259,8 @@ export default {
     async open({ loading }) {
       this.roleType = this.sendData.roleType
       loading(true)
-      // await this.set_menu_tree()
       await this.getRolePower()
-      if (this.roleType === 2) {
+      if (this.roleType === 2 && this.$refs.checkbox_tree2) {
         await this.getRoleControlGroupPower()
       }
 

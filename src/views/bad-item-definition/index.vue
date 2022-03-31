@@ -4,14 +4,17 @@
       <template v-slot:btns>
         <div style="text-align: right;">
           <ki-button
+            v-permission="['badDefinition.save']"
             type="primary"
             @click="add"
           >添加</ki-button>
           <ki-button
+            v-permission="['badDefinition.update']"
             type="warning"
             @click="edit"
           >修改</ki-button>
           <ki-message-box
+            v-permission="['badDefinition.delete']"
             :next="del"
             @click="del_btn"
           >
@@ -57,7 +60,6 @@
           :request="request_data"
           :page-sizes="[20,60,100]"
           fixed-height="100%"
-          @current-change="current_change"
           @select="select_callback"
         />
       </template>
@@ -143,10 +145,6 @@ export default {
     dialog_close() {
       this.bad_item_dialog = false
     },
-    current_change(val) {
-      console.log('current_change')
-      console.log(val)
-    },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await this.$api.badDefinition_list({
         badCode: this.form.badCode || '',
@@ -158,7 +156,7 @@ export default {
       if (code === '200' && data) {
         return {
           data: data.list,
-          total: data.totalPage
+          total: data.totalCount
         }
       }
     },

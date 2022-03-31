@@ -27,16 +27,16 @@
           <el-checkbox v-model="form.rule4">R4：连续<el-input v-model="form.rule4_data1" class="rule-input" />交替上下跳动</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule5">R5：连续<el-input v-model="form.rule5_data1" class="rule-input" />点中有<el-input v-model="form.rule5_data2" class="rule-input" />点落在中心线同侧{{ form.rule5_data3 }}倍标准差以外</el-checkbox>
+          <el-checkbox v-if="!count_graph.includes(controlChartType)" v-model="form.rule5">R5：连续<el-input v-model="form.rule5_data1" class="rule-input" />点中有<el-input v-model="form.rule5_data2" class="rule-input" />点落在中心线同侧{{ form.rule5_data3 }}倍标准差以外</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule6">R6：连续<el-input v-model="form.rule6_data1" class="rule-input" />点中有<el-input v-model="form.rule6_data2" class="rule-input" />点落在中心线同侧{{ form.rule6_data3 }}倍标准差以外</el-checkbox>
+          <el-checkbox v-if="!count_graph.includes(controlChartType)" v-model="form.rule6">R6：连续<el-input v-model="form.rule6_data1" class="rule-input" />点中有<el-input v-model="form.rule6_data2" class="rule-input" />点落在中心线同侧{{ form.rule6_data3 }}倍标准差以外</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧的{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
+          <el-checkbox v-if="!count_graph.includes(controlChartType)" v-model="form.rule7">R7：连续<el-input v-model="form.rule7_data1" class="rule-input" />点落在中心线两侧的{{ form.rule7_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
         <el-form-item>
-          <el-checkbox v-if="!['p','np'].includes(controlChartType)" v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule8_data2 }}倍标准差以内</el-checkbox>
+          <el-checkbox v-if="!count_graph.includes(controlChartType)" v-model="form.rule8">R8：连续<el-input v-model="form.rule8_data1" class="rule-input" />点落在中心线两侧但未在{{ form.rule8_data2 }}倍标准差以内</el-checkbox>
         </el-form-item>
       </el-form>
     </div>
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name: 'DiscriminationRulesDialog',
   props: {
@@ -58,11 +59,16 @@ export default {
     controlChartType: {
       type: String,
       default: ''
+    },
+    formData: {
+      type: [Array, Object],
+      default: () => ({})
     }
   },
   data() {
     return {
-      form: {
+      form: {},
+      form_data: {
         rule0: false,
         rule1: false,
         rule2: false,
@@ -99,21 +105,40 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters(['commonVariable']),
+    count_graph() {
+      return this.commonVariable['count_graph']
+    }
+  },
+  created() {
+    Object.freeze(this.form_data)
+    this.form = JSON.parse(JSON.stringify(this.form_data))
+  },
   methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
     handleClose() {
       this.$refs.form.resetFields()
       this.$emit('handleClose')
     },
     set_checkboxData() {
-      const { discriminationRulesStr } = this.selectRow
+      const { discriminationRulesStr } = this.formData
       const str = discriminationRulesStr || ''
       const ruleArr = str.split(',')
       for (let index = 0; index < 9; index++) {
         this.form[`rule${index}`] = false
       }
       ruleArr.forEach(item => {
-        const ruleNum = item.split('-')[0].substring(1)
+        const ruleStrArr = item.split('-')
+        const ruleNum = ruleStrArr[0].substring(1)
         this.form[`rule${ruleNum}`] = true
+        ruleStrArr.forEach((rule, index) => {
+          if (index > 0) {
+            this.form[`rule${ruleNum}_data${index}`] = parseInt(rule)
+          }
+        })
       })
     },
     async confirm({ loading }) {
@@ -138,6 +163,7 @@ export default {
       this.set_checkboxData()
     },
     closed() {
+      this.clean()
     }
   }
 }

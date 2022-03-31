@@ -20,5 +20,11 @@ export default {
   },
   yieldRateReportExcelQuery(data) {
     return http.post('/spc/excel/yieldRateReportExcelQuery', data)
+  },
+  multipleComparisonExcelQuery(data) {
+    return http.post('/spc/excel/multipleComparisonExcelQuery', data)
+  },
+  multipleComparisonExcel(data) {
+    return http.post('/spc/excel/multipleComparisonExcel', data, 'excel')
   }
 }

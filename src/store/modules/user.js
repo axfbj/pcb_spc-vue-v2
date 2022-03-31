@@ -65,7 +65,8 @@ const actions = {
       getCurrentUserInfo().then(response => {
         const { data } = response
         if (!data) {
-          reject('Verification failed, please Login again.')
+          // reject('Verification failed, please Login again.')
+          reject('验证失败，请再尝试登录！')
         }
         const d = {
           userId: data.id,

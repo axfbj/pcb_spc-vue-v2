@@ -6,36 +6,28 @@
           <!-- <ki-button
             type="paimary"
             @click="add"
+            v-permission="['hierarchicalType.save']"
           >添加</ki-button> -->
           <ki-button
+            v-permission="['hierarchicalType.update']"
             type="primary"
             @click="edit"
           >修改</ki-button>
-          <!-- <el-reference
-            v-model="item2"
-            type="select-dialog-template"
-            style="margin:0 10px"
-          >
-            <ki-button
-              type="warning"
-              @click="keyword"
-            >备选值</ki-button>
-          </el-reference> -->
-
           <ki-button
             type="warning"
             @click="keyword_btn"
           >备选值</ki-button>
 
-          <ki-message-box
+          <!-- <ki-message-box
+            v-permission="['hierarchicalType.delete']"
             :next="del"
             @click="del_btn"
           >
-            <!-- <ki-button
+            <ki-button
               type="danger"
               style="margin-left: 10px;"
-            >删除</ki-button> -->
-          </ki-message-box>
+            >删除</ki-button>
+          </ki-message-box> -->
         </div>
       </template>
       <template v-slot:custum_content>
@@ -47,9 +39,9 @@
           :page-sizes="[20,60,100]"
           fixed-height="100%"
           :one-page-show-pagination="false"
-          @current-change="current_change"
           @select="select_callback"
         >
+          <!-- @current-change="current_change" -->
           <template v-slot:cell-template="data">
             <template v-if="data.list.template === 'enable'">
               <el-tag v-if="data.cellValue">是</el-tag>
@@ -79,7 +71,7 @@
 
 <script>
 import EditHierarchicalNameDialog from './components/edit-hierarchicalName'
-import { KeywordDialog } from '@/components/ki-reference'
+import { KeywordDialog } from './ki-reference'
 export default {
   name: 'HierarchicalTypeDefinition',
   components: {
@@ -94,7 +86,7 @@ export default {
       header_list: [
         { prop: 'id', label: '层次类型ID', width: '150' },
         { prop: 'hierarchicalName', label: '类型名称', width: '260' },
-        { prop: 'enable', label: '是否可用', width: '100', template: 'enable', align: 'center' }
+        { prop: 'enable', label: '是否可见', width: '100', template: 'enable', align: 'center' }
       ],
       select_row: {},
       tableData: []
@@ -157,10 +149,10 @@ export default {
       console.log(data)
       this.$refs.dy_table.refresh()
     },
-    current_change(val) {
-      console.log('current_change')
-      console.log(val)
-    },
+    // current_change(val) {
+    //   console.log('current_change')
+    //   console.log(val)
+    // },
     async request_data({ page_no, page_size, table_data }) {
       const { code, data } = await this.$api.hierarchicalType_list({
         page: page_no,

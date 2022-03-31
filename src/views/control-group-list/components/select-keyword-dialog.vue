@@ -259,9 +259,8 @@ export default {
 
     },
     async open({ load }) {
-      console.log('formData', this.formData)
+      // console.log('formData', this.formData)
       this.set_checkboxData()
-      // this.set_checkboxData()
     },
     closed() {
       // this.controlChartType = 'XBar-R'

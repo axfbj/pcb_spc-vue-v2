@@ -4,13 +4,19 @@
     title="不良分组"
     v-bind="$attrs"
     width="40%"
+    :permission="['badDefinitionGroup.update']"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
     @closed="closed"
   >
     <div style="padding: 10px 40px;">
-      <el-transfer v-model="value" :data="data" :props="props" />
+      <el-transfer
+        v-model="value"
+        :titles="['可选不良项目','已选不良项目']"
+        :data="data"
+        :props="props"
+      />
     </div>
   </ki-dialog>
 </template>
@@ -64,7 +70,11 @@ export default {
     },
     async confirm({ loading }) {
       const badGrupSelect = []
-      console.log('value', this.value)
+      // console.log('value', this.value)
+      if (this.value.length === 0) {
+        this.$message.warning('此控制图需要进行不良分组!')
+        return
+      }
       this.value.forEach(id => {
         const d = this.data.find(item => item.id === id)
         if (d) {
@@ -91,8 +101,6 @@ export default {
       const dels = this.hadData.filter(item => {
         return newGroup.every(i => i.badDefinitionId !== item.id)
       })
-      // console.log('newGroup', newGroup)
-      // console.log('dels', dels)
       const { code, data } = await this.$api.badDefinitionGroup_saveOrUpdateBatch({
         baDefinitionGroupDeletes: dels,
         baDefinitionGroups: newGroup

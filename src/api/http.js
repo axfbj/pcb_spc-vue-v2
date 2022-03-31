@@ -47,7 +47,7 @@ async function apiAxios(method, url, params, contentType) {
     }
     return await request(p)
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     return {
       code: 3000,
       data: false

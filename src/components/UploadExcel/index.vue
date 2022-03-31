@@ -2,9 +2,9 @@
   <div>
     <input ref="excel-upload-input" class="excel-upload-input" type="file" accept=".xlsx, .xls" @change="handleClick">
     <div class="drop" @drop="handleDrop" @dragover="handleDragover" @dragenter="handleDragover">
-      Drop excel file here or
+      拖拽Excel文件 或
       <el-button :loading="loading" style="margin-left:16px;" size="mini" type="primary" @click="handleUpload">
-        Browse
+        浏览
       </el-button>
     </div>
   </div>
@@ -12,6 +12,7 @@
 
 <script>
 import XLSX from 'xlsx'
+import { dateformat } from '@/utils/date-method'
 
 export default {
   props: {
@@ -28,6 +29,19 @@ export default {
     }
   },
   methods: {
+    getFormatDate_XLSX(serial) {
+      const utc_days = Math.floor(serial - 25569)
+      const utc_value = utc_days * 86400
+      const date_info = new Date(utc_value * 1000)
+      const fractional_day = serial - Math.floor(serial) + 0.0000001
+      let total_seconds = Math.floor(86400 * fractional_day)
+      const seconds = total_seconds % 60
+      total_seconds -= seconds
+      const hours = Math.floor(total_seconds / (60 * 60))
+      const minutes = Math.floor(total_seconds / 60) % 60
+      const d = new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate(), hours, minutes, seconds)
+      return d
+    },
     generateData({ header, results }) {
       this.excelData.header = header
       this.excelData.results = results
@@ -85,15 +99,22 @@ export default {
         reader.onload = e => {
           const data = e.target.result
           const workbook = XLSX.read(data, { type: 'array' })
-          // const workbook = XLSX.read(data, {
-          //   type: 'binary',
-          //   cellDates: true
-          // })
+
           const firstSheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[firstSheetName]
+
+          for (const key in worksheet) {
+            if (Object.hasOwnProperty.call(worksheet, key)) {
+              const item = worksheet[key]
+              if (item.t === 'n' && isNaN(item.w) && !isNaN(Date.parse(item.w))) {
+                item.t = 's'
+                item.v = dateformat(this.getFormatDate_XLSX(item.v))
+              }
+            }
+          }
+
           const header = this.getHeaderRow(worksheet)
           const results = XLSX.utils.sheet_to_json(worksheet)
-          // const results = XLSX.utils.sheet_to_json(worksheet, { raw: false })
           this.generateData({ header, results })
           this.loading = false
           resolve()

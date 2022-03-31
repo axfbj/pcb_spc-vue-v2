@@ -29,6 +29,15 @@
         <el-form-item prop="email" label="邮箱:">
           <el-input v-model="form.email" />
         </el-form-item>
+        <el-form-item prop="company" label="公司:">
+          <el-input v-model="form.company" />
+        </el-form-item>
+        <el-form-item prop="department" label="部门:">
+          <el-input v-model="form.department" />
+        </el-form-item>
+        <el-form-item prop="position" label="职位:">
+          <el-input v-model="form.position" />
+        </el-form-item>
         <el-form-item prop="mobilePhone" label="电话:">
           <el-input v-model="form.mobilePhone" />
         </el-form-item>
@@ -93,6 +102,9 @@ export default {
         'userName': '',
         'loginPassword': '',
         'email': '',
+        'company': '',
+        'department': '',
+        'position': '',
         'mobilePhone': '',
         'userStatus': 1,
         // 'id': 0,
@@ -109,22 +121,6 @@ export default {
         roleIds: [{ required: true, message: '请选择角色', trigger: 'change' }]
       },
       options: [
-        // {
-        //   value: '选项1',
-        //   label: '黄金糕'
-        // }, {
-        //   value: '选项2',
-        //   label: '双皮奶'
-        // }, {
-        //   value: '选项3',
-        //   label: '蚵仔煎'
-        // }, {
-        //   value: '选项4',
-        //   label: '龙须面'
-        // }, {
-        //   value: '选项5',
-        //   label: '北京烤鸭'
-        // }
       ]
     }
   },

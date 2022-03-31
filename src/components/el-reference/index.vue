@@ -7,8 +7,8 @@
       <div v-if="!$slots.default" class="el-select" style="width:100%;">
         <div v-if="multiple" class="el-select__tags" style="max-width: calc(100% - 32px);">
           <el-scrollbar ref="scrollbar" style="height:100%">
-            <span style="white-space:nowrap; display:inline-bloack;" @click.native="open()">
-              <el-tag v-for="(tag,index) in value" :key="tag.doccode" closable size="small" type="info" disable-transitions @close="close(index)">
+            <span style="white-space:nowrap; display:inline-block;" @click="open()">
+              <el-tag v-for="(tag,index) in value" :key="tag.doccode" style="display:inline-block;" closable size="small" type="info" disable-transitions @close="close(index)">
                 {{ render_title(tag) }}
               </el-tag>
             </span>
@@ -38,10 +38,13 @@
       </div>
 
       <!-- 模板 -->
-      <inspection-items v-if="type==='inspection-items'" :display="dialog_display && type==='inspection-items'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
-      <!-- 检测项目 -->
       <select-dialog-template v-if="type==='select-dialog-template'" :display="dialog_display && type==='select-dialog-template'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
-
+      <!-- 检测项目 -->
+      <inspection-items v-if="type==='inspection-items'" :display="dialog_display && type==='inspection-items'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
+      <!-- 选择用户 -->
+      <select-dialog-user v-if="type==='select-dialog-user'" :display="dialog_display && type==='select-dialog-user'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
+      <!-- 选择用户组 -->
+      <select-dialog-user-group v-if="type==='select-dialog-user-group'" :display="dialog_display && type==='select-dialog-user-group'" :data="transfer_data" :title="title" :extra="extra" @add-close="dialog_display= false" @add-sure="(v)=>$emit('change', v)" />
     </div>
 
   </div>
@@ -50,14 +53,17 @@
 <script>
 import SelectDialogTemplate from './select-dialog-template'
 import InspectionItems from './inspection-items'
+import SelectDialogUser from './select-dialog-user'
+import SelectDialogUserGroup from './select-dialog-user-group'
 
 export default {
   name: 'ElReference',
   components: {
     // 模板
     SelectDialogTemplate,
-    InspectionItems
-
+    InspectionItems,
+    SelectDialogUser,
+    SelectDialogUserGroup
   },
   model: {
     prop: 'value',
@@ -95,7 +101,7 @@ export default {
   data() {
     return {
       dialog_display: false,
-      tags_data: [],
+      // tags_data: [],
       options: [],
       transfer_data: Array.isArray(this.value) ? [] : {}// 用于再open事件中转数据,按钮v-if为false时watch不生效
     }
@@ -117,10 +123,17 @@ export default {
         let title = ''
         switch (!this.extra.custom_title && type) {
           case 'select-dialog-template':
-            title = item.id
+            title = `${item.id}`
             break
           case 'inspection-items':
-            title = item.id
+            // title = `${item.id}(${item.inspectionName})`
+            title = `${item.inspectionName}`
+            break
+          case 'select-dialog-user':
+            title = `${item.userName}`
+            break
+          case 'select-dialog-user-group':
+            title = `${item.groupName}`
             break
           default:
             title = typeof this.extra.custom_title === 'function' ? (this.extra.custom_title(item) || '') : (item[this.extra.custom_title] || '')
@@ -169,7 +182,7 @@ export default {
       this.$emit('before-open', this.show)
     },
     add() {
-      this.tags_data.push(new Date().getTime())
+      // this.tags_data.push(new Date().getTime())
       this.$nextTick(function() {
         const tags = this.$el.querySelector('.el-select__tags')
         const inp = this.$refs.select_input.$el.querySelector('.el-input__inner')

@@ -10,9 +10,16 @@ import inspectionRecord from './inspection-record'
 import controlChartAbnorma from './control-chart-abnorma'
 import reportSummary from './report-summary'
 import menuManagement from './menu-management'
+import emailDefinition from './email-definition'
+import controlTarget from './control-target'
 
 import user from './user'
 import role from './role'
+import dashboard from './dashboard'
+import warningUserGroup from './warning-user-group'
+import controlGroupCopy from './control-group-copy'
+import controlChartCopy from './control-chart-copy'
+import timingTask from './timing-task'
 export default {
   // login(data, token) {
   //   return http.post('/login', data, token)
@@ -34,5 +41,12 @@ export default {
   ...inspectionRecord,
   ...controlChartAbnorma,
   ...reportSummary,
-  ...menuManagement
+  ...menuManagement,
+  ...emailDefinition,
+  ...dashboard,
+  ...warningUserGroup,
+  ...controlGroupCopy,
+  ...controlTarget,
+  ...controlChartCopy,
+  ...timingTask
 }

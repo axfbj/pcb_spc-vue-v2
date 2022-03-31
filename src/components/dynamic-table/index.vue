@@ -14,7 +14,7 @@
       :max-height="!!fixedHeight && typeof(fixedHeight) === 'number' ? fixedHeight : 'none'"
       :height="!!fixedHeight ? (typeof fixedHeight === 'string' ? table_height : undefined) : table_height"
       size="mini"
-      :highlight-current-row="highlight_current_row"
+      :highlight-current-row="highlight_current_row && allowHighlight"
       :current-row-key="unique"
       :row-key="unique"
       :summary-method="summary_func"
@@ -22,18 +22,22 @@
       :cell-class-name="cell_class_name"
       border
       fit
+      :row-class-name="tableRowClassName"
       @row-click="click"
+      @row-dblclick="row_dbclick"
       @select="select"
       @select-all="select_all"
       @selection-change="selection_change"
       @sort-change="sort_change"
+      @row-contextmenu="openMenu"
+      @contextmenu.native="table_contextmenu"
     >
       <el-table-column
         v-if="multiple"
         type="selection"
         width="55"
         align="center"
-        fixed="left"
+        :fixed="checkboxFixed === 'none' ? undefined : checkboxFixed"
       />
 
       <template v-for="(list,index) in headerList">
@@ -89,18 +93,23 @@
         @current-change="pagination_current_change"
       />
     </div>
+
+    <ul v-if="rowContextmenu" v-show="visible" :style="{left:left+'px',top:top+'px'}" class="contextmenu">
+      <li v-for="item in filterMenuItems" :key="item.key" @click="menuClick({row:menu_row,menuKey: item.key})">{{ item.label }}</li>
+    </ul>
   </div>
 </template>
 
 <script>
 import table_select from '@/mixins/table-select'
 import TableColumnItem from '@/components/table-column-item'
+import row_contextmenu from './mixins/row-contextmenu'
 
 export default {
   components: {
     TableColumnItem
   },
-  mixins: [table_select],
+  mixins: [table_select, row_contextmenu],
   props: {
     treeProps: {
       type: Object,
@@ -141,6 +150,14 @@ export default {
     sortType: {
       type: String,
       default: 'server'
+    },
+    checkboxFixed: {
+      type: String,
+      default: 'left'
+    },
+    allowHighlight: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -163,6 +180,18 @@ export default {
     this.autoInit && this.refresh({ keep: true })
   },
   methods: {
+    table_contextmenu(e) {
+      // e.preventDefault()
+      return
+    },
+    get_tableData() {
+      return this.data
+    },
+    position_last() {
+      this.$nextTick(() => {
+        this.$refs.table.bodyWrapper.scrollTop = this.$refs.table.bodyWrapper.scrollHeight
+      })
+    },
     summary_func(param) {
       return this.summaryMethod(param) || this.get_summary(param)
     },
@@ -228,6 +257,10 @@ export default {
     click(row, column) {
       this.rowClickNoSelect ? this.row_click_no_select(row, column) : this.row_click(row, column)
     },
+    row_dbclick(...args) {
+      // const [row, column] = args
+      this.$emit('row-dbclick', ...args)
+    },
     row_click_no_select(...args) {
       const [row, column] = args
       if (column && column.type === 'selection') {
@@ -290,6 +323,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
 .layout-table {
   position: relative;
   top: 0;
@@ -301,13 +335,40 @@ export default {
     text-align: right;
     width: 100%;
   }
-}
-::v-deep .el-table__row {
-  .super-mini {
-    padding: 0;
-    .cell {
-      line-height: 22px;
+  .contextmenu {
+    margin: 0;
+    background: #fff;
+    z-index: 3000;
+    position: absolute;
+    list-style-type: none;
+    padding: 5px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #333;
+    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+    li {
+      margin: 0;
+      padding: 7px 16px;
+      cursor: pointer;
+      &:hover {
+        background: #eee;
+      }
     }
   }
 }
+:v-deep .el-table  {
+  .warning-row {
+    background: pink!important;
+  }
+  .el-table__row {
+    .super-mini {
+      padding: 0;
+      .cell {
+        line-height: 22px;
+      }
+    }
+  }
+}
+
 </style>

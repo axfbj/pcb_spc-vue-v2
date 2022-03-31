@@ -186,8 +186,8 @@ export default {
     confirm() {
       // this.$refs.form.validate(valid => {
       //   if (!valid) return
-      this.$emit('confirm', this.form)
-      // alert(1)
+      // this.$emit('confirm', { form: this.this.form, flag: 'chartcode_dialog' })
+      this.$emit('confirm', { filteOptions_data: this.form, flag: 'chartcode_dialog' })
       // setLoadingState(true)
       // buttonLoaing(setLoadingState(false))
       // })

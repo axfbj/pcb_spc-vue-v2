@@ -82,11 +82,11 @@ export default {
         { key: 'ppu', label: 'Ppu' },
         { key: 'ca', label: 'Ca' },
         { key: 'average', label: '平均值' },
-        { key: 'r', label: '极差值' },
-        { key: 'allSD', label: '标准差(整体)' }
+        { key: 'r', label: '极差值' }
+        // { key: 'allSD', label: '标准差(整体)' }
       ],
       checkbox_data2: [
-        { key: 'groupSD', label: '标准差(组内)' },
+        // { key: 'groupSD', label: '标准差(组内)' },
         { key: 'max', label: '最大值' },
         { key: 'min', label: '最小值' },
         { key: 'records', label: '记录数' }
@@ -110,14 +110,11 @@ export default {
     handleClose() {
       this.$emit('handleClose')
     },
-    async confirm() {
-      this.$refs.form.validate(valid => {
-        if (!valid) return
-        // alert(1)
-        // setLoadingState(true)
-        // buttonLoaing(setLoadingState(false))
-      })
-    },
+    // async confirm() {
+    //   this.$refs.form.validate(valid => {
+    //     if (!valid) return
+    //   })
+    // },
     checkAll() {
       this.checklist1 = []
       this.checklist1 = [...this.checkbox_data1.map(item => item.key)]

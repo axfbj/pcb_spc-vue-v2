@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import getters from './getters'
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
@@ -16,10 +17,20 @@ const modules = modulesFiles.keys().reduce((modules, modulePath) => {
   modules[moduleName] = value.default
   return modules
 }, {})
-
+// const PERSIST_PATHS = ['test.count.count']
+const PERSIST_PATHS2 = ['compareMultipleGraphs.rows']
 const store = new Vuex.Store({
   modules,
-  getters
+  getters,
+  plugins: [
+    // createPersistedState({
+    //   paths: PERSIST_PATHS
+    // }),
+    createPersistedState({
+      storage: window.sessionStorage,
+      paths: PERSIST_PATHS2
+    })
+  ]
 })
 
 export default store

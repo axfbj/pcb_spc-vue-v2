@@ -1,3 +1,4 @@
+import { debounce } from '@/utils'
 export default {
   model: {
     prop: 'value',
@@ -75,13 +76,15 @@ export default {
     bind_resize() {
       this.calc_height()
       this.remove_resize()
-      window.addEventListener('resize', this.calc_height, false)
+      this.$_resizeHandler = debounce(() => {
+        this.calc()
+      }, 100)
+      window.addEventListener('resize', this.$_resizeHandler, false)
     },
     remove_resize() {
-      window.removeEventListener('resize', this.calc_height, false)
+      window.removeEventListener('resize', this.$_resizeHandler, false)
     },
     calc_height() {
-      this.calc()
       setTimeout(() => {
         this.calc()
       }, 10)
@@ -104,22 +107,26 @@ export default {
         if (column && column.type === 'selection') {
           this.highlight_current_row = false
           this.$refs.table.toggleRowSelection(row)
-        } else {
           if (this.save_data) {
-            this.save_data = []
-            const not_selected = this.data.filter(item => item[this.unique] !== row[this.unique])
-            not_selected.forEach(s => this.$refs.table.toggleRowSelection(s, false))
-            this.save_data.push(row)
-          } else {
-            this.$refs.table.clearSelection()
+            this.select([], row)
           }
+        } else {
+          this.$refs.table.clearSelection()
           this.highlight_current_row = true
           this.$refs.table.toggleRowSelection(row, true)
+          if (this.save_data) {
+            this.save_data = []
+            this.save_data.push(row)
+            this.$emit('get-all-select-data', row)
+          }
         }
       } else {
         this.highlight_current_row = true
         this.$refs.table.setCurrentRow(row)
         this.$emit('select', row)
+        if (this.save_data) {
+          this.$emit('get-all-select-data', row)
+        }
       }
       this.$emit('row-click', ...args)
     },
@@ -157,7 +164,7 @@ export default {
       this.request_data()
     },
     // 请求表格数据
-    async request_data() {
+    async request_data(params) {
       this.loading = true
       let res = await this.request({
         page_no: String(this.page_no),
@@ -182,7 +189,7 @@ export default {
         this.fill_data(this.value, true)
         if (this.$refs.table) {
           if (this.multiple || !this.value || ['{}', '[]'].includes(this.value)) {
-            this.$refs.table.bodyWrapper.scrollTop = 0
+            if (params && !params.keep) this.$refs.table.bodyWrapper.scrollTop = 0
           }
           this.$refs['table'] && this.$refs['table'].doLayout() // 能重置表格的布局 必要
           this.calc()
@@ -195,10 +202,10 @@ export default {
      */
     refresh(params) {
       if (params && params.keep) {
-        this.request_data()
+        this.request_data(params)
       } else {
         this.page_no = 1
-        this.request_data()
+        this.request_data(params)
       }
     },
     // 复选框选中变化
@@ -234,46 +241,15 @@ export default {
         data = this.save_data
       }
       if (!this.multiple) {
-        data = [value]
-        if (this.save_data) {
-          data = [this.save_data]
-        }
+        data = [data]
       }
 
-      const select = this.data.filter((i) => {
-        return data.some((j) => {
-          return i[this.unique] === j[this.unique]
-        })
-      })
-      // console.log('select', select)
-      const not_selected = this.data.filter((i) => {
-        return select.every((j) => {
-          return i[this.unique] !== j[this.unique]
-        })
-      })
-      // console.log('select2', not_selected)
+      const select = this.data.filter((i) => data.some((j) => i[this.unique] === j[this.unique]))
+
       this.$nextTick(() => {
         if (this.multiple) {
-          if (select.length !== 0) {
-            if (!request) this.$refs.table && this.$refs.table.clearSelection() // 这页有被选择的项才调用清理
-            select.forEach(s => this.$refs.table.toggleRowSelection(s, true))
-          } else {
-            // TODO：临时解决方法 触发一下watch
-            // 当页一个数据也没有选择,单选会取消之前的数据
-            this.$refs.table.toggleRowSelection(this.data[0], true)
-          }
-
-          if (not_selected.length !== 0) {
-            not_selected.forEach(s => this.$refs.table.toggleRowSelection(s, false))
-          }
-          if (this.save_data) {
-            if (this.highlight_current_row) { // 在多选中点击行 但是没有点击确定
-              this.set_currentRow(-1)
-            }
-            // this.$emit('select', this.save_data) // 全手动
-          } else {
-            this.$emit('select', select)
-          }
+          this.$refs.table && this.$refs.table.clearSelection()
+          select.forEach(s => this.$refs.table.toggleRowSelection(s, true))
         } else {
           if (select.length !== 0) {
             this.set_currentRow(select[0])

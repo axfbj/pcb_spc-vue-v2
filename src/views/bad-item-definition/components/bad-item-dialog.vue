@@ -8,7 +8,6 @@
     @confirm="confirm"
     @open="open"
     @opened="opened"
-    @keypress.native.enter="confirm"
   >
     <div style="padding: 10px 20px;">
       <el-form

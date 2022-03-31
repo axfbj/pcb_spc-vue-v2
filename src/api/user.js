@@ -40,13 +40,19 @@ export function resetPwd(data) {
   return http.post(`/spc/user/resetPwd/${data.userId}`, data, 'form')
 }
 export function updatePwd(data) {
-  return http.put(`/spc/user/updatePwd/${data.userId}`, data, 'form')
+  return http.post(`/spc/user/updatePwd`, data)
 }
 export function user_add_or_update(data) {
   return http.post('/spc/user', data)
 }
 export function userDelete(data) {
   return http.post('/spc/user/delete', data)
+}
+export function user_import(data) {
+  return http.post('/spc/user/excel/import', data)
+}
+export function user_export(data) {
+  return http.post('/spc/user/excel/export', data, 'excel')
 }
 
 const user = {
@@ -55,7 +61,9 @@ const user = {
   resetPwd,
   updatePwd,
   user_add_or_update,
-  userDelete
+  userDelete,
+  user_import,
+  user_export
 }
 
 export default user

@@ -14,6 +14,7 @@
         :model="form"
         label-width="auto"
         :rules="rules"
+        @submit.native.prevent
       >
         <el-form-item
           prop="hierarchicalName"
@@ -66,7 +67,7 @@ export default {
         hierarchicalName: this.form.hierarchicalName
       })
       if (code === '200' && data) {
-        this.$store.dispatch('hierarchicalTypesDefinition/changeHtypes', this)
+        this.$store.dispatch('hierarchicalTypesDefinition/changeHtypes')
         this.$emit('confirm')
       }
       this.handleClose()

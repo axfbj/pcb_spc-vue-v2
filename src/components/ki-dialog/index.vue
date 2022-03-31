@@ -8,8 +8,9 @@
     :before-close="handleClose"
     @open="open"
     @opened="opened"
+    @close="close"
     @closed="closed"
-    @keypress.native.enter="confirm"
+    @keypress.native.enter="enter_confirm($event)"
   >
     <div v-loading="loading">
       <container-title
@@ -27,12 +28,13 @@
       slot="footer"
       class="dialog-footer"
     >
-      <el-button @click="handleClose">取 消</el-button>
+      <el-button @click="handleClose">{{ buttonText[1] }}</el-button>
       <el-button
+        v-permission="permission"
         :disabled="loading"
         type="primary"
         @click="confirm"
-      >确 定</el-button>
+      >{{ buttonText[0] }}</el-button>
     </span>
     <template v-if="!defaultFooter" slot="footer">
       <slot name="footer_custum" :setLoadingState="setLoadingState" :load="load" :loading="loading" />
@@ -62,6 +64,14 @@ export default {
     top: {
       type: String,
       default: '15vh'
+    },
+    permission: {
+      type: Array,
+      default: () => ([])
+    },
+    buttonText: {
+      type: Array,
+      default: () => (['确 定', '取 消'])
     }
   },
   data() {
@@ -88,6 +98,11 @@ export default {
       if (this.loading || !this.defaultFooter) return
       this.$emit('confirm', { loading: this.setLoadingState, load: this.load })
     },
+    enter_confirm(e) {
+      if (this.loading || !this.defaultFooter) return
+      e.target.blur()
+      this.$emit('confirm', { loading: this.setLoadingState, load: this.load })
+    },
     setLoadingState(state) {
       this.loading = state
       return this.loading
@@ -106,6 +121,9 @@ export default {
     },
     opened() {
       this.$emit('opened', { loading: this.setLoadingState, load: this.load })
+    },
+    close() {
+      this.$emit('close')
     },
     closed() {
       this.flag = ''

@@ -28,7 +28,7 @@ export default {
 }
 .app-main {
   /* 50= navbar  50  */
-  min-width: 1024px;
+  min-width: 1200px;
   min-height: calc(100vh - 50px);
   width: 100%;
   position: relative;

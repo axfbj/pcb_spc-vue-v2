@@ -33,13 +33,13 @@
         <span style="white-space:nowrap; display:inline-bloack;">
           <div style="height:24px">
             <el-tag
-              v-for="(tag,index) in save_data"
+              v-for="tag in save_data"
               :key="tag[unique]"
               closable
               size="small"
               type="info"
               disable-transitions
-              @close="close(index)"
+              @close="close(tag[unique])"
             >
               {{ tagContent ? tagContent(tag) : tag[unique] }}
             </el-tag>
@@ -139,9 +139,6 @@ export default {
   computed: {
     visible: {
       get() {
-        this.$nextTick(() => {
-          this.fill_data(this.value, false)
-        })
         return this.display
       },
       set() {
@@ -153,19 +150,11 @@ export default {
   watch: {
     display: {
       deep: true,
-      handler() {
+      handler(show) {
         this.save_data = JSON.parse(JSON.stringify(this.value))
-
-        if (this.flag === 0) {
-          this.flag++
-          this.request_data()
+        if (show) {
+          this.refresh({ keep: true })
         }
-      }
-    },
-    value: {
-      deep: true,
-      handler(selection, old_selection) {
-        this.save_all_select_row({ vm: this, selection, old_selection })
       }
     },
     save_data: {
@@ -176,98 +165,46 @@ export default {
     }
   },
   methods: {
-    row_dblclick(...args) {
-      this.$emit('row-dblclick', ...args)
-    },
-    close(index) {
-      const del_row = this.save_data[index]
-      if (del_row) {
-        const del_row_index = this.data.findIndex(item => {
-          return item[this.unique] === del_row[this.unique]
-        })
-        if (del_row_index !== -1) {
-          this.set_currentRow(-1)
-          this.$refs.table.toggleRowSelection(this.data[del_row_index], false)
-          return
-        }
+    select(selection, row) {
+      this.highlight_current_row = false
+      const index = this.save_data.findIndex(item => item[this.unique] === row[this.unique])
+      if (index > -1) {
         this.save_data.splice(index, 1)
+      } else {
+        this.save_data.push(row)
+      }
+      this.$emit('get-all-select-data', this.save_data)
+    },
+    select_all(selection) {
+      this.highlight_current_row = false
+      this.data.forEach(row => {
+        const index = this.save_data.findIndex(item => item[this.unique] === row[this.unique])
+        if (selection.length === 0) {
+          if (index > -1) this.save_data.splice(index, 1)
+        } else {
+          if (index === -1) this.save_data.push(row)
+        }
+      })
+      this.$emit('get-all-select-data', this.save_data)
+    },
+    row_dblclick(...args) {
+      if (this.save_data) {
         this.$emit('get-all-select-data', this.save_data)
       }
+      this.$emit('row-dblclick', ...args)
+    },
+    close(del_key) {
+      const del_row = this.data.find(row => row[this.unique] === del_key)
+      if (del_row) this.$refs.table.toggleRowSelection(del_row, false)
+      const del_index = this.save_data.findIndex(item => item[this.unique] === del_key)
+      this.save_data.splice(del_index, 1)
+      this.$emit('get-all-select-data', this.save_data)
     },
     update_scrollbar: debounce(({ vm }) => {
       vm.$nextTick(() => {
         vm.$refs.scrollbar && vm.$refs.scrollbar.update()
       })
     }, 20),
-    save_all_select_row: debounce(({ vm, selection, old_selection }) => {
-      // console.log('old_selection', old_selection)
-      // console.log('selection', selection)
-      // console.log('vm.save_data', vm.save_data)
-
-      if (!vm.multiple) {
-        // 单选翻页高亮的情况
-        if (selection === null || JSON.stringify(selection) === '{}') {
-          vm.save_data = { ...old_selection }
-        } else {
-          vm.save_data = { ...selection }
-        }
-        vm.$emit('get-all-select-data', vm.save_data)
-        return
-      }
-      if (vm.multiple && vm.highlight_current_row && selection.length === 1) {
-        // console.log('多选高亮')
-        // 多选高亮
-        vm.save_data = [...selection]
-        vm.$emit('get-all-select-data', vm.save_data)
-        return
-      }
-
-      if (!Array.isArray(selection) || !Array.isArray(old_selection)) return
-
-      if (selection.length >= old_selection.length) {
-        const add_data = selection.filter(item => {
-          return old_selection.every(i => {
-            return i[vm.unique] !== item[vm.unique]
-          })
-        })
-        // console.log('add_data', add_data)
-        if (add_data.length >= 1) {
-          add_data.forEach(item => {
-            const add_data_bool = vm.save_data.every(i => {
-              return item[vm.unique] !== i[vm.unique]
-            })
-            // console.log('vm.save_data', vm.save_data)
-            if (add_data_bool) {
-              vm.save_data.push(item)
-            }
-          })
-        }
-      } else {
-        const del_data = old_selection.filter(item => {
-          return selection.every(i => {
-            return i[vm.unique] !== item[vm.unique]
-          })
-        })
-        if (del_data.length >= 1) {
-          const del_data_index_arr = []
-          del_data.forEach(item => {
-            const del_data_index = vm.save_data.findIndex(i => {
-              return item[vm.unique] === i[vm.unique]
-            })
-            if (del_data_index !== -1) {
-              del_data_index_arr.push(del_data_index)
-            }
-          })
-          // console.log(del_data_index_arr)
-          del_data_index_arr.forEach(i => {
-            vm.save_data[i] = null
-          })
-          vm.save_data = vm.save_data.filter(i => i !== null)
-        }
-      }
-      vm.$emit('get-all-select-data', vm.save_data)
-    }, 20),
-
     // 重新计算表格的最大高度
     calc() {
       this.dialog_max_height = window.innerHeight / 2

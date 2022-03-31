@@ -18,13 +18,15 @@
           <el-row>
             <!-- <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span> -->
             <span style="float: right;">
-              <ki-button type="primary" @click="menu_setting_dialog_btn('add')">新建</ki-button>
+              <ki-button v-permission="['role.save']" type="primary" @click="menu_setting_dialog_btn('add')">新建</ki-button>
               <!-- <ki-button type="warning" @click="menu_setting_dialog_btn('update')">修改</ki-button> -->
               <ki-message-box
+                v-permission="['role.delete']"
                 :next="del"
                 @click="del_btn"
               >
                 <ki-button
+
                   type="danger"
                   style="margin-left: 10px;"
                 >删除</ki-button>
@@ -61,8 +63,8 @@
               </template>
               <template v-else-if="data.list.template === 'operate'">
                 <div class="operate-box">
-                  <el-link type="warning" @click="update_role_btn(data.scope)">修改</el-link>
-                  <el-link type="primary" @click="assign_permissions_btn(data.scope)">分配权限</el-link>
+                  <el-link v-permission="['role.update']" type="warning" @click="update_role_btn(data.scope)">修改</el-link>
+                  <el-link v-permission="['role.power','role.control.group.power']" type="primary" @click="assign_permissions_btn(data.scope)">分配权限</el-link>
                 </div>
               </template>
               <!-- <el-link v-else-if="data.list.template === 'link'" type="primary" @click="detail_dialog(data.scope)">{{ data.cellValue }}</el-link> -->
@@ -100,7 +102,7 @@ import AssignPermissionsDialog from './components/assign-permissions-dialog'
 // import { getRoutes, getRoles, addRole, deleteRole, updateRole } from '@/api/role'
 import { getRoles, deleteRole } from '@/api/role'
 export default {
-  name: 'Role',
+  name: 'RolePermission',
   components: {
     // MenuTree
     AddRoleDialog,
@@ -137,8 +139,7 @@ export default {
 
   methods: {
     update_role_btn({ row, column }) {
-      // this.dialog_flag = 'update'
-      // console.log(row)
+      this.dialog_flag = 'update'
       this.send_data = row
       this.update_role_dialog = true
     },

@@ -4,13 +4,13 @@
       <container-layout ref="left_tree">
         <template v-slot:btns>
           <el-row>
-            <el-col :span="8" style="text-align: left; font-size: 14px;">
+            <span style="float: left;" class="c-text">
               控制组列表
-            </el-col>
-            <el-col :span="16" style="text-align: right;">
+            </span>
+            <span style="float: right;">
               <el-button-group>
                 <ki-button v-permission="['control.group.save']" type="primary" icon="el-icon-plus" @click="tree_add" />
-                <ki-button v-permission="['control.group.update']" type="warning" icon="el-icon-edit" @click="tree_edit" />
+                <!-- <ki-button v-permission="['control.group.update']" type="warning" icon="el-icon-edit" @click="tree_edit" />
                 <ki-message-box
                   v-permission="['control.group.delete']"
                   :next="tree_del_next"
@@ -18,9 +18,9 @@
                   @click="tree_del"
                 >
                   <ki-button type="danger" icon="el-icon-delete" />
-                </ki-message-box>
+                </ki-message-box> -->
               </el-button-group>
-            </el-col>
+            </span>
           </el-row>
         </template>
         <template v-slot:custum_content>
@@ -29,6 +29,7 @@
             @node-click="node_click"
             @render-after="render_after"
             @path-change="path_change"
+            @menu-click="tree_menu_click"
           />
         </template>
       </container-layout>
@@ -37,20 +38,39 @@
       <container-layout ref="control-pic-list">
         <template v-slot:btns>
           <el-row>
-            <span style="font-size: 14px; color: #008040;">控制组路径: {{ path }}</span>
+            <span style="font-size: 14px; color: #008040;">控制组路径: {{ path.pathStr }}</span>
             <span style="float: right;">
-              <!-- v-permission="[1111]" -->
+              <!-- <ki-button
+                type="primary"
+                @click="compare_graphs_btn"
+              >多图对比</ki-button> -->
               <ki-button
                 v-permission="['badDefinitionGroup.update']"
                 type="primary"
+                icon="el-icon-s-fold"
                 @click="badGroup_btn"
               >不良分组</ki-button>
               <ki-button
-                v-permission="['control.save','control.update','control.delete']"
+                v-permission="['control.save']"
                 type="primary"
-                @click="check_setting_dialog"
-              >控制图设置</ki-button>
-              <ki-button v-permission="['control.save']" type="warning" @click="inspectionr_record_btn">单项目输入</ki-button>
+                icon="el-icon-plus"
+                @click="check_setting_dialog('add')"
+              >新增控制图</ki-button>
+              <!-- <ki-button
+                v-permission="['control.update']"
+                type="warning"
+                @click="check_setting_dialog('update')"
+              >修改控制图</ki-button> -->
+
+              <!-- 'inspectionRecord.save',
+                    'inspectionRecord.update',
+                    'inspectionRecord.delete',
+                    'excel.inspectionRecordExcel' -->
+              <!-- <ki-button
+                v-permission="['inspectionRecord.list']"
+                type="warning"
+                @click="inspectionr_record_btn"
+              >单项目输入</ki-button> -->
               <ki-message-box
                 v-permission="['control.delete']"
                 :next="del"
@@ -59,6 +79,7 @@
                 <ki-button
                   type="danger"
                   style="margin-left: 10px;"
+                  icon="el-icon-delete"
                 >删除</ki-button>
               </ki-message-box>
             </span>
@@ -66,7 +87,7 @@
 
         </template>
         <template v-slot:form>
-          <el-form-item label="日期:">
+          <el-form-item label="更新时间:">
             <el-date-picker
               v-model="form.date"
               type="datetimerange"
@@ -140,10 +161,18 @@
             :request="request_data"
             :page-sizes="[20,60,100]"
             fixed-height="100%"
+            row-contextmenu
+            :menu-items="menu_items"
+            @row-dbclick="dbclick"
             @select="select_callback"
+            @menu-click="menu_click"
           >
             <template slot="cell-template" slot-scope="data">
               <status-flag v-if="data.list.template === 'states'" :states="data.cellValue" />
+              <template v-else-if="data.list.template === 'controlLimitStatus'">
+                <el-tag v-if="data.cellValue === '解析'" type="info">{{ data.cellValue }}</el-tag>
+                <el-tag v-if="data.cellValue === '管制'" type="primary">{{ data.cellValue }}</el-tag>
+              </template>
               <template v-else-if="data.list.template === 'hierarchicalType'">
                 {{ data.cellValue || 'N/A' }}
               </template>
@@ -180,8 +209,20 @@
       :tree-path="path"
       :setting-flag="control_chart_settings_flag"
       :select-row="select_row"
+      :send-row="send_row"
       @handleClose="control_chart_settings_close"
       @confirm="control_chart_settings_confirm"
+    />
+    <!-- 批量控制图设置弹框 -->
+    <batch-control-chart-settings
+      :control-group-id="current_tree_node_key"
+      :visible="batch_chartSetting_dialog"
+      top="5vh"
+      :tree-path="path"
+      :setting-flag="batch_control_chart_settings_flag"
+      :select-row="select_row"
+      @handleClose="batch_control_chart_settings_close"
+      @confirm="batch_control_chart_settings_confirm"
     />
     <!-- 树图添加节点 -->
     <add-group-tree-dialog
@@ -198,6 +239,20 @@
       @handleClose="badGroup_close"
       @confirm="badGroup_confirm"
     />
+    <multiple-entry-dialog
+      :select-row="select_row"
+      :visible="multipleEntry_dialog"
+      @handleClose="multipleEntry_dialog_close"
+      @confirm="multipleEntry_dialog_confirm"
+    />
+    <copy-position-dialog
+      :level="level"
+      :copy-node="copy_node"
+      :current-tree-node-data="current_tree_node_data"
+      :visible="copyPosition_dialog"
+      @handleClose="copyPosition_dialog_close"
+      @confirm="copyPosition_dialog_confirm"
+    />
   </el-row>
 
 </template>
@@ -207,12 +262,19 @@ import { AllowCreateSelect } from '@/components/form-item'
 import Rectangle from './components/status-graph/rectangle'
 import RoundShape from './components/status-graph/round-shape'
 import StatusFlag from './components/status-graph/status-flag'
-
 import ControlChartSettings from './components/control-chart-settings'
+import BatchControlChartSettings from './components/batch-control-chart-settings'
 import ControlGroupTree from './components/control-group-tree'
 import AddGroupTreeDialog from './components/add-group-tree-dialog'
-import HierarchicalTypeData from './components/mixins/hierarchicalType-data'
 import BadGroupDialog from './components/bad-group-dialog'
+import HierarchicalTypeData from './mixins/hierarchicalType-data'
+import compare_graphs from './mixins/compare-multiple-graphs'
+import batch_control_chart_settings_dialog from './mixins/batch-control-chart-settings-dialog'
+import MultipleEntryDialog from './components/multiple-entry-dialog'
+import multiple_entry_dialog from './mixins/multiple-entry-dialog'
+import CopyPositionDialog from './components/copy-position-dialog'
+import copy_position_dialog from './mixins/copy-position-dialog'
+import copy_chart from './mixins/copy-chart.js'
 import { mapGetters } from 'vuex'
 export default {
   name: 'ControlGroupList',
@@ -221,18 +283,66 @@ export default {
     RoundShape,
     AllowCreateSelect,
     ControlChartSettings,
+    BatchControlChartSettings,
     ControlGroupTree,
     AddGroupTreeDialog,
     StatusFlag,
-    BadGroupDialog
+    BadGroupDialog,
+    // 多项目输入弹框
+    MultipleEntryDialog,
+    CopyPositionDialog
   },
-  mixins: [HierarchicalTypeData],
+  mixins: [HierarchicalTypeData, compare_graphs, batch_control_chart_settings_dialog, multiple_entry_dialog, copy_position_dialog, copy_chart],
   data() {
     return {
+      // count_graph: ['p', 'np', 'c', 'u'],
+      menu_items: [
+        {
+          key: '1',
+          label: '修改控制图',
+          permission: ['control.update']
+
+        },
+        {
+          key: '2',
+          label: '单项目输入',
+          permission: ['inspectionRecord.list']
+        },
+        {
+          key: '3',
+          label: '多图对比',
+          permission: ['control.comparison']
+        },
+        {
+          key: '4',
+          label: '批量修改控制图',
+          permission: ['control.update']
+
+        },
+        {
+          key: '5',
+          label: '多项目录入',
+          permission: ['inspectionRecord.save']
+        },
+        {
+          key: '6',
+          label: '复制控制图'
+        },
+        {
+          key: '7',
+          label: '粘贴控制图(包含数据)'
+        },
+        {
+          key: '8',
+          label: '粘贴控制图(不包含数据)'
+        }
+      ],
+
       badGroup_dialog: false,
       tree_flag: '',
       badGroup_flag: '',
       control_chart_settings_flag: '',
+
       // current_tree_node_key: '',
       current_tree_node_data: {},
       add_group_tree_dialog: false,
@@ -258,12 +368,13 @@ export default {
       ],
       item2: {},
       header_data: [
-        { prop: 'id', label: '控制图ID', width: '180' },
-        { prop: 'states', label: '状态', width: '80', template: 'states' },
-        { prop: 'controlChartCode', label: '编号', width: '180' },
-        { prop: 'inspectionName', label: '检测项目', width: '150' },
-        { prop: 'controlChartType', label: '图类', width: '150' },
-        { prop: 'sampleSize', label: '样本容量', width: '150' },
+        { prop: 'id', label: '控制图ID', width: '160' },
+        { prop: 'states', label: '状态', width: '60', template: 'states', align: 'center' },
+        { prop: 'controlLimitStatus', label: '控制限状态', width: '85', template: 'controlLimitStatus', align: 'center' },
+        { prop: 'controlChartCode', label: '编号', width: '140' },
+        { prop: 'inspectionName', label: '检测项目', width: '200' },
+        { prop: 'controlChartType', label: '图类', width: '80' },
+        { prop: 'sampleSize', label: '样本容量', width: '100' },
         '$1',
         // { prop: 'hierarchicalTypeValueOne', label: '产品型号', width: '150' },
         // { prop: 'hierarchicalTypeValueTwo', label: '产品名称', width: '150' },
@@ -277,7 +388,7 @@ export default {
         { prop: 'usl', label: '规格上限', width: '150' },
         { prop: 'sl', label: '目标值', width: '150' },
         { prop: 'lsl', label: '规格下限', width: '150' },
-        { prop: 'discriminationRules', label: '判异规则', width: '150' },
+        { prop: 'discriminationRules', label: '判异规则', width: '280' },
         { prop: 'userName', label: '更新用户', width: '150' },
         { prop: 'updateDate', label: '更新时间', width: '150' }
       ],
@@ -292,13 +403,14 @@ export default {
         // desc: ''
       },
       select_row: [],
+      send_row: {},
       path: ''
     }
   },
   computed: {
-    ...mapGetters(['hierarchicalTypes']),
+    ...mapGetters(['hierarchicalTypes', 'powerCodes', 'commonVariable']),
     current_tree_node_key() {
-      return this.current_tree_node_data.id
+      return this.current_tree_node_data.id || ''
     },
     header_list() {
       const inx = this.header_data.indexOf('$1')
@@ -315,13 +427,90 @@ export default {
       })
       temp_headers.splice(inx, 1, ...headers)
       return temp_headers
+    },
+    count_graph() {
+      return this.commonVariable['count_graph']
     }
   },
   created() {
     Object.freeze(this.header_data)
   },
+  activated() {
+    this.$refs.dy_table.refresh({ keep: true })
+  },
   methods: {
+    tree_menu_click({ node, menuKey }) {
+      if (menuKey === '1') { // 添加
+        this.tree_add()
+      } else if (menuKey === '2') {
+        this.tree_edit()
+      } else if (menuKey === '3') {
+        if (Object.hasOwnProperty.call(this.current_tree_node_data, 'children') && Array.isArray(this.current_tree_node_data['children']) && this.current_tree_node_data['children'].length !== 0) {
+          this.$message.warning('不能直接删除含有子节点的节点')
+          return
+        }
+        this.tree_del_next()
+      } else if (menuKey === '4') {
+        this.copy_node = node.data
+        this.$message.info('复制成功')
+      } else if (menuKey === '5') {
+        if (!Object.hasOwnProperty.call(this.copy_node, 'id')) {
+          this.$message.warning('没有复制一个控制组')
+          return
+        }
+        this.copyPosition_dialog_btn({ level: '1' })
+      } else if (menuKey === '6') {
+        if (!Object.hasOwnProperty.call(this.copy_node, 'id')) {
+          this.$message.warning('没有复制一个控制组')
+          return
+        }
+        this.copyPosition_dialog_btn({ level: '0' })
+      }
+    },
+    menu_click({ row, menuKey }) {
+      if (menuKey === '1') { // 修改控制图
+        this.check_setting_dialog('update', row)
+      } else if (menuKey === '2') { // 单项目输入
+        this.inspectionr_record_btn({ row })
+      } else if (menuKey === '3') { // 多图对比
+        this.compare_graphs_btn({ rows: this.select_row })
+      } else if (menuKey === '4') { // 批量修改
+        this.batch_setting_dialog(true)
+      } else if (menuKey === '5') { // 多项目录入
+        const has_count_graph = this.select_row.some(item => this.count_graph.includes(item.controlChartType))
+        if (has_count_graph) {
+          this.$message.warning('多项目输入只支持Xbar-R、Xbar-s、X-MR')
+          return
+        }
+        this.multipleEntry_dialog_btn(true)
+      } else if (menuKey === '6') {
+        this.copy_chart_btn()
+      } else if (['7', '8'].includes(menuKey)) {
+        if (this.copy_chart.length === 0) {
+          this.$message.warning('没有复制一个控制图')
+          return
+        }
+        this.paste_chart_btn(menuKey)
+      }
+    },
+
+    dbclick() {
+      this.inspectionr_record_btn({ row: this.select_row[0] })
+    },
     badGroup_btn() {
+      // 单项目输入跳转
+      if (this.select_row.length === 0) {
+        this.$message.warning('请选择一行数据')
+        return
+      }
+      if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+        this.$message.warning('不良分组只能选择一行')
+        return
+      }
+      if (!this.count_graph.includes(this.select_row[0].controlChartType)) {
+        this.$message.warning('只有计数型图类才需要进行不良分组!')
+        return
+      }
       this.badGroup_dialog = true
     },
     badGroup_confirm(flag) {
@@ -334,10 +523,14 @@ export default {
       this.badGroup_dialog = false
     },
     toDetils() {
+      const { controlLimitStatus, id, controlChartType } = this.select_row[0]
       this.$router.push({ path: '/statistical-process-control/control-chart-details', query: {
-        controlChartSonId: this.select_row[0].id,
-        controlChartType: this.select_row[0].controlChartType,
-        controlGroupId: this.current_tree_node_key }})
+        controlGroupId: this.current_tree_node_key,
+        controlChartSonId: id,
+        // controlChartCode: this.select_row[0].controlChartCode,
+        controlChartType,
+        controlLimitStatus: controlLimitStatus === '解析' ? '0' : '1'
+      }})
     },
     formatter_states(row) { // 格式化控制图状态
       const { historicalPointNotOutOfControl, historicalPointNotHandle, historicalPointHandle } = row
@@ -348,19 +541,19 @@ export default {
       const state2 = lastPoint.indexOf(1)
       return [String(state1), String(state2)]
     },
-    async inspectionr_record_btn() {
+    async inspectionr_record_btn({ row }) {
       // 单项目输入跳转
-      if (this.select_row.length === 0) {
-        this.$message.warning('请选择一行数据')
-      }
-      if (Array.isArray(this.select_row) && this.select_row.length > 1) {
-        this.$message.warning('查看控制图设置详情只能选择一行')
-        return
-      }
-
-      if (['p', 'np'].includes(this.select_row[0].controlChartType)) {
+      // if (this.select_row.length === 0) {
+      //   this.$message.warning('请选择一行数据')
+      //   return
+      // }
+      // if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+      //   this.$message.warning('查看控制图设置详情只能选择一行')
+      //   return
+      // }
+      if (this.count_graph.includes(row.controlChartType)) {
         // this.controlChartSonId
-        const { code, data } = await this.$api.badDefinitionGroup_info({ id: this.select_row[0].id })
+        const { code, data } = await this.$api.badDefinitionGroup_info({ id: row.id })
         if (code === '200' && data) {
           if (data.length === 0) {
             this.$confirm('此控制图需要进行不良分组', '提示', {
@@ -380,6 +573,7 @@ export default {
       }
     },
     control_chart_settings_confirm() {
+      this.send_row = {}
       this.chartSetting_dialog = false
       this.$refs.dy_table.refresh()
     },
@@ -395,16 +589,38 @@ export default {
       this.current_tree_node_data = currentData
       this.$refs.dy_table.refresh({ keep: true })
     },
-    check_setting_dialog() {
-      if (['[]', '{}'].includes(JSON.stringify(this.select_row))) {
-        this.control_chart_settings_flag = 'add'
-      } else {
-        if (Array.isArray(this.select_row) && this.select_row.length > 1) {
-          this.$message.warning('查看控制图设置详情只能选择一行')
-          return
-        }
-        this.control_chart_settings_flag = 'update'
+    check_setting_dialog(flag, row) {
+      if (row) {
+        this.send_row = row
       }
+      if (!this.current_tree_node_key) {
+        this.$message.warning('添加控制图需要选中一个节点！')
+        return
+      }
+      this.control_chart_settings_flag = flag
+      // if (this.control_chart_settings_flag === 'update') {
+      //   if (!this.$refs.dy_table.one_row_select()) return
+      //   if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+      //     this.$message.warning('查看控制图设置详情只能选择一行')
+      //     return
+      //   }
+      // }
+
+      // if (this.control_chart_settings_flag === 'add') {
+      //   if (!this.current_tree_node_key) {
+      //     this.$message.warning('请选择一个控制组')
+      //     return
+      //   }
+      // }
+      // if (['[]', '{}'].includes(JSON.stringify(this.select_row))) {
+      //   this.control_chart_settings_flag = 'add'
+      // } else {
+      //   if (Array.isArray(this.select_row) && this.select_row.length > 1) {
+      //     this.$message.warning('查看控制图设置详情只能选择一行')
+      //     return
+      //   }
+      //   this.control_chart_settings_flag = 'update'
+      // }
       this.chartSetting_dialog = true
     },
     search_btn() {
@@ -425,23 +641,37 @@ export default {
       this.tree_flag = 'edit'
       this.add_group_tree_dialog = true
     },
-    tree_del(open) {
-      if (!this.current_tree_node_data.id) {
-        this.$message.warning('请选择一个节点')
-        return
-      }
-      open()
-    },
-    async tree_del_next(flag) {
-      if (flag === 'N') {
-        this.$message('操作取消')
-        return
-      }
-      const { code, data } = await this.$api.controlGroup_delete([this.current_tree_node_key])
-      if (code === '200' && data) {
-        this.$message.success('删除成功！')
-      }
-      this.$refs.tree.refresh()
+    // tree_del(open) {
+    //   if (!this.current_tree_node_data.id) {
+    //     this.$message.warning('请选择一个节点')
+    //     return
+    //   }
+    //   console.log('this.current_tree_node_data', this.current_tree_node_data)
+    //   if (Object.hasOwnProperty.call(this.current_tree_node_data, 'children') && Array.isArray(this.current_tree_node_data['children']) && this.current_tree_node_data['children'].length !== 0) {
+    //     this.$message.warning('不能直接删除含有子节点的节点')
+    //     return
+    //   }
+
+    //   open()
+    // },
+    async tree_del_next() {
+      this.$confirm('此操作将永久删除该节点, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const { code, data } = await this.$api.controlGroup_delete([this.current_tree_node_key])
+        if (code === '200' && data) {
+          this.current_tree_node_data = {}
+          this.$message.success('删除成功！')
+          this.$refs.tree.refresh(this.$refs.tree.resetNodeData)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     tree_dialog_close() {
       this.add_group_tree_dialog = false
@@ -469,6 +699,10 @@ export default {
       }
     },
     async request_data({ page_no, page_size, table_data }) {
+      if (!this.current_tree_node_key) {
+        // this.$message.warning('请点击选择一个控制组!,若没有请添加控制组!')
+        return
+      }
       const { controlChartCode,
         controlChartType,
         inspectionItemsId,
@@ -499,7 +733,7 @@ export default {
         hierarchicalTypeValueEight,
         hierarchicalTypeValueNine,
         'limit': page_size,
-        'order': 'asc',
+        // 'order': 'asc',
         'page': page_no,
         // 'sidx': '',
         'thisMonthStart': this.form.date ? (this.form.date[0] || '') : '',
@@ -529,10 +763,13 @@ export default {
   align-items: center;
   font-size: 12px;
   padding-bottom: 2px;
-  // span {
-  // &+span {
-  //   margin-left: 10px;
-  // }
-  // }
 }
+
+@media screen and (max-width: 1200px) {
+    .c-text {
+        // display: none;
+        font-size: 14px;
+    }
+}
+
 </style>

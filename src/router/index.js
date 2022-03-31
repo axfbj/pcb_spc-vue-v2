@@ -73,25 +73,40 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/statistical-process-control/control-group-list',
+    redirect: '/dashboard',
     children: [
       {
         path: 'dashboard',
-        component: () => import('@/views/control-group-list/index'),
-        // name: 'ControlGroupList',
-        meta: {
-          title: '控制组列表'
-        },
-        hidden: true
+        component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard',
+        meta: { title: '首页', icon: 'dashboard', affix: true }
+      },
+      {
+        path: 'compare-multiple-graphs',
+        name: 'CompareMultipleGraphs',
+        component: () => import('@/views/compare-multiple-graphs/index'),
+        hidden: true,
+        meta: { title: '多图对比', icon: 'example' }
       }
-      // {
-      //   path: 'dashboard',
-      //   component: () => import('@/views/dashboard/index'),
-      //   name: 'Dashboard',
-      //   meta: { title: '首页', icon: 'dashboard', affix: true }
-      // }
     ]
   },
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/statistical-process-control/control-group-list',
+  //   children: [
+  //     {
+  //       path: 'dashboard',
+  //       component: () => import('@/views/control-group-list/index'),
+  //       // name: 'ControlGroupList',
+  //       meta: {
+  //         title: '控制组列表'
+  //       },
+  //       hidden: true
+  //     }
+
+  //   ]
+  // },
   {
     path: '/components',
     component: Layout,
@@ -102,7 +117,7 @@ export const constantRoutes = [
     children: [
       {
         path: 'dnamic-table-demo',
-        name: 'dnamicTableDemo',
+        name: 'DnamicTableDemo',
         component: () => import('@/components/container-layout/dnamic-table-demo'),
         meta: { title: '动态表格', icon: 'example' }
       },
@@ -112,47 +127,27 @@ export const constantRoutes = [
         component: () => import('@/components/container-layout/test'),
         meta: { title: '布局1', icon: 'example' }
       }
+      // {
+      //   path: 'compare-multiple-graphs',
+      //   name: 'CompareMultipleGraphs',
+      //   component: () => import('@/views/compare-multiple-graphs/index'),
+      //   meta: { title: '多图对比', icon: 'example' }
+      // }
+      // {
+      //   path: 'user-group-management',
+      //   name: 'UserGroupManagement',
+      //   component: () => import('@/views/user-group-management/index'),
+      //   meta: { title: '预警用户组', icon: 'example' }
+      // }
+      // {
+      //   path: 'email-definition',
+      //   name: 'EmailDefinition',
+      //   component: () => import('@/views/email-definition/index'),
+      //   meta: { title: '邮件定义', icon: 'example' }
+      // }
     ]
   }
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/documentation/index'),
-  //       name: 'Documentation',
-  //       meta: { title: 'documentation', icon: 'documentation', affix: true }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/guide',
-  //   component: Layout,
-  //   redirect: '/guide/index',
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/guide/index'),
-  //       name: 'Guide',
-  //       meta: { title: 'guide', icon: 'guide', noCache: true }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/profile',
-  //   component: Layout,
-  //   redirect: '/profile/index',
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       component: () => import('@/views/profile/index'),
-  //       name: 'Profile',
-  //       meta: { title: 'profile', icon: 'user', noCache: true }
-  //     }
-  //   ]
-  // }
+
 ]
 
 /**
@@ -195,8 +190,8 @@ export const asyncRoutes = [
         component: () => import('@/views/menu-management/index'),
         name: 'MenuManagement',
         meta: {
-          title: '菜单管理',
-          roles: ['admin']
+          title: '菜单管理'
+          // roles: ['admin']
         }
       },
       {
@@ -204,8 +199,8 @@ export const asyncRoutes = [
         component: () => import('@/views/role-permission/index'),
         name: 'RolePermission',
         meta: {
-          title: '角色权限',
-          roles: ['admin']
+          title: '角色权限'
+          // roles: ['admin']
         }
       },
       {
@@ -213,8 +208,8 @@ export const asyncRoutes = [
         component: () => import('@/views/user-management/index'),
         name: 'UserManagement',
         meta: {
-          title: '用户管理',
-          roles: ['admin']
+          title: '用户管理'
+          // roles: ['admin']
         }
       }
     ]

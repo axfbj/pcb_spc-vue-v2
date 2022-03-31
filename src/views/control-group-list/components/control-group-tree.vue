@@ -7,8 +7,12 @@
     node-key="id"
     :default-expanded-keys="defaultExpandedKeys"
     :current-key="currentKey"
+    :menu-items="tree_menu_items"
+    tree-contextmenu
     @node-click="node_click"
     @path-change="path_change"
+    @open-menu="openMenu"
+    @menu-click="tree_menu_click"
   />
   <!-- :default-expand-all="true" -->
   <!-- :current-node-key="'1460868489119117313'" -->
@@ -32,7 +36,40 @@ export default {
       defaultProps: {
         label: 'groupName',
         children: 'children'
-      }
+      },
+      tree_menu_items: [
+        {
+          key: '1',
+          label: '添加',
+          permission: ['control.group.save']
+        },
+        {
+          key: '2',
+          label: '修改',
+          permission: ['control.group.update']
+
+        },
+        {
+          key: '3',
+          label: '删除',
+          permission: ['control.group.delete']
+        },
+        {
+          key: '4',
+          label: '复制控制组',
+          permission: ['control.group.copy.no.chart', 'control.group.copy.chart', 'control.group.copy.chartAndData']
+        },
+        {
+          key: '5',
+          label: '粘贴(到子级)',
+          permission: ['control.group.copy.no.chart', 'control.group.copy.chart', 'control.group.copy.chartAndData']
+        },
+        {
+          key: '6',
+          label: '粘贴(到同级)',
+          permission: ['control.group.copy.no.chart', 'control.group.copy.chart', 'control.group.copy.chartAndData']
+        }
+      ]
     }
   },
   computed: {
@@ -41,16 +78,34 @@ export default {
     }
   },
   async created() {
-    this.refresh((data) => {
+    this.refresh(this.setfirstNode)
+  },
+  methods: {
+    openMenu({ data, node }) {
+      this.current_tree_node = data
+      // this.defaultExpandedKeys.push(data.id)
+      // if (!this.defaultExpandedKeys.includes(data.id)) {
+      //   this.defaultExpandedKeys.push(data.id)
+      // }
+      this.$refs.tree.setCurrentKey(data.id)
+      this.node_click(data, node)
+    },
+    tree_menu_click({ node, menuKey }) {
+      this.$emit('menu-click', { node, menuKey })
+    },
+    setfirstNode(data) {
       if (data && data.length > 0) {
         this.defaultExpandedKeys.push(data[0].id)
         this.$refs.tree.setCurrentKey(data[0].id)
         this.current_tree_node = data[0]
         this.$emit('render-after', data[0])
       }
-    })
-  },
-  methods: {
+    },
+    resetNodeData() {
+      this.$refs.tree.setCurrentKey(null)
+      this.current_tree_node = {}
+      this.$emit('render-after', this.current_tree_node)
+    },
     path_change(path) {
       this.$emit('path-change', path)
     },

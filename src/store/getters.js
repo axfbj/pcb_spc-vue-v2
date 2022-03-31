@@ -7,12 +7,14 @@ const getters = {
   token: state => state.user.token,
   avatar: state => state.user.avatar,
   userId: state => state.user.userId,
-  name: state => state.user.name,
+  username: state => state.user.name,
   introduction: state => state.user.introduction,
   roles: state => state.user.roles,
   powerCodes: state => state.permission.powerCodes,
   permission_routes: state => state.permission.routes,
   errorLogs: state => state.errorLog.logs,
-  hierarchicalTypes: state => state.hierarchicalTypesDefinition.hierarchicalTypes
+  hierarchicalTypes: state => state.hierarchicalTypesDefinition.hierarchicalTypes,
+  abnormalMessage: state => state.abnormalMessage.abnormalMessage,
+  commonVariable: state => state.commonVariable
 }
 export default getters

@@ -6,22 +6,17 @@
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-        <search id="header-search" class="right-menu-item" />
 
-        <error-log class="errLog-container right-menu-item hover-effect" />
-
+        <search id="header-search" class="right-menu-item " />
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
-
-        <!-- <el-tooltip content="Global Size" effect="dark" placement="bottom">
-          <size-select id="size-select" class="right-menu-item hover-effect" />
-        </el-tooltip> -->
+        <tips id="Tips" class="right-menu-item hover-effect" />
 
       </template>
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
 
         <div class="avatar-wrapper">
-          {{ name }}
+          {{ username }}
           <!-- <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar"> -->
           <!-- <img :src="'http://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" class="user-avatar"> -->
           <i class="el-icon-caret-bottom" />
@@ -39,12 +34,22 @@
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a> -->
+          <el-dropdown-item v-permission="['user.update.pwd']" divided @click.native="update_pwd">
+            <span style="display:block;">修改密码</span>
+          </el-dropdown-item>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">退出登录</span>
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
+    <update-pwd-dialog
+      :visible="update_pwd_dialog"
+      @handleClose="update_pwd_dialog_close"
+      @confirm="update_pwd_dialog_confirm"
+    />
+
   </div>
 </template>
 
@@ -52,35 +57,62 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
+// import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
+import Tips from '@/components/Tips'
 // import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
+import UpdatePwdDialog from './update-pwd-dialog'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger,
-    ErrorLog,
+    // ErrorLog,
     Screenfull,
     // SizeSelect,
-    Search
+    Search,
+    UpdatePwdDialog,
+    Tips
+  },
+  data() {
+    return {
+      update_pwd_dialog: false
+    }
   },
   computed: {
     ...mapGetters([
-      'name',
+      'username',
       'sidebar',
       'avatar',
       'device'
     ])
   },
+
   methods: {
+    update_pwd() {
+      this.update_pwd_dialog = true
+    },
+    update_pwd_dialog_close() {
+      this.update_pwd_dialog = false
+    },
+    async update_pwd_dialog_confirm() {
+      this.update_pwd_dialog = false
+      setTimeout(() => {
+        this.$store.dispatch('user/resetToken').then(() => {
+          setTimeout(async() => {
+            location.reload('/login')
+          }, 1000)
+        })
+      }, 1500)
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
       await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      // this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      this.$router.push(`/login`)
     }
   }
 }

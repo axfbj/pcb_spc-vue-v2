@@ -94,6 +94,12 @@
   background-color: #ffe48d !important;
 }
 
+// // 颜色会留下的bug 不知道怎么导致的
+.el-table tbody tr > td {
+  background-color: #fff !important;
+}
+
+
 
 .el-table .cell {
   line-height: 21px;
@@ -129,6 +135,30 @@
 
 .el-input-number .el-input__inner {
   text-align: left;
+}
+
+.el-table .primary-row {
+  background: #bcd0ed;
+}
+
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
+}
+.el-table .danger-row {
+  background: #F56C6C;
+}
+
+
+.el-table tbody tr.right-click-row-color > td  {
+  background-color:  oldlace !important;
+}
+
+.el-table tbody tr.right-click-row-color:hover > td {
+  background-color:  oldlace !important;
 }
 
 

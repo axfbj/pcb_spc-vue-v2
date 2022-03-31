@@ -134,14 +134,15 @@
                   <div style="height: 24px;">
                     <span style="white-space:nowrap; display:inline-bloack;">
                       <el-tag
-                        v-if="userGroup_select.id"
+                        v-for="(group,index) in userGroup_select"
+                        :key="group.id"
                         type="primary"
                         disable-transitions
                         style="margin-right: 5px;"
                         closable
-                        @close="userGroup_tag_close"
+                        @close="userGroup_tag_close(index)"
                       >
-                        {{ userGroup_select.groupName }}
+                        {{ group.groupName }}
                       </el-tag>
                       <!-- <el-tag
                         v-for="userGroup in userGroup_select"

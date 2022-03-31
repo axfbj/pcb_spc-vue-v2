@@ -75,6 +75,9 @@ export default {
     this.form = JSON.parse(JSON.stringify(this.form_data))
   },
   methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
     input_change() {
       console.log('this.result', this.result)
       if (this.result) this.$emit('get-result', { type: 'minute', result: this.result })

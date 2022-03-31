@@ -3,27 +3,26 @@
     <el-form>
 
       <el-form-item>
-        <el-radio-group v-model="form.radio">
-          <el-radio :label="3">每月 允许的通配符[, - * /]</el-radio>
-          <el-radio :label="4">不指定</el-radio>
-          <el-radio :label="6">
+        <el-radio-group v-model="form.radio" @change="radio_change">
+          <el-radio :label="1">每月 允许的通配符[, - * /]</el-radio>
+          <el-radio :label="2">不指定</el-radio>
+          <el-radio :label="3">
             <span class="custum-label">周期从</span>
-            <el-input v-model="form.input1" placeholder="" style="width: 200px;" />
-            <el-input v-model="form.input2" placeholder="" style="width: 200px;" />
+            <el-input-number v-model="form.input1" style="width: 200px;" :controls="false" :min="1" :max="11" @change="input_change" />
+            <span class="custum-label" style="width: 90px; text-align: center;">-</span>
+            <el-input-number v-model="form.input2" style="width: 200px;" :controls="false" :min="2" :max="12" @change="input_change" />
             月
           </el-radio>
-          <el-radio :label="9">
-            <el-input v-model="form.input3" placeholder="" style="width: 300px;">
-              <template slot="prepend">从</template>
-              <template slot="append">月开始，每</template>
-            </el-input>
-            <el-input v-model="form.input4" placeholder="" style="width: 300px;">
-              <template slot="append">月执行一次</template>
-            </el-input>
+          <el-radio :label="4">
+            <span class="custum-label">从</span>
+            <el-input-number v-model="form.input3" style="width: 200px;" :controls="false" :min="1" :max="12" @change="input_change" />
+            <span class="custum-label" style="width: 80px;">&nbsp;月开始，每</span>
+            <el-input-number v-model="form.input4" style="width: 200px;" :controls="false" :min="1" :max="12" @change="input_change" />
+            月执行一次
           </el-radio>
-          <el-radio :label="10">指定
+          <el-radio :label="5">指定
             <br>
-            <el-checkbox-group v-model="form.checkList" style="margin-left: 20px;">
+            <el-checkbox-group v-model="form.checkList" style="margin-left: 20px;" @change="input_change">
               <el-checkbox v-for="index of 12" :key="index" :label="index">
                 <template v-if="index < 10">
                   {{ index }}<span style="visibility:hidden;">0</span>
@@ -46,19 +45,48 @@ export default {
   data() {
     return {
       form_data: {
-        radio: 3,
-        input1: '',
-        input2: '',
-        input3: '',
-        input4: '',
+        radio: 1,
+        input1: undefined,
+        input2: undefined,
+        input3: undefined,
+        input4: undefined,
         checkList: []
       },
       form: {}
     }
   },
+  computed: {
+    result() {
+      const { radio, input1, input2, input3, input4, checkList } = this.form
+      let result = ''
+      if (radio === 1) {
+        result = '*'
+      } else if (radio === 2) {
+        result = '?'
+      } else if (radio === 3) {
+        if (typeof input1 === 'number' && typeof input2 === 'number') result = `${input1}-${input2}`
+      } else if (radio === 4) {
+        if (typeof input3 === 'number' && typeof input4 === 'number') result = `${input3}/${input4}`
+      } else if (radio === 5) {
+        if (checkList.length > 0) result = checkList.toString()
+      }
+      return result
+    }
+  },
   created() {
     Object.freeze(this.form_data)
     this.form = JSON.parse(JSON.stringify(this.form_data))
+  },
+  methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
+    input_change() {
+      if (this.result) this.$emit('get-result', { type: 'month', result: this.result })
+    },
+    radio_change() {
+      if (this.result) this.$emit('get-result', { type: 'month', result: this.result })
+    }
   }
 }
 </script>
@@ -71,7 +99,8 @@ export default {
         margin-right: 0;
         margin: 10px 0;
     }
-    .ipt-item {
-      width: 300px;
+   .custum-label {
+      display: inline-block;
+      width: 50px;
     }
 </style>

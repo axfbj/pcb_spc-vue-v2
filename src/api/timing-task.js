@@ -18,7 +18,7 @@ export default {
   timingTask_start(data) {
     return http.post(`/spc/timing/task/start/${data.id}`, data, 'form')
   },
-  timingTask_end(data) {
+  timingTask_stop(data) {
     return http.post(`/spc/timing/task/stop/${data.id}`, data, 'form')
   }
 }

@@ -39,9 +39,10 @@
 </template>
 
 <script>
-import add_task_dialog from '../mixins/radio-group-change'
+// import add_task_dialog from '../mixins/radio-group-change'
+// this.$emit('confirm')
 export default {
-  mixins: [add_task_dialog],
+
   data() {
     return {
       form_data: {
@@ -76,6 +77,9 @@ export default {
     this.form = JSON.parse(JSON.stringify(this.form_data))
   },
   methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
     input_change() {
       if (this.result) this.$emit('get-result', { type: 'second', result: this.result })
     },

@@ -3,35 +3,14 @@
     v-bind="$attrs"
     :visible="visible"
     title="定时任务"
-    width="30%"
+    width="34%"
     @handleClose="handleClose"
     @confirm="confirm"
     @open="open"
     @closed="closed"
   >
     <div style="padding: 10px 40px;">
-      <el-form ref="form" :model="form" :rules="rules" label-width="100px">
-        <!-- <el-form-item label="月份:" label-width="100px" prop="month">
-          <el-date-picker
-            v-model="form.month"
-            type="month"
-            placeholder="选择月份"
-            style="width: 100%;"
-            @change="month_change"
-          />
-        </el-form-item>
-        <el-form-item
-          prop="targetValue"
-          label-width="100px"
-          label="目标值(%):"
-        >
-          <el-input-number
-            v-model="form.targetValue"
-            :controls="false"
-            style="width: 100%;"
-          />
-        </el-form-item> -->
-
+      <el-form ref="form" :model="form" :rules="rules" label-width="110px">
         <el-form-item
           prop="taskCode"
           label="任务编码:"
@@ -61,7 +40,7 @@
             :controls="false"
             style="width: 80%;"
           />
-          <ki-button type="warning" style="margin-left: 10px;" @click="setting_target_dialog_btn">设置</ki-button>
+          <ki-button type="warning" style="margin-left: 10px;" @click="setting_cron_dialog_btn">设置</ki-button>
         </el-form-item>
 
         <el-form-item label="状态" prop="taskStatus">
@@ -72,24 +51,25 @@
         </el-form-item>
       </el-form>
     </div>
-    <setting-task-dialog
-      :visible="setting_target_dialog"
-      @handleClose="setting_target_dialog_close"
-      @confirm="setting_target_dialog_confirm"
+    <setting-cron-dialog
+      :visible="setting_cron_dialog"
+      @handleClose="setting_cron_dialog_close"
+      @confirm="setting_cron_dialog_confirm"
     />
   </ki-dialog>
 </template>
 
 <script>
+import { dateformat } from '@/utils/date-method'
 import { mapGetters } from 'vuex'
-import settingTaskDialog from './components/add-task-dialog'
-import setting_task_dialog from './mixins/add-task-dialog'
+import settingCronDialog from './components/setting-cron-dialog'
+import setting_cron_dialog from './mixins/setting-cron-dialog'
 export default {
   name: 'AddTaskDialog',
   components: {
-    settingTaskDialog
+    settingCronDialog
   },
-  mixins: [setting_task_dialog],
+  mixins: [setting_cron_dialog],
   props: {
     visible: {
       type: Boolean,
@@ -113,8 +93,9 @@ export default {
         'taskUpdateTime': ''
       },
       rules: {
-        'month': [{ required: true, message: '请选择月份', trigger: 'change' }],
-        'targetValue': [{ required: true, message: '请输入目标值', trigger: 'change' }]
+        'taskCode': [{ required: true, message: '请输入编码', trigger: 'change' }],
+        'taskName': [{ required: true, message: '请输入名称', trigger: 'change' }],
+        'taskCron': [{ required: true, message: '请输入Cron 表达式', trigger: 'change' }]
       }
     }
   },
@@ -156,42 +137,38 @@ export default {
       })
     },
     async add(loading) {
-      // const { code, data } = await this.$api.control_target_save({
-      //   targetYear: this.targetYear,
-      //   targetMonth: this.targetMonth,
-      //   targetValue: this.form.targetValue
-      // })
-      // if (code === '200' && data) {
-      //   this.$emit('confirm')
-      // }
-      // loading(false)
+      const { code, data } = await this.$api.timingTask_save({
+        ...this.form,
+        'taskUpdateTime': dateformat(new Date())
+      })
+      if (code === '200' && data) {
+        this.$emit('confirm')
+      }
+      loading(false)
     },
     async update(loading) {
-      // const { code, data } = await this.$api.control_target_update({
-      //   ...this.form,
-      //   targetYear: this.targetYear,
-      //   targetMonth: this.targetMonth,
-      //   targetValue: this.form.targetValue
-      // })
-      // if (code === '200' && data) {
-      //   this.$emit('confirm')
-      // }
-      // loading(false)
+      const { code, data } = await this.$api.control_target_update({
+        ...this.form,
+        'taskUpdateTime': dateformat(new Date())
+      })
+      if (code === '200' && data) {
+        this.$emit('confirm')
+      }
+      loading(false)
     },
     async open({ load }) {
-      // this.flag = this.$attrs.flag
-      // if (this.flag !== 'update') return
-      // const { code, data } = await load(() => this.$api.control_target_info({
-      //   id: this.selectRow.id
-      // }))
+      this.flag = this.$attrs.flag
+      // alert(this.flag)
+      if (this.flag !== 'update') return
+      const { code, data } = await load(() => this.$api.timingTask_info({
+        id: this.selectRow.id
+      }))
 
-      // if (code === '200' && data) {
-      //   const { targetYear, targetMonth } = data
-      //   this.form = {
-      //     ...data,
-      //     month: new Date(`${targetYear}-${targetMonth}`)
-      //   }
-      // }
+      if (code === '200' && data) {
+        this.form = {
+          ...data
+        }
+      }
     },
     closed() {
       this.clean()

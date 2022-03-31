@@ -75,6 +75,9 @@ export default {
     this.form = JSON.parse(JSON.stringify(this.form_data))
   },
   methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
     input_change() {
       if (this.result) this.$emit('get-result', { type: 'hour', result: this.result })
     },

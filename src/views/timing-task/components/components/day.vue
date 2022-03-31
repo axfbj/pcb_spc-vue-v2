@@ -3,35 +3,31 @@
     <el-form>
 
       <el-form-item>
-        <el-radio-group v-model="form.radio">
+        <el-radio-group v-model="form.radio" @change="radio_change">
           <el-radio :label="1">每日 允许的通配符[, - * /]</el-radio>
           <el-radio :label="2">不指定</el-radio>
           <el-radio :label="3">
             <span class="custum-label">周期从</span>
-            <el-input v-model="form.input1" placeholder="" style="width: 300px;" />
-            <template slot="append">-</template>
-            <el-input v-model="form.input2" placeholder="" style="width: 300px; border-left-width: 0;">
-              <template slot="append">日</template>
-            </el-input>
+            <el-input-number v-model="form.input1" style="width: 200px;" :controls="false" :min="1" :max="30" @change="input_change" />
+            <span class="custum-label" style="width: 80px; text-align: center;">-</span>
+            <el-input-number v-model="form.input2" style="width: 200px;" :controls="false" :min="2" :max="31" @change="input_change" />
+            日
           </el-radio>
           <el-radio :label="4">
-            <el-input v-model="form.input3" placeholder="" style="width: 300px;">
-              <template slot="prepend">从</template>
-              <template slot="append">日开始，每</template>
-            </el-input>
-            <el-input v-model="form.input4" placeholder="" style="width: 300px;">
-              <template slot="append">日执行一次</template>
-            </el-input>
+            <span class="custum-label">从</span>
+            <el-input-number v-model="form.input3" style="width: 200px;" :controls="false" :min="1" :max="31" @change="input_change" />
+            <span class="custum-label" style="width: 80px;">&nbsp;日开始，每</span>
+            <el-input-number v-model="form.input4" style="width: 200px;" :controls="false" :min="1" :max="31" @change="input_change" />
+            日执行一次
           </el-radio>
           <el-radio :label="5">
-            <el-input v-model="form.input5" placeholder="" style="width: 600px;">
-              <template slot="prepend">每月</template>
-              <template slot="append">号最近的那个工作日</template>
-            </el-input>
+            <span class="custum-label">每月</span>
+            <el-input-number v-model="form.input5" style="width: 200px;" :controls="false" :min="1" :max="31" @change="input_change" />
+            号最近的那个工作日
           </el-radio>
           <el-radio :label="6">指定
             <br>
-            <el-checkbox-group v-model="form.checkList" style="margin-left: 20px;">
+            <el-checkbox-group v-model="form.checkList" style="margin-left: 20px;" @change="input_change">
               <el-checkbox v-for="index of 31" :key="index" :label="index">
                 <template v-if="index < 10">
                   {{ index }}<span style="visibility:hidden;">0</span>
@@ -55,20 +51,53 @@ export default {
   data() {
     return {
       form_data: {
-        radio: 3,
-        input1: '',
-        input2: '',
-        input3: '',
-        input4: '',
-        input5: '',
+        radio: 1,
+        input1: undefined,
+        input2: undefined,
+        input3: undefined,
+        input4: undefined,
+        input5: undefined,
         checkList: []
       },
       form: {}
     }
   },
+  computed: {
+    result() {
+      const { radio, input1, input2, input3, input4, input5, checkList } = this.form
+      let result = ''
+      if (radio === 1) {
+        result = '*'
+      } else if (radio === 2) {
+        result = '?'
+      } else if (radio === 3) {
+        if (typeof input1 === 'number' && typeof input2 === 'number') result = `${input1}-${input2}`
+      } else if (radio === 4) {
+        if (typeof input3 === 'number' && typeof input4 === 'number') result = `${input3}/${input4}`
+      } else if (radio === 5) {
+        if (typeof input5 === 'number') result = `${input5}W`
+      } else if (radio === 6) {
+        result = 'L'
+      } else if (radio === 7) {
+        if (checkList.length > 0) result = checkList.toString()
+      }
+      return result
+    }
+  },
   created() {
     Object.freeze(this.form_data)
     this.form = JSON.parse(JSON.stringify(this.form_data))
+  },
+  methods: {
+    clean() {
+      this.form = JSON.parse(JSON.stringify(this.form_data))
+    },
+    input_change() {
+      if (this.result) this.$emit('get-result', { type: 'day', result: this.result })
+    },
+    radio_change() {
+      if (this.result) this.$emit('get-result', { type: 'day', result: this.result })
+    }
   }
 }
 </script>

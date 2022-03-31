@@ -56,7 +56,7 @@
         :page-sizes="[20,60,100]"
         fixed-height="100%"
       >
-        <template slot="cell-template" slot-scope="data">
+        <template v-slot:cell-template="data">
           <template v-if="data.list.template === 'states'">
             <el-tag v-if="data.cellValue === 0" type="warning">关闭</el-tag>
             <el-tag v-else-if="data.cellValue === 1" type="success">开启</el-tag>
@@ -98,7 +98,7 @@ export default {
     }
   },
   methods: {
-    async request_data({ page_no, page_size, table_data }) {
+    async request_data({ page_no, page_size }) {
       const params = {
         'limit': page_size,
         'page': page_no
